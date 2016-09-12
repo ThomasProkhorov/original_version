@@ -1,0 +1,66 @@
+﻿@model string
+<div class="video_gallery">
+@{
+    if (Model!= null && Model.Contains('\n'))
+    {
+        <div class="video_gallery_images">
+        @foreach (string item in Model.Split('\n'))
+        {
+            string YoutubePic = "";
+            string YoutubeTitle = "";
+            string YoutubeId = item.Trim();
+
+            if (YoutubeId.Contains("http://www.youtube.com/watch?v="))
+            {
+                YoutubeId = YoutubeId.Replace("http://www.youtube.com/watch?v=", "");
+                if (YoutubeId.Contains("&")) { YoutubeId = YoutubeId.Remove(YoutubeId.IndexOf("&")); }
+                YoutubePic = "http://img.youtube.com/vi/" + YoutubeId + "/1.jpg";
+            }
+            <text>
+            <img id="@YoutubeId" src="@YoutubePic" alt="@YoutubeTitle" class="video_gallery_image" />
+            </text>
+        }
+        </div><div class="video_gallery_main"></div>
+    }
+    else if (Model!= null)
+    {
+        <div class="video_gallery_images">
+        @{
+            string YoutubePic = "";
+            string YoutubeTitle = "";
+            string YoutubeId = Model.Trim();
+
+            if (YoutubeId.Contains("http://www.youtube.com/watch?v="))
+            {
+                YoutubeId = YoutubeId.Replace("http://www.youtube.com/watch?v=", "");
+                if (YoutubeId.Contains("&")) { YoutubeId = YoutubeId.Remove(YoutubeId.IndexOf("&")); }
+                YoutubePic = "http://img.youtube.com/vi/" + YoutubeId + "/1.jpg";
+            }
+            <text>
+            <img id="@YoutubeId" src="@YoutubePic" alt="@YoutubeTitle" class="video_gallery_image" />
+            </text>
+        }
+        </div><div class="video_gallery_main"></div>
+    }
+ }
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            var $first = $('.video_gallery_images img:first');
+            $first.addClass('active');
+            var id = $first.attr("id");
+            $(".video_gallery_main").html("<object width='750' height='450'><param name='movie' value='http://www.youtube.com/v/" + id + "?fs=1&amp;hl=iw_IL&amp;rel=0&amp;autoplay=1'></param><param name='allowFullScreen' value='true'></param><param name='allowscriptaccess' value='always'></param><embed src='http://www.youtube.com/v/" + id + "?fs=1&amp;hl=iw_IL&amp;rel=0&amp;autoplay=0' type='application/x-shockwave-flash' allowscriptaccess='always' allowfullscreen='true' width='750' height='450'></embed></object>");
+            $(".video_gallery_images  img").live("click", function () {
+                var itemid = $(this).attr("id");
+                $(".video_gallery_main").stop();
+                $('.video_gallery_images img').removeClass('active');
+                $(this).addClass('active');
+                var id = $(this).attr("id");
+                $(".video_gallery_main").html("<object width='750' height='450'><param name='movie' value='http://www.youtube.com/v/" + id + "?fs=1&amp;hl=iw_IL&amp;rel=0&amp;autoplay=1'></param><param name='allowFullScreen' value='true'></param><param name='allowscriptaccess' value='always'></param><embed src='http://www.youtube.com/v/" + id + "?fs=1&amp;hl=iw_IL&amp;rel=0&amp;autoplay=1' type='application/x-shockwave-flash' allowscriptaccess='always' allowfullscreen='true' width='750' height='450'></embed></object>");
+                return false;
+            });
+
+        });
+    </script>
+    <br class="clear" />
+</div>

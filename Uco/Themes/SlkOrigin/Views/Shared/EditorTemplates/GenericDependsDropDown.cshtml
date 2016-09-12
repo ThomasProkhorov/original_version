@@ -1,0 +1,153 @@
+﻿@using System.Reflection
+@using System.Collections.Generic
+@using System.Linq
+@using System.ComponentModel.DataAnnotations
+@{
+
+    System.Type t = Model.GetType();
+    var ModelName = t.Name;
+
+    // getting config
+    var dnAttribute = t.GetCustomAttributes<ModelGeneralAttribute>(true).Where(x => x.Role == ViewBag.CurrentRole || x.Role == null).OrderByDescending(x => x.Role).ToList().FirstOrDefault() as ModelGeneralAttribute;
+    if (dnAttribute == null)
+    {
+        dnAttribute = new ModelGeneralAttribute();
+
+    }
+    var pList = t.GetProperties();
+    var pDict = pList.ToDictionary(x => x.Name);
+
+}
+<table>
+    <tr>
+        @foreach (var p in pList)
+{
+    if (p.PropertyType.Namespace == "Uco.Models")
+    {
+        if (pDict.ContainsKey(p.Name + "ID"))
+        {
+            
+                var pname = p.Name + "ID";
+                var pid = "depend_" + pname;
+            <td>
+                <input id="@pid" type="text" value="@pDict[pname].GetValue(Model)" name="@pid" />
+
+                <script>
+                    $('#@pid')
+                                            .kendoComboBox(
+                    {
+                        placeholder: "Select ",
+                        dataTextField: "Name",
+                        dataValueField: "ID",
+
+                        filter: "contains",
+                        minLength: 1,
+                        change: function () {
+                            var combobox = $("#@ViewData.TemplateInfo.HtmlFieldPrefix").data("kendoComboBox");
+
+                            combobox.filter = "@(pname)~eq~" + $('#@pid').val();
+                            combobox.text("");
+                            combobox.value("");
+
+                            combobox.one("dataBound", function () {
+                                this.select(0);
+                                $('#@ViewData.TemplateInfo.HtmlFieldPrefix').val(this.value());
+                                this.trigger("change");
+                            });
+
+
+                            combobox.dataSource.read();
+
+
+                        },
+                        "autoBind": true,
+                        dataSource: {
+                            schema: {
+                                data: "Data",
+                                total: "Total",
+                                errors: "Errors",
+                            },
+                            type: "json",
+                            serverFiltering: true,
+                            filter: [],
+                            transport: {
+                                "prefix": "",
+                                read: {
+                                    url: "@Url.Action("_AjaxAutoComplete", "Generic", new { model = p.Name })"
+                ,
+                                    type: "POST",
+                                    data: function () {
+
+                                        var data = kendo.ui.ComboBox.requestData('#@pid');
+
+                                        /**
+                                        data["filter"] = "SpecificationAttributeID~eq~1";
+
+                                        console.log(data);
+                                        **/
+                                        return data;
+                                    },
+                                }
+                            }
+                        }
+                    });
+
+                </script>
+            </td>
+        }
+
+
+    }
+}
+        <td>
+            <input id="@ViewData.TemplateInfo.HtmlFieldPrefix" name="@ViewData.TemplateInfo.HtmlFieldPrefix" value="@Model.ID" />
+            <script>
+                $('#@ViewData.TemplateInfo.HtmlFieldPrefix')
+                                        .kendoComboBox(
+                {
+                    placeholder: "Select ",
+                    dataTextField: "Name",
+                    dataValueField: "ID",
+
+                    filter: "contains",
+                    minLength: 1,
+                    "autoBind": true,
+                    dataSource: {
+                        schema: {
+                            data: "Data",
+                            total: "Total",
+                            errors: "Errors",
+                        },
+                        type: "json",
+                        serverFiltering: true,
+
+                        filter: [],
+                        transport: {
+                            "prefix": "",
+                            read: {
+                                url: "@Url.Action("_AjaxAutoComplete", "Generic", new {model = Model.GetType().Name })"
+            ,
+                                type: "POST",
+                                data: function () {
+
+                                    var data = kendo.ui.ComboBox.requestData('#@ViewData.TemplateInfo.HtmlFieldPrefix');
+                                    var combobox = $("#@ViewData.TemplateInfo.HtmlFieldPrefix").data("kendoComboBox");
+
+                                    data["filter"] = combobox.filter;
+
+                                    /**
+                                    data["filter"] = "SpecificationAttributeID~eq~1";
+
+                                    console.log(data);
+                                    **/
+                                    return data;
+                                },
+                            }
+                        }
+                    }
+                });
+
+            </script>
+        </td>
+    </tr>
+</table>

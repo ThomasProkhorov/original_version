@@ -1,0 +1,1970 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://tempuri.org/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://tempuri.org/">
+      <s:element name="Login">
+        <s:complexType />
+      </s:element>
+      <s:element name="LoginResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="LoginResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="AuthHeader" type="tns:AuthHeader" />
+      <s:complexType name="AuthHeader">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="Username" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Password" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Token" type="s:string" />
+        </s:sequence>
+        <s:anyAttribute />
+      </s:complexType>
+      <s:element name="ImportCustomers">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="webCustomers" type="tns:ArrayOfWebCustomer" />
+            <s:element minOccurs="1" maxOccurs="1" name="groupId" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="mailinglistName" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfWebCustomer">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="WebCustomer" nillable="true" type="tns:WebCustomer" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="WebCustomer">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="City" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Email" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Fax" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="FirstName" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="LastName" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Phone1" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Phone2" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Street" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="ZipCode" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Birthday" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Anniversary" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Ext1" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Ext2" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Ext3" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Ext4" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Ext5" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Ext6" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="EncryptedExt1" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="EncryptedExt2" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="EncryptedExt3" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="EncryptedExt4" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="ImportCustomersResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ImportCustomersResult" type="tns:APIResponse" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="APIResponse">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="Data" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="ResponseDate" type="s:dateTime" />
+          <s:element minOccurs="0" maxOccurs="1" name="Method" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Result" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="ImportCustomersEmail">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="emails" type="tns:ArrayOfString" />
+            <s:element minOccurs="1" maxOccurs="1" name="groupId" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="mailinglistName" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfString">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="string" nillable="true" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="ImportCustomersEmailResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ImportCustomersEmailResult" type="tns:APIResponse" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ImportCustomer">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="webcustomer" type="tns:WebCustomer" />
+            <s:element minOccurs="0" maxOccurs="1" name="groups" type="tns:ArrayOfInt" />
+            <s:element minOccurs="0" maxOccurs="1" name="mailinglists" type="tns:ArrayOfInt" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfInt">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="int" type="s:int" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="ImportCustomerResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ImportCustomerResult" type="tns:APIResponse" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ImportCustomerAndTriggerCampaign">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="webcustomer" type="tns:WebCustomer" />
+            <s:element minOccurs="0" maxOccurs="1" name="groups" type="tns:ArrayOfInt" />
+            <s:element minOccurs="0" maxOccurs="1" name="mailinglists" type="tns:ArrayOfInt" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ImportCustomerAndTriggerCampaignResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ImportCustomerAndTriggerCampaignResult" type="tns:APIResponse" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ImportCustomerAsConfirmed">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="webcustomer" type="tns:WebCustomer" />
+            <s:element minOccurs="0" maxOccurs="1" name="groups" type="tns:ArrayOfInt" />
+            <s:element minOccurs="0" maxOccurs="1" name="mailinglists" type="tns:ArrayOfInt" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ImportCustomerAsConfirmedResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ImportCustomerAsConfirmedResult" type="tns:APIResponse" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ImportEmail">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="email" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="groups" type="tns:ArrayOfInt" />
+            <s:element minOccurs="0" maxOccurs="1" name="mailinglists" type="tns:ArrayOfInt" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ImportEmailResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ImportEmailResult" type="tns:APIResponse" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ImportEmailAsConfirmed">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="email" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="groups" type="tns:ArrayOfInt" />
+            <s:element minOccurs="0" maxOccurs="1" name="mailinglists" type="tns:ArrayOfInt" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ImportEmailAsConfirmedResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ImportEmailAsConfirmedResult" type="tns:APIResponse" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ConfirmEmails">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="emails" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ConfirmEmailsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ConfirmEmailsResult" type="tns:APIResponse" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ConfirmCustomers">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="customers" type="tns:ArrayOfWebCustomer" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ConfirmCustomersResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ConfirmCustomersResult" type="tns:APIResponse" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="DeleteCustomer">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="email" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="DeleteCustomerResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="DeleteCustomerResult" type="tns:APIResponse" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ChangeCustomerEmail">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="email" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="newEmail" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ChangeCustomerEmailResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ChangeCustomerEmailResult" type="tns:APIResponse" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="BulkInsertEmails">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="emails" type="tns:ArrayOfString" />
+            <s:element minOccurs="1" maxOccurs="1" name="groupId" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="confirmationStatus" type="s:boolean" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="BulkInsertEmailsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="BulkInsertEmailsResult" type="tns:APIResponse" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetCustomerByEmail">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="email" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetCustomerByEmailResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetCustomerByEmailResult" type="tns:WebCustomer" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetCustomerStateByEmail">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="email" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetCustomerStateByEmailResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetCustomerStateByEmailResult" type="tns:WebCustomerState" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="WebCustomerState">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="State" type="tns:CustomerState" />
+          <s:element minOccurs="1" maxOccurs="1" name="Inactive_Type" type="tns:InactiveType" />
+        </s:sequence>
+      </s:complexType>
+      <s:simpleType name="CustomerState">
+        <s:restriction base="s:string">
+          <s:enumeration value="Active" />
+          <s:enumeration value="InActive" />
+          <s:enumeration value="Deleted" />
+        </s:restriction>
+      </s:simpleType>
+      <s:simpleType name="InactiveType">
+        <s:restriction base="s:string">
+          <s:enumeration value="None" />
+          <s:enumeration value="Unsubscribed" />
+          <s:enumeration value="Bounced" />
+          <s:enumeration value="Spam_Complaint" />
+          <s:enumeration value="Quarantined" />
+          <s:enumeration value="Do_Not_Mail" />
+        </s:restriction>
+      </s:simpleType>
+      <s:element name="IsCustomerConfirmed">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="email" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="IsCustomerConfirmedResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="IsCustomerConfirmedResult" type="s:boolean" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetCustomersRecordSet">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="pageNumber" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="fromDate" type="s:dateTime" />
+            <s:element minOccurs="1" maxOccurs="1" name="toDate" type="s:dateTime" />
+            <s:element minOccurs="1" maxOccurs="1" name="stateType" type="tns:StateTypes" />
+            <s:element minOccurs="1" maxOccurs="1" name="inactiveType" type="tns:InActiveTypes" />
+            <s:element minOccurs="0" maxOccurs="1" name="groupsIds" type="tns:ArrayOfInt" />
+            <s:element minOccurs="0" maxOccurs="1" name="mailingListsIds" type="tns:ArrayOfInt" />
+            <s:element minOccurs="1" maxOccurs="1" name="confirmStatus" type="tns:CustomerConfirmType" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:simpleType name="StateTypes">
+        <s:restriction base="s:string">
+          <s:enumeration value="None" />
+          <s:enumeration value="Active" />
+          <s:enumeration value="NotActive" />
+          <s:enumeration value="Delete" />
+          <s:enumeration value="Pending" />
+          <s:enumeration value="Archive" />
+        </s:restriction>
+      </s:simpleType>
+      <s:simpleType name="InActiveTypes">
+        <s:restriction base="s:string">
+          <s:enumeration value="None" />
+          <s:enumeration value="CustomerRequest" />
+          <s:enumeration value="Bounced" />
+          <s:enumeration value="SpamComplaint" />
+          <s:enumeration value="Quarantined" />
+          <s:enumeration value="UserRequest" />
+          <s:enumeration value="Suspected" />
+          <s:enumeration value="HeaderListUnsubscribe" />
+        </s:restriction>
+      </s:simpleType>
+      <s:simpleType name="CustomerConfirmType">
+        <s:restriction base="s:string">
+          <s:enumeration value="NONE" />
+          <s:enumeration value="NOT_CONFIRMED" />
+          <s:enumeration value="CONFIRMED" />
+        </s:restriction>
+      </s:simpleType>
+      <s:element name="GetCustomersRecordSetResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetCustomersRecordSetResult" type="tns:WebCustomersRecordSet" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="WebCustomersRecordSet">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="WebCustomerRecords" type="tns:ArrayOfWebCustomerRecord" />
+          <s:element minOccurs="1" maxOccurs="1" name="Pages" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="CurrentPage" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="PageSize" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="RecordFilter" type="tns:WebCustomerRecordFilter" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfWebCustomerRecord">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="WebCustomerRecord" nillable="true" type="tns:WebCustomerRecord" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="WebCustomerRecord">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="MailingListsCollection" type="tns:ArrayOfInt" />
+          <s:element minOccurs="0" maxOccurs="1" name="GroupsCollection" type="tns:ArrayOfInt" />
+          <s:element minOccurs="0" maxOccurs="1" name="WebCustomerRec" type="tns:WebCustomer" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="WebCustomerRecordFilter">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="FromDate" type="s:dateTime" />
+          <s:element minOccurs="1" maxOccurs="1" name="ToDate" type="s:dateTime" />
+          <s:element minOccurs="1" maxOccurs="1" name="StateType" type="tns:StateTypes" />
+          <s:element minOccurs="1" maxOccurs="1" name="InactiveType" type="tns:InActiveTypes" />
+          <s:element minOccurs="0" maxOccurs="1" name="Groups" type="tns:ArrayOfInt" />
+          <s:element minOccurs="0" maxOccurs="1" name="Mailinglists" type="tns:ArrayOfInt" />
+          <s:element minOccurs="1" maxOccurs="1" name="RegistrationConfirmStatus" type="tns:CustomerConfirmType" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="GetUnsubscribeCustomers">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="securityToken" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="dateTime" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetUnsubscribeCustomersResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetUnsubscribeCustomersResult" type="tns:ArrayOfWebCustomer" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetCustomers">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="customerState" type="tns:CustomerStates" />
+            <s:element minOccurs="1" maxOccurs="1" name="fromDate" type="s:dateTime" />
+            <s:element minOccurs="1" maxOccurs="1" name="toDate" type="s:dateTime" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:simpleType name="CustomerStates">
+        <s:restriction base="s:string">
+          <s:enumeration value="ALL" />
+          <s:enumeration value="ACTIVE" />
+          <s:enumeration value="INACTIVE" />
+          <s:enumeration value="CUSTOMER_REQUEST" />
+          <s:enumeration value="BOUNCED" />
+          <s:enumeration value="SPAM_COMPLIENT" />
+          <s:enumeration value="QUARANTINED" />
+        </s:restriction>
+      </s:simpleType>
+      <s:element name="GetCustomersResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetCustomersResult">
+              <s:complexType>
+                <s:sequence>
+                  <s:element ref="s:schema" />
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetCustomersInGroup">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="groupid" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetCustomersInGroupResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetCustomersInGroupResult" type="tns:ArrayOfWebCustomer" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="BulkDoNotMail">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="emails" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="BulkDoNotMailResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="BulkDoNotMailResult" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="BulkDoNotMailWithErrors">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="emails" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="BulkDoNotMailWithErrorsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="BulkDoNotMailWithErrorsResult" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="BulkUnsubscribe">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="emails" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="BulkUnsubscribeResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="BulkUnsubscribeResult" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="BulkUnsubscribeAsCustomerRequest">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="emails" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="BulkUnsubscribeAsCustomerRequestResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="BulkUnsubscribeAsCustomerRequestResult" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="BulkUnsubscribeWithErrors">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="emails" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="BulkUnsubscribeWithErrorsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="BulkUnsubscribeWithErrorsResult" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="BulkUnsubscribeCustomers">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="securityToken" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="emails" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="BulkUnsubscribeCustomersResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="BulkUnsubscribeCustomersResult" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="UnsubscribeCustomers">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="securityToken" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="campaignid" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="resoneId" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="resoneText" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="emails" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="UnsubscribeCustomersResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="UnsubscribeCustomersResult" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="UnsubscribeCustomersWithDetailes">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="securityToken" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="campaignid" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="unsubscribeCustomers" type="tns:ArrayOfUnsubscribeCustomer" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfUnsubscribeCustomer">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="UnsubscribeCustomer" nillable="true" type="tns:UnsubscribeCustomer" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="UnsubscribeCustomer">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="Email" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="ResoneText" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="ResoneId" type="s:int" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="UnsubscribeCustomersWithDetailesResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="UnsubscribeCustomersWithDetailesResult" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="RemoveFromMailinglists">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="emails" type="tns:ArrayOfString" />
+            <s:element minOccurs="0" maxOccurs="1" name="mailinglistNames" type="tns:ArrayOfString" />
+            <s:element minOccurs="0" maxOccurs="1" name="mailinglistIds" type="tns:ArrayOfInt" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="RemoveFromMailinglistsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="RemoveFromMailinglistsResult" type="tns:APIResponse" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="AddToMailinglists">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="emails" type="tns:ArrayOfString" />
+            <s:element minOccurs="0" maxOccurs="1" name="mailinglistNames" type="tns:ArrayOfString" />
+            <s:element minOccurs="0" maxOccurs="1" name="mailinglistIds" type="tns:ArrayOfInt" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="AddToMailinglistsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="AddToMailinglistsResult" type="tns:APIResponse" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="RemoveFromGroups">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="emails" type="tns:ArrayOfString" />
+            <s:element minOccurs="0" maxOccurs="1" name="groupNames" type="tns:ArrayOfString" />
+            <s:element minOccurs="0" maxOccurs="1" name="groupIds" type="tns:ArrayOfInt" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="RemoveFromGroupsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="RemoveFromGroupsResult" type="tns:APIResponse" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="AddToGroups">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="emails" type="tns:ArrayOfString" />
+            <s:element minOccurs="0" maxOccurs="1" name="groupNames" type="tns:ArrayOfString" />
+            <s:element minOccurs="0" maxOccurs="1" name="groupIds" type="tns:ArrayOfInt" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="AddToGroupsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="AddToGroupsResult" type="tns:APIResponse" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="DisconnectFromAllMailinglists">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="email" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="DisconnectFromAllMailinglistsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="DisconnectFromAllMailinglistsResult" type="tns:APIResponse" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReactivateCustomer">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="email" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReactivateCustomerResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ReactivateCustomerResult" type="tns:APIResponse" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetCustomerStatisticsByEmail">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="email" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetCustomerStatisticsByEmailResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetCustomerStatisticsByEmailResult" type="tns:CustomerStatistic" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="CustomerStatistic">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:CustomerStatisticBase" />
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="CustomerStatisticBase">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="CustomerId" type="s:long" />
+          <s:element minOccurs="1" maxOccurs="1" name="Opens" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="OpensLastUpdateDate" type="s:dateTime" />
+          <s:element minOccurs="1" maxOccurs="1" name="Clicks" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="ClicksLastUpdateDate" type="s:dateTime" />
+          <s:element minOccurs="1" maxOccurs="1" name="Bounces" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="BouncesLastUpdateDate" type="s:dateTime" />
+          <s:element minOccurs="1" maxOccurs="1" name="Sent" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="SentLastUpdateDate" type="s:dateTime" />
+          <s:element minOccurs="1" maxOccurs="1" name="Created" type="s:dateTime" />
+          <s:element minOccurs="1" maxOccurs="1" name="Deleted" type="s:dateTime" />
+          <s:element minOccurs="1" maxOccurs="1" name="Updated" type="s:dateTime" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="GetSmsUsubscribed">
+        <s:complexType />
+      </s:element>
+      <s:element name="GetSmsUsubscribedResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetSmsUsubscribedResult" type="tns:ArrayOfWebSmsLogOptout" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfWebSmsLogOptout">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="WebSmsLogOptout" nillable="true" type="tns:WebSmsLogOptout" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="WebSmsLogOptout">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="CampaignId" type="s:long" />
+          <s:element minOccurs="1" maxOccurs="1" name="DateCreated" type="s:dateTime" />
+          <s:element minOccurs="0" maxOccurs="1" name="Mobile" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="Updated" type="s:dateTime" />
+        </s:sequence>
+      </s:complexType>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="LoginSoapIn">
+    <wsdl:part name="parameters" element="tns:Login" />
+  </wsdl:message>
+  <wsdl:message name="LoginSoapOut">
+    <wsdl:part name="parameters" element="tns:LoginResponse" />
+  </wsdl:message>
+  <wsdl:message name="LoginAuthHeader">
+    <wsdl:part name="AuthHeader" element="tns:AuthHeader" />
+  </wsdl:message>
+  <wsdl:message name="ImportCustomersSoapIn">
+    <wsdl:part name="parameters" element="tns:ImportCustomers" />
+  </wsdl:message>
+  <wsdl:message name="ImportCustomersSoapOut">
+    <wsdl:part name="parameters" element="tns:ImportCustomersResponse" />
+  </wsdl:message>
+  <wsdl:message name="ImportCustomersAuthHeader">
+    <wsdl:part name="AuthHeader" element="tns:AuthHeader" />
+  </wsdl:message>
+  <wsdl:message name="ImportCustomersEmailSoapIn">
+    <wsdl:part name="parameters" element="tns:ImportCustomersEmail" />
+  </wsdl:message>
+  <wsdl:message name="ImportCustomersEmailSoapOut">
+    <wsdl:part name="parameters" element="tns:ImportCustomersEmailResponse" />
+  </wsdl:message>
+  <wsdl:message name="ImportCustomersEmailAuthHeader">
+    <wsdl:part name="AuthHeader" element="tns:AuthHeader" />
+  </wsdl:message>
+  <wsdl:message name="ImportCustomerSoapIn">
+    <wsdl:part name="parameters" element="tns:ImportCustomer" />
+  </wsdl:message>
+  <wsdl:message name="ImportCustomerSoapOut">
+    <wsdl:part name="parameters" element="tns:ImportCustomerResponse" />
+  </wsdl:message>
+  <wsdl:message name="ImportCustomerAuthHeader">
+    <wsdl:part name="AuthHeader" element="tns:AuthHeader" />
+  </wsdl:message>
+  <wsdl:message name="ImportCustomerAndTriggerCampaignSoapIn">
+    <wsdl:part name="parameters" element="tns:ImportCustomerAndTriggerCampaign" />
+  </wsdl:message>
+  <wsdl:message name="ImportCustomerAndTriggerCampaignSoapOut">
+    <wsdl:part name="parameters" element="tns:ImportCustomerAndTriggerCampaignResponse" />
+  </wsdl:message>
+  <wsdl:message name="ImportCustomerAndTriggerCampaignAuthHeader">
+    <wsdl:part name="AuthHeader" element="tns:AuthHeader" />
+  </wsdl:message>
+  <wsdl:message name="ImportCustomerAsConfirmedSoapIn">
+    <wsdl:part name="parameters" element="tns:ImportCustomerAsConfirmed" />
+  </wsdl:message>
+  <wsdl:message name="ImportCustomerAsConfirmedSoapOut">
+    <wsdl:part name="parameters" element="tns:ImportCustomerAsConfirmedResponse" />
+  </wsdl:message>
+  <wsdl:message name="ImportCustomerAsConfirmedAuthHeader">
+    <wsdl:part name="AuthHeader" element="tns:AuthHeader" />
+  </wsdl:message>
+  <wsdl:message name="ImportEmailSoapIn">
+    <wsdl:part name="parameters" element="tns:ImportEmail" />
+  </wsdl:message>
+  <wsdl:message name="ImportEmailSoapOut">
+    <wsdl:part name="parameters" element="tns:ImportEmailResponse" />
+  </wsdl:message>
+  <wsdl:message name="ImportEmailAuthHeader">
+    <wsdl:part name="AuthHeader" element="tns:AuthHeader" />
+  </wsdl:message>
+  <wsdl:message name="ImportEmailAsConfirmedSoapIn">
+    <wsdl:part name="parameters" element="tns:ImportEmailAsConfirmed" />
+  </wsdl:message>
+  <wsdl:message name="ImportEmailAsConfirmedSoapOut">
+    <wsdl:part name="parameters" element="tns:ImportEmailAsConfirmedResponse" />
+  </wsdl:message>
+  <wsdl:message name="ImportEmailAsConfirmedAuthHeader">
+    <wsdl:part name="AuthHeader" element="tns:AuthHeader" />
+  </wsdl:message>
+  <wsdl:message name="ConfirmEmailsSoapIn">
+    <wsdl:part name="parameters" element="tns:ConfirmEmails" />
+  </wsdl:message>
+  <wsdl:message name="ConfirmEmailsSoapOut">
+    <wsdl:part name="parameters" element="tns:ConfirmEmailsResponse" />
+  </wsdl:message>
+  <wsdl:message name="ConfirmEmailsAuthHeader">
+    <wsdl:part name="AuthHeader" element="tns:AuthHeader" />
+  </wsdl:message>
+  <wsdl:message name="ConfirmCustomersSoapIn">
+    <wsdl:part name="parameters" element="tns:ConfirmCustomers" />
+  </wsdl:message>
+  <wsdl:message name="ConfirmCustomersSoapOut">
+    <wsdl:part name="parameters" element="tns:ConfirmCustomersResponse" />
+  </wsdl:message>
+  <wsdl:message name="ConfirmCustomersAuthHeader">
+    <wsdl:part name="AuthHeader" element="tns:AuthHeader" />
+  </wsdl:message>
+  <wsdl:message name="DeleteCustomerSoapIn">
+    <wsdl:part name="parameters" element="tns:DeleteCustomer" />
+  </wsdl:message>
+  <wsdl:message name="DeleteCustomerSoapOut">
+    <wsdl:part name="parameters" element="tns:DeleteCustomerResponse" />
+  </wsdl:message>
+  <wsdl:message name="DeleteCustomerAuthHeader">
+    <wsdl:part name="AuthHeader" element="tns:AuthHeader" />
+  </wsdl:message>
+  <wsdl:message name="ChangeCustomerEmailSoapIn">
+    <wsdl:part name="parameters" element="tns:ChangeCustomerEmail" />
+  </wsdl:message>
+  <wsdl:message name="ChangeCustomerEmailSoapOut">
+    <wsdl:part name="parameters" element="tns:ChangeCustomerEmailResponse" />
+  </wsdl:message>
+  <wsdl:message name="ChangeCustomerEmailAuthHeader">
+    <wsdl:part name="AuthHeader" element="tns:AuthHeader" />
+  </wsdl:message>
+  <wsdl:message name="BulkInsertEmailsSoapIn">
+    <wsdl:part name="parameters" element="tns:BulkInsertEmails" />
+  </wsdl:message>
+  <wsdl:message name="BulkInsertEmailsSoapOut">
+    <wsdl:part name="parameters" element="tns:BulkInsertEmailsResponse" />
+  </wsdl:message>
+  <wsdl:message name="BulkInsertEmailsAuthHeader">
+    <wsdl:part name="AuthHeader" element="tns:AuthHeader" />
+  </wsdl:message>
+  <wsdl:message name="GetCustomerByEmailSoapIn">
+    <wsdl:part name="parameters" element="tns:GetCustomerByEmail" />
+  </wsdl:message>
+  <wsdl:message name="GetCustomerByEmailSoapOut">
+    <wsdl:part name="parameters" element="tns:GetCustomerByEmailResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetCustomerByEmailAuthHeader">
+    <wsdl:part name="AuthHeader" element="tns:AuthHeader" />
+  </wsdl:message>
+  <wsdl:message name="GetCustomerStateByEmailSoapIn">
+    <wsdl:part name="parameters" element="tns:GetCustomerStateByEmail" />
+  </wsdl:message>
+  <wsdl:message name="GetCustomerStateByEmailSoapOut">
+    <wsdl:part name="parameters" element="tns:GetCustomerStateByEmailResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetCustomerStateByEmailAuthHeader">
+    <wsdl:part name="AuthHeader" element="tns:AuthHeader" />
+  </wsdl:message>
+  <wsdl:message name="IsCustomerConfirmedSoapIn">
+    <wsdl:part name="parameters" element="tns:IsCustomerConfirmed" />
+  </wsdl:message>
+  <wsdl:message name="IsCustomerConfirmedSoapOut">
+    <wsdl:part name="parameters" element="tns:IsCustomerConfirmedResponse" />
+  </wsdl:message>
+  <wsdl:message name="IsCustomerConfirmedAuthHeader">
+    <wsdl:part name="AuthHeader" element="tns:AuthHeader" />
+  </wsdl:message>
+  <wsdl:message name="GetCustomersRecordSetSoapIn">
+    <wsdl:part name="parameters" element="tns:GetCustomersRecordSet" />
+  </wsdl:message>
+  <wsdl:message name="GetCustomersRecordSetSoapOut">
+    <wsdl:part name="parameters" element="tns:GetCustomersRecordSetResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetCustomersRecordSetAuthHeader">
+    <wsdl:part name="AuthHeader" element="tns:AuthHeader" />
+  </wsdl:message>
+  <wsdl:message name="GetUnsubscribeCustomersSoapIn">
+    <wsdl:part name="parameters" element="tns:GetUnsubscribeCustomers" />
+  </wsdl:message>
+  <wsdl:message name="GetUnsubscribeCustomersSoapOut">
+    <wsdl:part name="parameters" element="tns:GetUnsubscribeCustomersResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetCustomersSoapIn">
+    <wsdl:part name="parameters" element="tns:GetCustomers" />
+  </wsdl:message>
+  <wsdl:message name="GetCustomersSoapOut">
+    <wsdl:part name="parameters" element="tns:GetCustomersResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetCustomersAuthHeader">
+    <wsdl:part name="AuthHeader" element="tns:AuthHeader" />
+  </wsdl:message>
+  <wsdl:message name="GetCustomersInGroupSoapIn">
+    <wsdl:part name="parameters" element="tns:GetCustomersInGroup" />
+  </wsdl:message>
+  <wsdl:message name="GetCustomersInGroupSoapOut">
+    <wsdl:part name="parameters" element="tns:GetCustomersInGroupResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetCustomersInGroupAuthHeader">
+    <wsdl:part name="AuthHeader" element="tns:AuthHeader" />
+  </wsdl:message>
+  <wsdl:message name="BulkDoNotMailSoapIn">
+    <wsdl:part name="parameters" element="tns:BulkDoNotMail" />
+  </wsdl:message>
+  <wsdl:message name="BulkDoNotMailSoapOut">
+    <wsdl:part name="parameters" element="tns:BulkDoNotMailResponse" />
+  </wsdl:message>
+  <wsdl:message name="BulkDoNotMailAuthHeader">
+    <wsdl:part name="AuthHeader" element="tns:AuthHeader" />
+  </wsdl:message>
+  <wsdl:message name="BulkDoNotMailWithErrorsSoapIn">
+    <wsdl:part name="parameters" element="tns:BulkDoNotMailWithErrors" />
+  </wsdl:message>
+  <wsdl:message name="BulkDoNotMailWithErrorsSoapOut">
+    <wsdl:part name="parameters" element="tns:BulkDoNotMailWithErrorsResponse" />
+  </wsdl:message>
+  <wsdl:message name="BulkDoNotMailWithErrorsAuthHeader">
+    <wsdl:part name="AuthHeader" element="tns:AuthHeader" />
+  </wsdl:message>
+  <wsdl:message name="BulkUnsubscribeSoapIn">
+    <wsdl:part name="parameters" element="tns:BulkUnsubscribe" />
+  </wsdl:message>
+  <wsdl:message name="BulkUnsubscribeSoapOut">
+    <wsdl:part name="parameters" element="tns:BulkUnsubscribeResponse" />
+  </wsdl:message>
+  <wsdl:message name="BulkUnsubscribeAuthHeader">
+    <wsdl:part name="AuthHeader" element="tns:AuthHeader" />
+  </wsdl:message>
+  <wsdl:message name="BulkUnsubscribeAsCustomerRequestSoapIn">
+    <wsdl:part name="parameters" element="tns:BulkUnsubscribeAsCustomerRequest" />
+  </wsdl:message>
+  <wsdl:message name="BulkUnsubscribeAsCustomerRequestSoapOut">
+    <wsdl:part name="parameters" element="tns:BulkUnsubscribeAsCustomerRequestResponse" />
+  </wsdl:message>
+  <wsdl:message name="BulkUnsubscribeAsCustomerRequestAuthHeader">
+    <wsdl:part name="AuthHeader" element="tns:AuthHeader" />
+  </wsdl:message>
+  <wsdl:message name="BulkUnsubscribeWithErrorsSoapIn">
+    <wsdl:part name="parameters" element="tns:BulkUnsubscribeWithErrors" />
+  </wsdl:message>
+  <wsdl:message name="BulkUnsubscribeWithErrorsSoapOut">
+    <wsdl:part name="parameters" element="tns:BulkUnsubscribeWithErrorsResponse" />
+  </wsdl:message>
+  <wsdl:message name="BulkUnsubscribeWithErrorsAuthHeader">
+    <wsdl:part name="AuthHeader" element="tns:AuthHeader" />
+  </wsdl:message>
+  <wsdl:message name="BulkUnsubscribeCustomersSoapIn">
+    <wsdl:part name="parameters" element="tns:BulkUnsubscribeCustomers" />
+  </wsdl:message>
+  <wsdl:message name="BulkUnsubscribeCustomersSoapOut">
+    <wsdl:part name="parameters" element="tns:BulkUnsubscribeCustomersResponse" />
+  </wsdl:message>
+  <wsdl:message name="UnsubscribeCustomersSoapIn">
+    <wsdl:part name="parameters" element="tns:UnsubscribeCustomers" />
+  </wsdl:message>
+  <wsdl:message name="UnsubscribeCustomersSoapOut">
+    <wsdl:part name="parameters" element="tns:UnsubscribeCustomersResponse" />
+  </wsdl:message>
+  <wsdl:message name="UnsubscribeCustomersWithDetailesSoapIn">
+    <wsdl:part name="parameters" element="tns:UnsubscribeCustomersWithDetailes" />
+  </wsdl:message>
+  <wsdl:message name="UnsubscribeCustomersWithDetailesSoapOut">
+    <wsdl:part name="parameters" element="tns:UnsubscribeCustomersWithDetailesResponse" />
+  </wsdl:message>
+  <wsdl:message name="RemoveFromMailinglistsSoapIn">
+    <wsdl:part name="parameters" element="tns:RemoveFromMailinglists" />
+  </wsdl:message>
+  <wsdl:message name="RemoveFromMailinglistsSoapOut">
+    <wsdl:part name="parameters" element="tns:RemoveFromMailinglistsResponse" />
+  </wsdl:message>
+  <wsdl:message name="RemoveFromMailinglistsAuthHeader">
+    <wsdl:part name="AuthHeader" element="tns:AuthHeader" />
+  </wsdl:message>
+  <wsdl:message name="AddToMailinglistsSoapIn">
+    <wsdl:part name="parameters" element="tns:AddToMailinglists" />
+  </wsdl:message>
+  <wsdl:message name="AddToMailinglistsSoapOut">
+    <wsdl:part name="parameters" element="tns:AddToMailinglistsResponse" />
+  </wsdl:message>
+  <wsdl:message name="AddToMailinglistsAuthHeader">
+    <wsdl:part name="AuthHeader" element="tns:AuthHeader" />
+  </wsdl:message>
+  <wsdl:message name="RemoveFromGroupsSoapIn">
+    <wsdl:part name="parameters" element="tns:RemoveFromGroups" />
+  </wsdl:message>
+  <wsdl:message name="RemoveFromGroupsSoapOut">
+    <wsdl:part name="parameters" element="tns:RemoveFromGroupsResponse" />
+  </wsdl:message>
+  <wsdl:message name="RemoveFromGroupsAuthHeader">
+    <wsdl:part name="AuthHeader" element="tns:AuthHeader" />
+  </wsdl:message>
+  <wsdl:message name="AddToGroupsSoapIn">
+    <wsdl:part name="parameters" element="tns:AddToGroups" />
+  </wsdl:message>
+  <wsdl:message name="AddToGroupsSoapOut">
+    <wsdl:part name="parameters" element="tns:AddToGroupsResponse" />
+  </wsdl:message>
+  <wsdl:message name="AddToGroupsAuthHeader">
+    <wsdl:part name="AuthHeader" element="tns:AuthHeader" />
+  </wsdl:message>
+  <wsdl:message name="DisconnectFromAllMailinglistsSoapIn">
+    <wsdl:part name="parameters" element="tns:DisconnectFromAllMailinglists" />
+  </wsdl:message>
+  <wsdl:message name="DisconnectFromAllMailinglistsSoapOut">
+    <wsdl:part name="parameters" element="tns:DisconnectFromAllMailinglistsResponse" />
+  </wsdl:message>
+  <wsdl:message name="DisconnectFromAllMailinglistsAuthHeader">
+    <wsdl:part name="AuthHeader" element="tns:AuthHeader" />
+  </wsdl:message>
+  <wsdl:message name="ReactivateCustomerSoapIn">
+    <wsdl:part name="parameters" element="tns:ReactivateCustomer" />
+  </wsdl:message>
+  <wsdl:message name="ReactivateCustomerSoapOut">
+    <wsdl:part name="parameters" element="tns:ReactivateCustomerResponse" />
+  </wsdl:message>
+  <wsdl:message name="ReactivateCustomerAuthHeader">
+    <wsdl:part name="AuthHeader" element="tns:AuthHeader" />
+  </wsdl:message>
+  <wsdl:message name="GetCustomerStatisticsByEmailSoapIn">
+    <wsdl:part name="parameters" element="tns:GetCustomerStatisticsByEmail" />
+  </wsdl:message>
+  <wsdl:message name="GetCustomerStatisticsByEmailSoapOut">
+    <wsdl:part name="parameters" element="tns:GetCustomerStatisticsByEmailResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetCustomerStatisticsByEmailAuthHeader">
+    <wsdl:part name="AuthHeader" element="tns:AuthHeader" />
+  </wsdl:message>
+  <wsdl:message name="GetSmsUsubscribedSoapIn">
+    <wsdl:part name="parameters" element="tns:GetSmsUsubscribed" />
+  </wsdl:message>
+  <wsdl:message name="GetSmsUsubscribedSoapOut">
+    <wsdl:part name="parameters" element="tns:GetSmsUsubscribedResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetSmsUsubscribedAuthHeader">
+    <wsdl:part name="AuthHeader" element="tns:AuthHeader" />
+  </wsdl:message>
+  <wsdl:portType name="CustomerServiceSoap">
+    <wsdl:operation name="Login">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Log in to the system </wsdl:documentation>
+      <wsdl:input message="tns:LoginSoapIn" />
+      <wsdl:output message="tns:LoginSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ImportCustomers">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Import customers to the system </wsdl:documentation>
+      <wsdl:input message="tns:ImportCustomersSoapIn" />
+      <wsdl:output message="tns:ImportCustomersSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ImportCustomersEmail">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Import customers email to the system </wsdl:documentation>
+      <wsdl:input message="tns:ImportCustomersEmailSoapIn" />
+      <wsdl:output message="tns:ImportCustomersEmailSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ImportCustomer">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Import customer to the system </wsdl:documentation>
+      <wsdl:input message="tns:ImportCustomerSoapIn" />
+      <wsdl:output message="tns:ImportCustomerSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ImportCustomerAndTriggerCampaign">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Import customer to the system </wsdl:documentation>
+      <wsdl:input message="tns:ImportCustomerAndTriggerCampaignSoapIn" />
+      <wsdl:output message="tns:ImportCustomerAndTriggerCampaignSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ImportCustomerAsConfirmed">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Import customer to the system and mark it as confirmed</wsdl:documentation>
+      <wsdl:input message="tns:ImportCustomerAsConfirmedSoapIn" />
+      <wsdl:output message="tns:ImportCustomerAsConfirmedSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ImportEmail">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Import email to the system </wsdl:documentation>
+      <wsdl:input message="tns:ImportEmailSoapIn" />
+      <wsdl:output message="tns:ImportEmailSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ImportEmailAsConfirmed">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Import email to the system and mark it as confirmed</wsdl:documentation>
+      <wsdl:input message="tns:ImportEmailAsConfirmedSoapIn" />
+      <wsdl:output message="tns:ImportEmailAsConfirmedSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ConfirmEmails">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">This method receives an Array of emails and creates a subscription record (Confirmation record) for each email address which is valid and exists in the account.</wsdl:documentation>
+      <wsdl:input message="tns:ConfirmEmailsSoapIn" />
+      <wsdl:output message="tns:ConfirmEmailsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ConfirmCustomers">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">This method receives an Array of WebCustomer objects and creates a subscription record (Confirmation record) for each email address which is valid and exists in the account.</wsdl:documentation>
+      <wsdl:input message="tns:ConfirmCustomersSoapIn" />
+      <wsdl:output message="tns:ConfirmCustomersSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="DeleteCustomer">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Delete an existing customer by a given email address</wsdl:documentation>
+      <wsdl:input message="tns:DeleteCustomerSoapIn" />
+      <wsdl:output message="tns:DeleteCustomerSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ChangeCustomerEmail">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Change the email address of an existing customer</wsdl:documentation>
+      <wsdl:input message="tns:ChangeCustomerEmailSoapIn" />
+      <wsdl:output message="tns:ChangeCustomerEmailSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="BulkInsertEmails">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Insert any non-existing emails from the given list in to the database</wsdl:documentation>
+      <wsdl:input message="tns:BulkInsertEmailsSoapIn" />
+      <wsdl:output message="tns:BulkInsertEmailsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCustomerByEmail">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Get a single customer by email</wsdl:documentation>
+      <wsdl:input message="tns:GetCustomerByEmailSoapIn" />
+      <wsdl:output message="tns:GetCustomerByEmailSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCustomerStateByEmail">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Get the customer's state</wsdl:documentation>
+      <wsdl:input message="tns:GetCustomerStateByEmailSoapIn" />
+      <wsdl:output message="tns:GetCustomerStateByEmailSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="IsCustomerConfirmed">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Check if the customer is confirmed</wsdl:documentation>
+      <wsdl:input message="tns:IsCustomerConfirmedSoapIn" />
+      <wsdl:output message="tns:IsCustomerConfirmedSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCustomersRecordSet">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Get Recordset of Customers</wsdl:documentation>
+      <wsdl:input message="tns:GetCustomersRecordSetSoapIn" />
+      <wsdl:output message="tns:GetCustomersRecordSetSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetUnsubscribeCustomers">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Get unsubscribed customers </wsdl:documentation>
+      <wsdl:input message="tns:GetUnsubscribeCustomersSoapIn" />
+      <wsdl:output message="tns:GetUnsubscribeCustomersSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCustomers">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Get customers by state</wsdl:documentation>
+      <wsdl:input message="tns:GetCustomersSoapIn" />
+      <wsdl:output message="tns:GetCustomersSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCustomersInGroup">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Returns the list of customers in the given group</wsdl:documentation>
+      <wsdl:input message="tns:GetCustomersInGroupSoapIn" />
+      <wsdl:output message="tns:GetCustomersInGroupSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="BulkDoNotMail">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Remove the given emails from the system as DoNotMail</wsdl:documentation>
+      <wsdl:input message="tns:BulkDoNotMailSoapIn" />
+      <wsdl:output message="tns:BulkDoNotMailSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="BulkDoNotMailWithErrors">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Remove the given emails from the system as DoNotMail, returning errors</wsdl:documentation>
+      <wsdl:input message="tns:BulkDoNotMailWithErrorsSoapIn" />
+      <wsdl:output message="tns:BulkDoNotMailWithErrorsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="BulkUnsubscribe">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Remove the given emails from the system as CustomerRequest</wsdl:documentation>
+      <wsdl:input message="tns:BulkUnsubscribeSoapIn" />
+      <wsdl:output message="tns:BulkUnsubscribeSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="BulkUnsubscribeAsCustomerRequest">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Remove the given emails from the system with CustomerRequest state. Obsolete - use the BulkUnsubscribe(emails) method.</wsdl:documentation>
+      <wsdl:input message="tns:BulkUnsubscribeAsCustomerRequestSoapIn" />
+      <wsdl:output message="tns:BulkUnsubscribeAsCustomerRequestSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="BulkUnsubscribeWithErrors">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Unsubscribe the given emails and returns the errors occured</wsdl:documentation>
+      <wsdl:input message="tns:BulkUnsubscribeWithErrorsSoapIn" />
+      <wsdl:output message="tns:BulkUnsubscribeWithErrorsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="BulkUnsubscribeCustomers">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Remove the given emails from the system</wsdl:documentation>
+      <wsdl:input message="tns:BulkUnsubscribeCustomersSoapIn" />
+      <wsdl:output message="tns:BulkUnsubscribeCustomersSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="UnsubscribeCustomers">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Unsubscribe Customer From Campaign</wsdl:documentation>
+      <wsdl:input message="tns:UnsubscribeCustomersSoapIn" />
+      <wsdl:output message="tns:UnsubscribeCustomersSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="UnsubscribeCustomersWithDetailes">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Unsubscribe Extended Customer From Campaign</wsdl:documentation>
+      <wsdl:input message="tns:UnsubscribeCustomersWithDetailesSoapIn" />
+      <wsdl:output message="tns:UnsubscribeCustomersWithDetailesSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="RemoveFromMailinglists">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Remove the given emails from mailinglist</wsdl:documentation>
+      <wsdl:input message="tns:RemoveFromMailinglistsSoapIn" />
+      <wsdl:output message="tns:RemoveFromMailinglistsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="AddToMailinglists">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Add the given emails to mailinglist</wsdl:documentation>
+      <wsdl:input message="tns:AddToMailinglistsSoapIn" />
+      <wsdl:output message="tns:AddToMailinglistsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="RemoveFromGroups">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Remove the given emails from group</wsdl:documentation>
+      <wsdl:input message="tns:RemoveFromGroupsSoapIn" />
+      <wsdl:output message="tns:RemoveFromGroupsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="AddToGroups">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Add the given emails to group</wsdl:documentation>
+      <wsdl:input message="tns:AddToGroupsSoapIn" />
+      <wsdl:output message="tns:AddToGroupsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="DisconnectFromAllMailinglists">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Disconnect email form all mailing lists</wsdl:documentation>
+      <wsdl:input message="tns:DisconnectFromAllMailinglistsSoapIn" />
+      <wsdl:output message="tns:DisconnectFromAllMailinglistsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReactivateCustomer">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Reactivate a deleted customer</wsdl:documentation>
+      <wsdl:input message="tns:ReactivateCustomerSoapIn" />
+      <wsdl:output message="tns:ReactivateCustomerSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCustomerStatisticsByEmail">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Get a single customer statistics by email</wsdl:documentation>
+      <wsdl:input message="tns:GetCustomerStatisticsByEmailSoapIn" />
+      <wsdl:output message="tns:GetCustomerStatisticsByEmailSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetSmsUsubscribed">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Get SMS Usubscribed</wsdl:documentation>
+      <wsdl:input message="tns:GetSmsUsubscribedSoapIn" />
+      <wsdl:output message="tns:GetSmsUsubscribedSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="CustomerServiceSoap" type="tns:CustomerServiceSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="Login">
+      <soap:operation soapAction="http://tempuri.org/Login" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:LoginAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ImportCustomers">
+      <soap:operation soapAction="http://tempuri.org/ImportCustomers" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:ImportCustomersAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ImportCustomersEmail">
+      <soap:operation soapAction="http://tempuri.org/ImportCustomersEmail" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:ImportCustomersEmailAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ImportCustomer">
+      <soap:operation soapAction="http://tempuri.org/ImportCustomer" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:ImportCustomerAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ImportCustomerAndTriggerCampaign">
+      <soap:operation soapAction="http://tempuri.org/ImportCustomerAndTriggerCampaign" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:ImportCustomerAndTriggerCampaignAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ImportCustomerAsConfirmed">
+      <soap:operation soapAction="http://tempuri.org/ImportCustomerAsConfirmed" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:ImportCustomerAsConfirmedAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ImportEmail">
+      <soap:operation soapAction="http://tempuri.org/ImportEmail" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:ImportEmailAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ImportEmailAsConfirmed">
+      <soap:operation soapAction="http://tempuri.org/ImportEmailAsConfirmed" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:ImportEmailAsConfirmedAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ConfirmEmails">
+      <soap:operation soapAction="http://tempuri.org/ConfirmEmails" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:ConfirmEmailsAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ConfirmCustomers">
+      <soap:operation soapAction="http://tempuri.org/ConfirmCustomers" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:ConfirmCustomersAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DeleteCustomer">
+      <soap:operation soapAction="http://tempuri.org/DeleteCustomer" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:DeleteCustomerAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ChangeCustomerEmail">
+      <soap:operation soapAction="http://tempuri.org/ChangeCustomerEmail" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:ChangeCustomerEmailAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="BulkInsertEmails">
+      <soap:operation soapAction="http://tempuri.org/BulkInsertEmails" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:BulkInsertEmailsAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCustomerByEmail">
+      <soap:operation soapAction="http://tempuri.org/GetCustomerByEmail" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:GetCustomerByEmailAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCustomerStateByEmail">
+      <soap:operation soapAction="http://tempuri.org/GetCustomerStateByEmail" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:GetCustomerStateByEmailAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="IsCustomerConfirmed">
+      <soap:operation soapAction="http://tempuri.org/IsCustomerConfirmed" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:IsCustomerConfirmedAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCustomersRecordSet">
+      <soap:operation soapAction="http://tempuri.org/GetCustomersRecordSet" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:GetCustomersRecordSetAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetUnsubscribeCustomers">
+      <soap:operation soapAction="http://tempuri.org/GetUnsubscribeCustomers" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCustomers">
+      <soap:operation soapAction="http://tempuri.org/GetCustomers" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:GetCustomersAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCustomersInGroup">
+      <soap:operation soapAction="http://tempuri.org/GetCustomersInGroup" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:GetCustomersInGroupAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="BulkDoNotMail">
+      <soap:operation soapAction="http://tempuri.org/BulkDoNotMail" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:BulkDoNotMailAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="BulkDoNotMailWithErrors">
+      <soap:operation soapAction="http://tempuri.org/BulkDoNotMailWithErrors" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:BulkDoNotMailWithErrorsAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="BulkUnsubscribe">
+      <soap:operation soapAction="http://tempuri.org/BulkUnsubscribe" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:BulkUnsubscribeAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="BulkUnsubscribeAsCustomerRequest">
+      <soap:operation soapAction="http://tempuri.org/BulkUnsubscribeAsCustomerRequest" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:BulkUnsubscribeAsCustomerRequestAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="BulkUnsubscribeWithErrors">
+      <soap:operation soapAction="http://tempuri.org/BulkUnsubscribeWithErrors" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:BulkUnsubscribeWithErrorsAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="BulkUnsubscribeCustomers">
+      <soap:operation soapAction="http://tempuri.org/BulkUnsubscribeCustomers" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UnsubscribeCustomers">
+      <soap:operation soapAction="http://tempuri.org/UnsubscribeCustomers" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UnsubscribeCustomersWithDetailes">
+      <soap:operation soapAction="http://tempuri.org/UnsubscribeCustomersWithDetailes" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RemoveFromMailinglists">
+      <soap:operation soapAction="http://tempuri.org/RemoveFromMailinglists" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:RemoveFromMailinglistsAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AddToMailinglists">
+      <soap:operation soapAction="http://tempuri.org/AddToMailinglists" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:AddToMailinglistsAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RemoveFromGroups">
+      <soap:operation soapAction="http://tempuri.org/RemoveFromGroups" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:RemoveFromGroupsAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AddToGroups">
+      <soap:operation soapAction="http://tempuri.org/AddToGroups" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:AddToGroupsAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DisconnectFromAllMailinglists">
+      <soap:operation soapAction="http://tempuri.org/DisconnectFromAllMailinglists" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:DisconnectFromAllMailinglistsAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReactivateCustomer">
+      <soap:operation soapAction="http://tempuri.org/ReactivateCustomer" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:ReactivateCustomerAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCustomerStatisticsByEmail">
+      <soap:operation soapAction="http://tempuri.org/GetCustomerStatisticsByEmail" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:GetCustomerStatisticsByEmailAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSmsUsubscribed">
+      <soap:operation soapAction="http://tempuri.org/GetSmsUsubscribed" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+        <soap:header message="tns:GetSmsUsubscribedAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="CustomerServiceSoap12" type="tns:CustomerServiceSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="Login">
+      <soap12:operation soapAction="http://tempuri.org/Login" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+        <soap12:header message="tns:LoginAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ImportCustomers">
+      <soap12:operation soapAction="http://tempuri.org/ImportCustomers" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+        <soap12:header message="tns:ImportCustomersAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ImportCustomersEmail">
+      <soap12:operation soapAction="http://tempuri.org/ImportCustomersEmail" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+        <soap12:header message="tns:ImportCustomersEmailAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ImportCustomer">
+      <soap12:operation soapAction="http://tempuri.org/ImportCustomer" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+        <soap12:header message="tns:ImportCustomerAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ImportCustomerAndTriggerCampaign">
+      <soap12:operation soapAction="http://tempuri.org/ImportCustomerAndTriggerCampaign" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+        <soap12:header message="tns:ImportCustomerAndTriggerCampaignAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ImportCustomerAsConfirmed">
+      <soap12:operation soapAction="http://tempuri.org/ImportCustomerAsConfirmed" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+        <soap12:header message="tns:ImportCustomerAsConfirmedAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ImportEmail">
+      <soap12:operation soapAction="http://tempuri.org/ImportEmail" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+        <soap12:header message="tns:ImportEmailAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ImportEmailAsConfirmed">
+      <soap12:operation soapAction="http://tempuri.org/ImportEmailAsConfirmed" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+        <soap12:header message="tns:ImportEmailAsConfirmedAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ConfirmEmails">
+      <soap12:operation soapAction="http://tempuri.org/ConfirmEmails" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+        <soap12:header message="tns:ConfirmEmailsAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ConfirmCustomers">
+      <soap12:operation soapAction="http://tempuri.org/ConfirmCustomers" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+        <soap12:header message="tns:ConfirmCustomersAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DeleteCustomer">
+      <soap12:operation soapAction="http://tempuri.org/DeleteCustomer" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+        <soap12:header message="tns:DeleteCustomerAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ChangeCustomerEmail">
+      <soap12:operation soapAction="http://tempuri.org/ChangeCustomerEmail" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+        <soap12:header message="tns:ChangeCustomerEmailAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="BulkInsertEmails">
+      <soap12:operation soapAction="http://tempuri.org/BulkInsertEmails" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+        <soap12:header message="tns:BulkInsertEmailsAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCustomerByEmail">
+      <soap12:operation soapAction="http://tempuri.org/GetCustomerByEmail" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+        <soap12:header message="tns:GetCustomerByEmailAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCustomerStateByEmail">
+      <soap12:operation soapAction="http://tempuri.org/GetCustomerStateByEmail" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+        <soap12:header message="tns:GetCustomerStateByEmailAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="IsCustomerConfirmed">
+      <soap12:operation soapAction="http://tempuri.org/IsCustomerConfirmed" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+        <soap12:header message="tns:IsCustomerConfirmedAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCustomersRecordSet">
+      <soap12:operation soapAction="http://tempuri.org/GetCustomersRecordSet" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+        <soap12:header message="tns:GetCustomersRecordSetAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetUnsubscribeCustomers">
+      <soap12:operation soapAction="http://tempuri.org/GetUnsubscribeCustomers" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCustomers">
+      <soap12:operation soapAction="http://tempuri.org/GetCustomers" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+        <soap12:header message="tns:GetCustomersAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCustomersInGroup">
+      <soap12:operation soapAction="http://tempuri.org/GetCustomersInGroup" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+        <soap12:header message="tns:GetCustomersInGroupAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="BulkDoNotMail">
+      <soap12:operation soapAction="http://tempuri.org/BulkDoNotMail" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+        <soap12:header message="tns:BulkDoNotMailAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="BulkDoNotMailWithErrors">
+      <soap12:operation soapAction="http://tempuri.org/BulkDoNotMailWithErrors" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+        <soap12:header message="tns:BulkDoNotMailWithErrorsAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="BulkUnsubscribe">
+      <soap12:operation soapAction="http://tempuri.org/BulkUnsubscribe" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+        <soap12:header message="tns:BulkUnsubscribeAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="BulkUnsubscribeAsCustomerRequest">
+      <soap12:operation soapAction="http://tempuri.org/BulkUnsubscribeAsCustomerRequest" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+        <soap12:header message="tns:BulkUnsubscribeAsCustomerRequestAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="BulkUnsubscribeWithErrors">
+      <soap12:operation soapAction="http://tempuri.org/BulkUnsubscribeWithErrors" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+        <soap12:header message="tns:BulkUnsubscribeWithErrorsAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="BulkUnsubscribeCustomers">
+      <soap12:operation soapAction="http://tempuri.org/BulkUnsubscribeCustomers" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UnsubscribeCustomers">
+      <soap12:operation soapAction="http://tempuri.org/UnsubscribeCustomers" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UnsubscribeCustomersWithDetailes">
+      <soap12:operation soapAction="http://tempuri.org/UnsubscribeCustomersWithDetailes" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RemoveFromMailinglists">
+      <soap12:operation soapAction="http://tempuri.org/RemoveFromMailinglists" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+        <soap12:header message="tns:RemoveFromMailinglistsAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AddToMailinglists">
+      <soap12:operation soapAction="http://tempuri.org/AddToMailinglists" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+        <soap12:header message="tns:AddToMailinglistsAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RemoveFromGroups">
+      <soap12:operation soapAction="http://tempuri.org/RemoveFromGroups" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+        <soap12:header message="tns:RemoveFromGroupsAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AddToGroups">
+      <soap12:operation soapAction="http://tempuri.org/AddToGroups" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+        <soap12:header message="tns:AddToGroupsAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DisconnectFromAllMailinglists">
+      <soap12:operation soapAction="http://tempuri.org/DisconnectFromAllMailinglists" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+        <soap12:header message="tns:DisconnectFromAllMailinglistsAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReactivateCustomer">
+      <soap12:operation soapAction="http://tempuri.org/ReactivateCustomer" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+        <soap12:header message="tns:ReactivateCustomerAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCustomerStatisticsByEmail">
+      <soap12:operation soapAction="http://tempuri.org/GetCustomerStatisticsByEmail" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+        <soap12:header message="tns:GetCustomerStatisticsByEmailAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSmsUsubscribed">
+      <soap12:operation soapAction="http://tempuri.org/GetSmsUsubscribed" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+        <soap12:header message="tns:GetSmsUsubscribedAuthHeader" part="AuthHeader" use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="CustomerService">
+    <wsdl:port name="CustomerServiceSoap" binding="tns:CustomerServiceSoap">
+      <soap:address location="https://webapi.mymarketing.co.il/customers/customerservice.asmx" />
+    </wsdl:port>
+    <wsdl:port name="CustomerServiceSoap12" binding="tns:CustomerServiceSoap12">
+      <soap12:address location="https://webapi.mymarketing.co.il/customers/customerservice.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

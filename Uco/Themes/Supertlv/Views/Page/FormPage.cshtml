@@ -1,0 +1,269 @@
+﻿@model Uco.Models.FormPage
+@{
+    Layout = ViewBag.Layout;
+    List<Uco.Models.FormField> l = ViewBag.Items;
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".t-button").val("");
+    })
+    
+</script>
+<style type="text/css">
+    .contact_form, .editor_html {
+        width: 498px;
+    }
+    .contact_form .input-validation-error {
+        background-color: white !important;
+    }
+    .contact_form .editor-label {
+        display: none;
+    }
+    /*email*/
+
+    .contact_form .row .single-line {
+            padding: 0;
+        text-indent: 10px;
+        float: right;
+        width: 240px;
+        height: 32px;
+        border: 1px solid #c7c4b8;
+        -moz-border-radius: 5px 5px 5px 5px !important;
+        -webkit-border-radius: 5px 5px 5px 5px !important;
+        border-radius: 5px 5px 5px 5px !important;
+        behavior: url(PIE.htc);
+        margin-bottom: 14px;
+    }
+    .contact_form .field-validation-error {
+        position: relative;
+        top: -10px;
+    }
+    .contact_form .row:nth-child(odd) .editor-field {
+        float: left;
+        width: 242px;
+    }
+    .contact_form .row:nth-child(even) .editor-field {
+        float: right;
+        width: 242px;
+    }
+
+    .contact_form .row:nth-last-child(2) .editor-field {
+        float: none;
+        width: 100%;
+    }
+    
+    /*textarea*/
+    .contact_form .multi-line {
+        float:none !important;
+        margin-top: 14px;
+        width: 100%;
+        margin: 0;
+        padding: 0 3%;
+        height: 82px;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 14px;
+        color: #5c5654;
+        border: 1px solid #c7c4b8;
+        -moz-border-radius: 5px 5px 5px 5px !important;
+        -webkit-border-radius: 5px 5px 5px 5px !important;
+        border-radius: 5px 5px 5px 5px !important;
+        behavior: url(PIE.htc);
+    }
+     /*input_btn*/
+    .contact_form .t-button {
+        background: url(/Content/DesignFiles/contact_submit.png) no-repeat;
+        width: 106px;
+        height: 35px;
+        border: none;
+        margin-top: 19px;
+    }
+    .contact_form .editor-button {
+        text-align: left;
+        width: 498px;
+    }
+
+    /*dropdown*/
+    .contact_form .drop-down {
+        text-indent: 10px;
+        float: left;
+        width: 244px;
+        height: 36px;
+        border: 1px solid #c7c4b8;
+        -moz-border-radius: 5px 5px 5px 5px !important;
+        -webkit-border-radius: 5px 5px 5px 5px !important;
+        border-radius: 5px 5px 5px 5px !important;
+        behavior: url(PIE.htc);
+        margin-bottom: 14px;
+    }
+    .linebotoom{
+          border-bottom: 1px solid #c7c4b8;
+          width:752px;
+          margin-top:17px;
+    }
+    .editor-field {
+    height: 65px;
+}
+</style>
+
+<h1 class="main_heading_h1_profile">@ViewBag.H1</h1>
+<div class="cantact_right_in">
+    <div class="contact_row1">
+        <ul>
+            <li class="first">@RP.Text("Form.Page.Address")</li>
+            <li class="second">@RP.Text("Form.Page.Phone")</li>
+            <li class="third">@RP.Text("Form.Page.Email")</li>
+        </ul>
+        <div class="clear"></div>
+        <div class="linebotoom"></div>
+    </div>
+    <div class="editor_html">
+        @Html.Raw(Model.Text)
+    </div>
+    <div class="clear"></div>
+    @using (Ajax.BeginForm("FormPage", "Page", new AjaxOptions
+{
+    UpdateTargetId = "form_update",
+    InsertionMode = InsertionMode.Replace,
+    LoadingElementId = "form_loading",
+    HttpMethod = "POST"
+}))
+    {
+        <div class="contact_form contact_form_@(ViewBag.ID)" id="form_update">
+
+            <script type="text/javascript">
+                function changeClass(elementID, newClass) {
+                    var element = document.getElementById(elementID);
+                    element.className = element.className + newClass;
+                }
+                function setAttribute(elementID, attrName, attrValue) {
+                    var element = document.getElementById(elementID);
+                    element.setAttribute(attrName, attrValue);
+                }
+            </script>
+            @foreach (Uco.Models.FormField item in l)
+            {
+
+                if (item.FormFieldType == Uco.Models.FormField.FormFildType.RadioBottonList)
+                {
+                    <div class="row row_@(item.FormFieldID.ToString())">
+                        <div class="editor-label">@Html.Label(item.FormFieldTitle)@(item.FormFieldRequired ? " * " : ""):</div>
+                        <div class="editor-field">
+                            @Html.Editor("form_item_" + Model.ID + "_" + item.FormFieldID.ToString(), item.FormFieldType.ToString(), new { Placeholder = item.FormFieldTitle, RequiredTitle = item.FormFieldRequiredTitle })
+                            @if (item.FormFieldRequired)
+                            {
+                                <text>
+                                    <script type="text/javascript">changeClass("form_item_@(Model.ID)_@(item.FormFieldID.ToString())", " required")</script></text>
+                            }
+                        </div>
+                    </div>
+                }
+                else if (item.FormFieldType == Uco.Models.FormField.FormFildType.CheckboxList)
+                {
+                    <div class="row row_@(item.FormFieldID.ToString())">
+                        <div class="editor-label">@Html.Label(item.FormFieldTitle)@(item.FormFieldRequired ? " * " : ""):</div>
+                        <div class="editor-field">
+                            @Html.Editor("form_item_" + Model.ID + "_" + item.FormFieldID.ToString(), item.FormFieldType.ToString(), new { Placeholder = item.FormFieldTitle, RequiredTitle = item.FormFieldRequiredTitle })
+                            @if (item.FormFieldRequired)
+                            {
+                                <text>
+                                    <script type="text/javascript">changeClass("form_item_@(Model.ID)_@(item.FormFieldID.ToString())", " required")</script></text>
+                            }
+                        </div>
+                    </div>
+                }
+                else if (item.FormFieldType == Uco.Models.FormField.FormFildType.DropDown)
+                {
+                    <div class="row row_@(item.FormFieldID.ToString())">
+                        <div class="editor-label">@Html.Label(item.FormFieldTitle)@(item.FormFieldRequired ? " * " : ""):</div>
+                        <div class="editor-field">
+                            @Html.Editor("form_item_" + Model.ID + "_" + item.FormFieldID.ToString(), item.FormFieldType.ToString(), new { Placeholder = item.FormFieldTitle, RequiredTitle = item.FormFieldRequiredTitle })
+                            @if (item.FormFieldRequired)
+                            {
+                                <text>
+                                    <script type="text/javascript">changeClass("form_item_@(Model.ID)_@(item.FormFieldID.ToString())", " required")</script></text>
+                            }
+                        </div>
+                    </div>
+                }
+                else if (item.FormFieldType == Uco.Models.FormField.FormFildType.EmailAddress)
+                {
+                    <div class="row row_@(item.FormFieldID.ToString())">
+                        <div class="editor-label">@Html.Label(item.FormFieldTitle)@(item.FormFieldRequired ? " * " : ""):</div>
+                        <div class="editor-field">
+                            @Html.Editor("form_item_" + Model.ID + "_" + item.FormFieldID.ToString(), item.FormFieldType.ToString(), new { htmlAttributes = new { Placeholder = item.FormFieldTitle, type = "email", @class = "email" } })
+                            @if (item.FormFieldRequired)
+                            {
+                                if (item.FormFieldRequired)
+                                {
+                                    if (!string.IsNullOrEmpty(item.FormFieldRequiredTitle))
+                                    {
+                                        <text>
+                                            <span data-valmsg-replace="true" data-valmsg-for="form_item_@(Model.ID)_@(item.FormFieldID.ToString())" class="field-validation-error"></span>
+                                            <script type="text/javascript">setAttribute("form_item_@(Model.ID)_@(item.FormFieldID.ToString())", "data-val-required", "@item.FormFieldRequiredTitle"); setAttribute("form_item_@(Model.ID)_@(item.FormFieldID.ToString())", "data-val", "true");</script>
+                                        </text>
+                                    }
+                                    <text>
+                                        <script type="text/javascript">changeClass("form_item_@(Model.ID)_@(item.FormFieldID.ToString())", " required")</script></text>
+                                }
+                            }
+                        </div>
+                    </div>
+                }
+                else if (item.FormFieldType == Uco.Models.FormField.FormFildType.PhoneNumber)
+                {
+                    <div class="row row_@(item.FormFieldID.ToString())">
+                        <div class="editor-label">@Html.Label(item.FormFieldTitle)@(item.FormFieldRequired ? " * " : ""):</div>
+                        <div class="editor-field">
+                            @Html.Editor("form_item_" + Model.ID + "_" + item.FormFieldID.ToString(), item.FormFieldType.ToString(), new { htmlAttributes = new { Placeholder = item.FormFieldTitle, type = "phone", data_val_regex_pattern = "^[0-9 ()*-]{9,15}$", data_val_regex = "בדוק טלפון" } })
+                            @if (item.FormFieldRequired)
+                            {
+                                if (item.FormFieldRequired)
+                                {
+                                    if (!string.IsNullOrEmpty(item.FormFieldRequiredTitle))
+                                    {
+                                        <text>
+                                            <span data-valmsg-replace="true" data-valmsg-for="form_item_@(Model.ID)_@(item.FormFieldID.ToString())" class="field-validation-error"></span>
+                                            <script type="text/javascript">setAttribute("form_item_@(Model.ID)_@(item.FormFieldID.ToString())", "data-val-required", "@item.FormFieldRequiredTitle"); setAttribute("form_item_@(Model.ID)_@(item.FormFieldID.ToString())", "data-val", "true");</script>
+                                        </text>
+                                    }
+                                    <text>
+                                        <script type="text/javascript">changeClass("form_item_@(Model.ID)_@(item.FormFieldID.ToString())", " required")</script></text>
+                                }
+                            }
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="row row_@(item.FormFieldID.ToString())">
+                        <div class="editor-label">@Html.Label(item.FormFieldTitle)@(item.FormFieldRequired ? " * " : ""):</div>
+                        <div class="editor-field">
+                            @Html.Editor("form_item_" + Model.ID + "_" + item.FormFieldID.ToString(), item.FormFieldType.ToString(), new { htmlAttributes = new { Placeholder = item.FormFieldTitle } })
+                            @if (item.FormFieldRequired)
+                            {
+                                if (!string.IsNullOrEmpty(item.FormFieldRequiredTitle))
+                                {
+                                    <text>
+                                        <span data-valmsg-replace="true" data-valmsg-for="form_item_@(Model.ID)_@(item.FormFieldID.ToString())" class="field-validation-error"></span>
+                                        <script type="text/javascript">setAttribute("form_item_@(Model.ID)_@(item.FormFieldID.ToString())", "data-val-required", "@item.FormFieldRequiredTitle"); setAttribute("form_item_@(Model.ID)_@(item.FormFieldID.ToString())", "data-val", "true");</script>
+                                    </text>
+                                }
+                                <text>
+                                    <script type="text/javascript">changeClass("form_item_@(Model.ID)_@(item.FormFieldID.ToString())", " required")</script></text>
+                            }
+                        </div>
+                    </div>
+                }
+
+            }
+            <div class="clear clearfix"></div>
+            <div class="editor-button">
+                @Html.Partial("_InvisibleCaptcha", new Uco.Models.InvisibleCaptcha())
+                <input type="hidden" value="@Model.ID" name="FormID" id="FormID" />
+                <input type="submit" value="@Html.R(VirtualPath,"Send")" class="t-button" />
+                <span id="form_loading" class="dn">...Loading...</span>
+            </div>
+        </div>
+    }
+</div>
+

@@ -1,0 +1,98 @@
+﻿@model IEnumerable<Uco.Models.Category>
+@{
+    var listItemWidth = 150;
+}
+<div class="nav">
+    <div class="center_div">
+        <ul class="topMenu sf-menu sf-navbar sf-shadow" style="position:relative"> 
+            
+            <li class="nav1 " data-id="" data-name="@RP.T("Views.Shared._TopMenu.FirstCategoryName")"
+                  onmouseover="$('.nav_without_icons').show();"
+                       onmouseout="if (!window.currentCategory) { $('.nav_without_icons').show(); } else { $('.nav_without_icons').hide(); }">
+                   
+                <a href="#" class="first" id="firstCategoryProducts" style="position:relative" 
+                   onclick="$('.nav_without_icons').show(); window.currentCategory = 0;">
+                      <img src="/Content/DesignFiles/nav_icon.png" style="top: 13px;right: 36px; position: absolute;" />@RP.T("Views.Shared._TopMenu.FirstCategoryName")
+                </a>
+                <ul style="display: none; width:200px; right:0px!important; height: 94px!important;" class="submenuwrap">
+
+                    <li class="subCategory first" data-id="" data-name="@RP.T("Views.Shared._TopMenu.FavoriteProducts")">
+                        <a  onclick="$('.nav_without_icons').show(); window.currentCategory = 0;" id="favoriteProducts" href="#" style="line-height: 43px;display: block;padding: 0 25px 0 26px;">@RP.T("Views.Shared._TopMenu.FavoriteProducts")</a>
+                    </li>
+                    <li class="subCategory first" data-id="" data-name="@RP.T("Views.Shared._TopMenu.ProductsFromOrders")">
+                        <a  onclick="$('.nav_without_icons').show(); window.currentCategory = 0;" id="orderedProducts" href="#" style="line-height: 43px;display: block;padding: 0 25px 0 26px;">@RP.T("Views.Shared._TopMenu.ProductsFromOrders")</a>
+                    </li>
+                    <li class="subCategory first" data-id="" data-name="@RP.T("Views.Shared._TopMenu.DealsProducts")">
+                        <a  onclick="$('.nav_without_icons').show(); window.currentCategory = 0;" id="dealsProducts" href="#" style="line-height: 43px;display: block;padding: 0 25px 0 26px;">@RP.T("Views.Shared._TopMenu.DealsProducts")</a>
+                    </li>
+
+                </ul>
+            </li>
+            @{int i = 0;}
+            @foreach (var item in Model.Where(x => x.ParentCategoryID == 0).Take(11))
+            {
+                i++;
+                var childCount = Model.Where(x => x.ParentCategoryID == item.ID).ToList();
+                <li class="@(i == 1 ? "current-li current currentcat" : "") nav1" data-id="@item.ID" data-name="@item.Name" @if(childCount.Count == 0) { 
+                        <text>
+                     onmouseover="$('.nav_without_icons').hide();" onmouseout="if(window.currentCategory !=  @item.ID){  $('.nav_without_icons').show();}" </text>   
+                    }else{ 
+                        <text> 
+                       onmouseover="$('.nav_without_icons').show();"
+                       onmouseout="if (!window.currentCategory) { $('.nav_without_icons').show(); } else { $('.nav_without_icons').hide(); }" </text>
+                    }>
+                    <a href="#" class="@(i == 1 ? "orange-color " : "")" style="position:relative"
+                       @if(childCount.Count == 0) { 
+                        <text>onclick="$('.nav_without_icons').hide(); window.currentCategory = @item.ID;"
+                   </text>   
+                    }else{ 
+                        <text> onclick="$('.nav_without_icons').show(); window.currentCategory = 0;"
+                      </text>
+                    }>
+                        @*<img src="@SF.GetImage(item.Image, 40, 40, true,true)" style="top: 13px; right: 0; left: 0; margin-left: auto; position: absolute; margin-right: auto;" class="grayscale grayscale-fade @(i == 1 ? "grayscale-off" : "")" />*@ 
+                        @item.Name
+                    </a>
+                     @{
+                var width = "1198px";
+                
+                var rigth = (i*100).ToString()+"px";
+                            var columns = Math.Ceiling(((decimal)childCount.Count) / 7);
+                if(columns < 8)
+                {
+                    width = (listItemWidth * columns).ToString() + "px";
+                }
+                if ((i * 100) + (listItemWidth * columns) > 1198)
+                {
+                    var r = i;
+                    while (r >= 0 && ((r * 100) + (listItemWidth * columns) > 1198))
+                    {
+                        r--;
+                        
+                    }
+                    rigth = (r * 100).ToString() + "px";
+                }
+                if(columns == 0)
+                {
+                    columns = 1;
+                }
+                var height = (28 * Math.Ceiling(((decimal)childCount.Count) / columns) + 10).ToString() + "px";
+                        }
+                    <ul style="display: none; width:@width; right:@rigth!important; height: auto!important;" class="submenuwrap">
+
+                        @foreach (var subItem in childCount)
+                        {
+                            <li class="subCategory" data-id="@subItem.ID" data-name="@subItem.Name">
+                                <a href="#" style="line-height: 20px;display: block;padding: 4px 25px 4px 26px;" @if (childCount.Count == 0) {  <text> onclick="$('.nav_without_icons').hide(); window.currentCategory = @item.ID;"
+                                   </text>     } else {  <text> onclick="$('.nav_without_icons').show(); window.currentCategory = 0;"
+                                   </text>  }>@subItem.Name</a>
+                            </li>
+                                }
+                    </ul>
+
+                </li>
+            }
+        </ul>
+        <div class="clear"></div>
+    </div>
+    <div class="nav_without_icons_deprecated" style="display:none;"></div>   
+</div>

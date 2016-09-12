@@ -1,0 +1,86 @@
+ 1. In ~/Models/PageModels?.cs
+
+    add Custum page type.
+    set PreUrl? to some unique string.
+    defane default values in class initializer.
+    set [UIHint] for class elements. custum UIHint: Url, File, Image or set DataType?. Example: [DataType?(DataType?.Currency)]
+    set [Required] for class elements.
+    set validation for class elements using regular expression.Example [RegularExpression?("some regular expression")] or using ValidationAttributes? ValidationAttributes?: Email
+    set [Column(TypeName? = "nvarchar")] and [MaxLength?(255)] to define spesific data type. For dates use [Column(TypeName? = "datetime2")]
+    for propertes this Html set [DisplayFormat?(HtmlEncode? = false, ApplyFormatInEditMode? = true)].
+    set icon in ~/Areas/Admin/Content?/pages using png type and route_cp.png where cp is PreUrl?
+    add in RestrictChild? avaible page types
+    in LanguagePage? (and any other if nedded) add custum page name to RestrictChild?. 
+
+Example:
+
+[RestrictChild(new string[] { "CustumPage", "ContentPage" })]
+[RouteUrl("l")]
+public class CustumPage : AbstractPage
+{
+	[HiddenInput]
+	public override string PreUrl { get { return "cp"; } set { } }
+
+	[Display(Name = "PaymentPaidSite", Order = 910, ResourceType = typeof(Uco.Content.Resources.Models))]
+	public virtual bool PaymentPaidSite { get; set; }
+
+	[DataType(DataType.Currency)]
+	[Display(Name = "PaymentAmount", Order = 920, ResourceType = typeof(Uco.Content.Resources.Models))]
+	public virtual bool PaymentAmount { get; set; }
+
+	[Required]
+	[UIHint("Html")]
+	[Column(TypeName = "nvarchar")]
+	[MaxLength(255)]
+	[Display(Name = "PaymentTransactionNumber", Order = 930, ResourceType = typeof(Uco.Content.Resources.Models))]
+	public virtual string PaymentTransactionNumber { get; set; }
+
+	public override string RouteUrl { get { return "l"; } set { } }
+
+	//initializer
+	public CustumPage()
+	{
+		//here set default values
+		PaymentPaidSite = false;
+		PaymentAmount = 0;
+	}
+}
+
+2. in ~/Models/Db?.cs
+
+    add Custum page.
+    use ObjectName? + "s" fr varible name. 
+
+Example:
+
+public DbSet<CustumPage> CustumPages { get; set; }
+
+*UI* 3. in ~/Controllers/PageController?.cs
+
+    add ActionResult? Example: 
+
+[AcceptVerbs(HttpVerbs.Get)]
+public ActionResult ApartmentAll(string name)
+{
+	if (CurrentPage == null) return RedirectToAction("Error404", "Error");
+
+	ViewBag.Title = CurrentPage.SeoTitle != null && CurrentPage.SeoTitle != "" ? CurrentPage.SeoTitle : CurrentPage.Title;
+	ViewBag.H1 = CurrentPage.SeoH1 != null && CurrentPage.SeoH1 != "" ? CurrentPage.SeoH1 : CurrentPage.Title;
+	ViewBag.Keywords = CurrentPage.SeoKywords;
+	ViewBag.Description = CurrentPage.SeoDescription;
+
+
+	return View(CurrentPage);
+}
+
+4. Add Uco Site Page View
+
+5. in ~/Areas/Admin/Views/Main?/App_LocalResources/CreateList.cshtml.resx and CreateList?.cshtml.he-IL.resx
+
+    add all class name and translation 
+
+6. add png to Areas\Admin\Content\pages
+
+*Optional* 7. in ~/Content/Resources/Models?.resx and Models.he-IL.resx
+
+    add all class elements names and translation 

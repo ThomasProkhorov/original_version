@@ -1,0 +1,55 @@
+﻿@{
+  int month = LS.GetRandom();
+  string FieldID = ViewData.TemplateInfo.HtmlFieldPrefix.Replace(".", "_");
+  string keyFiled = "ID";
+  if (ViewData["KeyField"] != null)
+  {
+      keyFiled = (string)ViewData["KeyField"];
+  }
+  var val = ((object)Model).GetType().GetProperty(keyFiled).GetValue(Model);
+}
+
+
+<input id="@FieldID@(month)" data-zero="false" name="@ViewData.TemplateInfo.HtmlFieldPrefix.Replace("_",".")" value="@val" />
+
+<script>
+    $('#@FieldID@(month)')
+                            .kendoComboBox(
+    {
+        placeholder: "Select ",
+        dataTextField: "Name",
+        dataValueField: "@keyFiled",
+
+        filter: "contains",
+        minLength: 1,
+        "autoBind": true,
+        dataSource: {
+            schema: {
+                data: "Data",
+                total: "Total",
+                errors: "Errors",
+            },
+            type: "json",
+            serverFiltering: true,
+            filter: [],
+            transport: {
+                "prefix": "",
+                read: {
+                    url: "@Url.Action("_AjaxAutoComplete", "Generic", new { model = Model.GetType().Name, keyFiled = keyFiled })"
+,
+                    type: "POST",
+                    data: function () {
+                        var data = kendo.ui.ComboBox.requestData('#@FieldID@(month)');
+
+                        /** data["filter"] = "SpecificationAttributeID~eq~1";
+                        console.log(data);
+                        **/
+                        return data;
+                    },
+                }
+            }
+        }
+    });
+
+</script>
+

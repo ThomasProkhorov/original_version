@@ -1,0 +1,10 @@
+@model string
+@{
+    SelectList Items = new SelectList(RP.GetCurrentSettings().PageLocationType.Replace("\r","").Split('\n').ToList(), Model);
+}
+@(Html.Kendo().DropDownListFor(model => model)
+    .DataTextField("Text")
+    .DataValueField("Value")
+    .BindTo(Items)
+    .Value(Model)
+)

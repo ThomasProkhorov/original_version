@@ -1,0 +1,79 @@
+﻿@model int
+@using Kendo.Mvc.UI;
+@using Kendo.Mvc;
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutNoTree.cshtml";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Index</title>
+</head>
+<body class="t-rtl">
+    <div class="action_wrap">
+
+
+
+        @*@(Html.Kendo().Grid<Uco.Models.XmlContact>()
+        .Name("Grid")
+        .DataSource(dataSource =>
+            dataSource.Ajax()
+                .Model(model => { model.Id(item => item.ID); })
+                .Model(model => model.Field(r => r.ID).Editable(false))
+                .Read(r => r.Action("_XmlContacts_AjaxIndex", "ListItem", new { ParentID = Model }))
+                .Destroy(r => r.Action("_XmlContacts_AjaxDelete", "ListItem", new { ParentID = Model }))
+        )
+        .Columns(columns =>
+        {
+            columns.Bound(r => r.ID).Width(50);
+            columns.Bound(r => r.Order).Width(80);
+            columns.Bound(r => r.Title);
+            columns.Bound(r => r.FullName);
+            columns.Bound(r => r.Email);
+            columns.Template(r => r.ID).ClientTemplate(
+                "<a class='k-button' href='" + Url.Action("EditXMLContact", "ListItem") + "?ID=#= ID #&ParentID=" + Model +"'>ערוך</a>"
+            ).Width(100);
+        })
+        )*@
+
+
+
+
+
+
+        <br />
+            @(Html.Kendo().Grid<Uco.Models.XmlContact>()
+                .Name("XmlContacts")
+                .DataSource(dataSource => dataSource.Ajax()
+                    .Model(model => { model.Id(r => r.ID); })
+                    .Model(model => model.Field(r => r.ID).Editable(false))
+                    .Read(r => r.Action("_XmlContacts_AjaxIndex", "ListItem", new { ParentID = Model }))
+                    .Destroy(r => r.Action("_XmlContacts_AjaxDelete", "ListItem", new { ParentID = Model }))
+                )
+                .Columns(columns =>
+                {
+                    columns.Bound(r => r.ID).Width(50);
+                    columns.Bound(r => r.Order).Width(80);
+                    columns.Bound(r => r.Title);
+                    columns.Bound(r => r.FullName);
+                    columns.Bound(r => r.Email);
+                    columns.Template(r => r.ID).ClientTemplate(
+                        "<a class='k-button' href='" + Url.Action("EditXMLContact", "ListItem") + "?ID=#= ID #&ParentID=" + Model + "'>ערוך</a>"
+                    ).Width(100);
+                    columns.Command(commands =>
+                    {
+                       commands.Destroy();
+                    }).Width(210).Title("פקודות");
+                })
+                .ToolBar(commands => commands.Custom().Text("הוסף רשומה חדשה").Action("CreateXMLContact", "ListItem", new { ParentID = Model }))
+                .Pageable()
+                .Sortable()
+                .Filterable()
+                .Groupable()
+            )
+            <br />
+            <a href="@ViewBag.ReturnUrl" class="t-button t-state-default">חזרה</a>
+    </div>
+</body>
+</html>

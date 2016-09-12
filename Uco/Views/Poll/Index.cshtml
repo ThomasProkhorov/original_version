@@ -1,0 +1,79 @@
+﻿@using Uco.Models.Overview
+@using Uco.Models
+@model PollPageModel
+@{
+    ViewBag.Title = RP.T("Views.Poll.Index.ViewBagTitle");
+    Layout = "~/Views/Shared/_LayoutShop.cshtml";
+    ViewBag.Url = "~/Profile/Index/";
+}
+@*rewrite shopping cart footer*@
+@*@section FooterZone{
+
+}*@
+@section topmenu{
+   
+}
+
+
+<div class="midd_section midd_section2">
+	<div class="center_div">
+    	<div class="profile_page_right_sec">
+        	<h1 class="main_heading_h1_profile">שם הקטגוריה</h1>
+            <form id="pollform" class="profile_right_in">
+                <input type="hidden" name="ShopID" value="@Model.ShopID" />
+                <input type="hidden" name="OrderID" value="@Model.OrderID" />
+                <input type="hidden" name="ProductID" value="@Model.ProductID" />
+                <input type="hidden" name="token" value="@Model.token" />
+               
+            	<div class="profile_page"><img src="/Content/DesignFiles/profile_page.png" alt=""></div>
+            	<div class="profile_text1"><a href="#">לקוח יקר, דעתך חשובה לנו</a></div>
+                <div class="profile_text2">במידה וברצונך ליצור קשר עם תמיכה ושירות לקוחות סל קניות - אנא כתוב לנו.<br>
+במידה וברצונך ליצור קשר בנוגע לרכישה שביצעת - אנא צור קשר ישיר עם <a href="#">החנות</a><br>
+אם יש לך שאלה כללית, אולי מישהו כבר שאל לפניך... תוכל לקרוא בעמוד ״שאלות ותשובות״
+                </div>
+                <div class="prfl_row2">
+                	<div class="img_div"><a href="#"><img src="/Content/DesignFiles/prfl_logo.png" alt=""></a></div>
+                    <div class="text_div">שופרסל שלי</div>
+                    <div class="clear"></div>
+                </div>
+                <div class="prfl_row3">
+@Html.Action("Block",new {SystemName = "poll.what",model = Model })
+                	
+                </div>
+                <div class="prfl_row3">
+             @Html.Action("Block", new { SystemName = "poll.what2", model = Model })   	
+                </div>
+                <div class="prfl_row4">
+
+                	<div class="heading">על הקנייה</div>
+                    <ul>
+                    	<li class="prfl4_lstng">
+  @Html.Action("Block", new { SystemName = "poll.rating", model = Model })  
+                        	
+                        </li>
+                        <li class="prfl4_lstng">
+                        	 @Html.Action("Block", new { SystemName = "poll.rating2", model = Model })  
+                        </li>
+                        <li class="prfl4_lstng">
+                        	 @Html.Action("Block", new { SystemName = "poll.rating3", model = Model })  
+                        </li>
+                    </ul>
+                </div>
+                <div class="prfl_page_btns">
+                	<ul>
+                    	<li class="orange"><a href="#" onclick="Shop.PollVote(this,event,'pollform');">שלח דירוג</a></li>
+                        <li class="green"><a href="#">חזור לחנות</a></li>
+                    </ul>
+
+                    <div class="clear"></div>
+<div id="pollresult"></div>
+                </div>
+            </form>
+        </div>
+    	<div class="prfl_left_sec">
+        	<div class="banner1"><a href="#"><img src="/Content/DesignFiles/banner1.png" alt=""></a></div>
+        	<div class="banner2"><a href="#"><img src="/Content/DesignFiles/banner2.png" alt=""></a></div>
+        </div>
+        <div class="clear"></div>
+    </div>
+</div>      

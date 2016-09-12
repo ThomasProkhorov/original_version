@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<siteMap>
+  <siteMapNode title="Home" controller="Home" action="Overview">
+    <siteMapNode title="Order" Resource="Admin.Menu.Order" controller="Main" action="Index" ImageUrl="~/Areas/Member/Content/icons/cart.png"></siteMapNode>
+	<siteMapNode title="Clients" Resource="Admin.Menu.Clients" url="/member/manage/User" ImageUrl="~/Areas/Admin/Content/icons/user.png"></siteMapNode>
+    <siteMapNode title="Shop" Resource="Admin.Menu.Shop" ImageUrl="~/Areas/Member/Content/icons/application_view_columns.png">
+      <siteMapNode title="Products" Resource="Admin.Menu.Products" url="/Member/Manage/ProductShop"  />
+	  <siteMapNode title="ProductSkuMap" Resource="Admin.Menu.ProductSkuMap" url="/Member/Manage/ProductSkuMap"  />
+	</siteMapNode>
+	<siteMapNode title="Sales" Resource="Admin.Menu.Sales" ImageUrl="~/Areas/Member/Content/icons/bell.png">
+	  <siteMapNode title="ShopDiscount" Resource="Admin.Menu.Discounts" url="/member/manage/Discount"></siteMapNode>
+      <siteMapNode title="UserCredit" Resource="Admin.Menu.UserCredit" url="/member/manage/usercredit"></siteMapNode>
+	</siteMapNode>
+    <siteMapNode title="Report" controller="Main" action="PaymentReport" Resource="Admin.Menu.Report" ImageUrl="~/Areas/Admin/Content/icons/chart_pie.png"></siteMapNode>
+	<siteMapNode title="Contact"  controller="Contact" action="Index"  Resource="Admin.Menu.Contact" ImageUrl="~/Areas/Admin/Content/icons/email_open.png"></siteMapNode>
+    <siteMapNode title="Settings" Resource="Admin.Menu.Settings" ImageUrl="~/Areas/Admin/Content/icons/cog.png">
+	  <siteMapNode title="Profile" Resource="Admin.Menu.Profile" controller="Main" action="ShopProfile"></siteMapNode>
+      <siteMapNode title="CategoryMenu" Resource="Admin.Menu.CategoryMenu" url="/Member/CategoryMenu/Index"></siteMapNode>
+      <siteMapNode title="ShopDesign" Resource="Admin.Menu.ShopDesign" url="/Member/Manage/ShopDesign"></siteMapNode>
+      <siteMapNode title="ProcessError" Resource="Admin.Menu.ProcessError" url="/Member/Manage/ProcessError"></siteMapNode>
+      <siteMapNode title="RunCategoryUpdate" Resource="Admin.Menu.RunCategoryUpdate" url="/Member/Task/RunCategoryUpdate"></siteMapNode>
+      
+    </siteMapNode>
+    <siteMapNode title="Help" Resource="Admin.Menu.Help" ImageUrl="~/Areas/Member/Content/icons/information.png" url="/f/support"></siteMapNode>
+  </siteMapNode>
+</siteMap>

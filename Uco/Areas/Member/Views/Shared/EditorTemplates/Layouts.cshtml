@@ -1,0 +1,18 @@
+@model string
+@{
+    string[] Files = Directory.GetFiles(Server.MapPath("~/Views/Shared/"), "_Layout*.cshtml");
+    List<string> FilesList = new List<string>();
+    foreach (string item in Files)
+    {
+        string t = System.IO.Path.GetFileName(item);
+        if (t.Contains(".Mobile.cshtml")) { continue; }
+        FilesList.Add(t);
+    }
+    SelectList Items = new SelectList(FilesList, Model);
+}
+@(Html.Kendo().DropDownListFor(model => model)
+    .DataTextField("Text")
+    .DataValueField("Value")
+    .BindTo(Items)
+    .Value(Model)
+)

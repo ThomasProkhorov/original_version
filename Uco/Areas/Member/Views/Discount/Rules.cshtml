@@ -1,0 +1,53 @@
+﻿@model List<SelectListItem>
+@using System.Reflection
+@using System.Collections.Generic
+@using System.Linq
+@using System.ComponentModel.DataAnnotations
+@using Uco.Infrastructure.Discounts
+
+<div id="ruleadd">
+    @Html.DropDownList("Rule", Model)
+    <button id="addnewrule" class="k-button"> @RP.T("Admin.Common.Add") </button>
+    <input id="systemName" type="hidden" value="">
+</div>
+<div id="newrulewrap">
+
+</div>
+<div id="rulelist">
+
+</div>
+<script>
+    $('#addnewrule').click(function () {
+        var data = {};
+        data.RuleName = $('#Rule').val();
+        $('#systemName').val(data.RuleName);
+        $.ajax({
+            type: "POST",
+            dataType: "html",
+            url: "/Member/Discount/NewRule",
+            data: data,
+            cache: false,
+            error: function () { $('#mainstatus').html('@RP.T("Admin.Common.ServerError")'); }
+        }).done(function (data) {
+            $('#newrulewrap').html(data);
+            refreshList();
+        });
+
+
+    });
+    var refreshList = function () {
+        $.ajax({
+            type: "GET",
+            dataType: "html",
+            url: "/Member/Discount/DiscountRuleList/" + $('#ID').val(),
+            data: {},
+            cache: false,
+            error: function () { $('#mainstatus').html('@RP.T("Admin.Common.ServerError")'); }
+        }).done(function (data) {
+            $('#rulelist').html(data);
+
+        });
+    };
+
+    refreshList();
+</script>

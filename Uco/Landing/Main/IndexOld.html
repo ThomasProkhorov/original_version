@@ -1,0 +1,285 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>Welcome!</title>
+   
+    <link href="/Content/Kendo/2014.1.318/kendo.common.min.css" rel="stylesheet" />
+    <link href="/Content/Kendo/2014.1.318/kendo.default.min.css" rel="stylesheet" />
+    <link href="/Content/Kendo/2014.1.318/kendo.rtl.min.css" rel="stylesheet" />
+
+
+    <script src="/Scripts/jquery-1.10.2.js"></script>
+  
+    <script src="/Scripts/Kendo/2014.1.318/kendo.web.min.js"></script>
+    <!--<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true"></script>-->
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true&libraries=places&language=iw"></script>
+
+    <script type="text/javascript">
+        var geocoder = new google.maps.Geocoder();
+        var Latitude, Longitude;
+        var CookiesDataObject = {};
+
+        $(document).ready(function () {           
+            GetCookies();
+            Initialize();
+            $("#shopType").kendoDropDownList({
+                dataTextField: "Name",
+                dataValueField: "ID",
+				optionLabel: "בחר סוג חנות",
+                dataSource: {
+                    transport: {
+                        read: {
+                            dataType: "json",
+                            url: "/Shop/_GetShopTypeList",
+                        }
+                    }
+                }
+            });
+
+            $("#AddressMap").keyup(function (event) {
+                if (event.keyCode == 13) {
+                    var result = GetGeocode($("#AddressMap").val());
+                    $("#submit_btn").click();
+                }
+            });
+
+            $("#submit_btn").kendoButton({
+                click: function () { 
+					if($("#AddressMap").val() == "")
+					{
+						alert("הכנס כתובת");
+						return fasle;
+					}
+					if($("#shopType").val() == "")
+					{
+						alert("בחר סוג חנות");
+						return fasle;
+					}
+                    //var result = GetGeocode($("#AddressMap").val());
+					if (Latitude != null && Longitude != null) {
+					    RedirectToUrl();
+					}
+					
+                }
+            });
+
+            $("#AddressMap").on('blur', function () {
+                var result = GetGeocode($("#AddressMap").val());
+            })
+        });        
+
+        function RedirectToUrl()            
+        {
+            var address = $("#AddressMap").val();
+
+            createCookie("Address", address, 30);
+            createCookie("Latitude", Latitude, 30);
+            createCookie("Longitude", Longitude, 30);           
+
+            $.ajax({
+                type: "Post",
+                url: "/Shop/LandingSelectShop",
+                data: { shopType: $("#shopType").val(), address: address, Latitude: Latitude, Longitude: Longitude },
+                async: false,
+                success: function (data) {
+                    if (data == "noshop")
+                    {                       
+                        var _atpopq = window._atpopq || (window._atpopq = []);
+                        window._atpopobj = {};
+                        if (!_atpopq.loaded) {
+                            var atpopjs = document.createElement('script');
+                            atpopjs.type = 'text/javascript';
+                            atpopjs.async = true;
+                            atpopjs.src = '//cdn-media.web-view.net/popups/lib/v1/loader.min.js';
+                            var s = document.getElementsByTagName('script')[0];
+                            s.parentNode.insertBefore(atpopjs, s);
+                            _atpopq.loaded = true;
+                        }
+                        _atpopq.push(['UserId', 'xfzts2dh']);
+                        _atpopq.push(['PopupId', 'x3fsa2']);
+                        _atpopq.push(['OnEventCallback', 'handleATPopupEvent']);
+                    }
+                    else
+                    {
+                        $(location).attr('href', data);
+                    }
+
+                }
+
+            });
+        }
+
+        //Sample event handler function
+        function handleATPopupEvent(ev, args) {
+            switch (ev) {
+                case 'display':
+                    //Do this when the popup is displayed
+                    break;
+                case 'close':
+                    //Do this when the popup gets closed by the user
+                    break;
+                case 'submit':
+                    //Do this when popup gets submitted and the user doesn't get redirected to a URL
+                    break;
+            }
+        }
+
+        function GetCookies() {
+            CookiesDataObject.address = getCookie("Address");
+            CookiesDataObject.latitude = getCookie("Latitude");
+            CookiesDataObject.longitude = getCookie("Longitude");
+            $("#AddressMap").val(CookiesDataObject.address);
+        }
+
+        var createCookie = function (name, value, days) {
+            var expires;
+            if (days) {
+                var date = new Date();
+                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                expires = "; expires=" + date.toGMTString();
+            }
+            else {
+                expires = "";
+            }
+            document.cookie = name + "=" + value + expires + "; path=/";
+        }
+        function getCookie(c_name) {
+            if (document.cookie.length > 0) {
+                c_start = document.cookie.indexOf(c_name + "=");
+                if (c_start != -1) {
+                    c_start = c_start + c_name.length + 1;
+                    c_end = document.cookie.indexOf(";", c_start);
+                    if (c_end == -1) {
+                        c_end = document.cookie.length;
+                    }
+                    return unescape(document.cookie.substring(c_start, c_end));
+                }
+            }
+            return "";
+        }
+
+        function GetGeocode(v)
+        {
+            var cur_val = v;
+            
+            geocoder.geocode({ 'address': cur_val }, function (results, status) {
+                if (status == google.maps.GeocoderStatus.OK) {
+                    
+                    Latitude = results[0].geometry.location.lat();
+                    Longitude = results[0].geometry.location.lng();                
+
+                    map.setCenter(results[0].geometry.location);
+                    var marker = new google.maps.Marker({
+                        map: map,
+                        position: results[0].geometry.location
+                    });      
+                    
+                } 
+				else {
+                    alert("לא מצליח למצוא את הכתובת: " + status);
+                }
+                
+            });
+        }
+        function Initialize() {
+            geocoder = new google.maps.Geocoder();
+            if (CookiesDataObject && CookiesDataObject.latitude && CookiesDataObject.longitude) {
+                Latitude = CookiesDataObject.latitude;
+                Longitude = CookiesDataObject.longitude;
+                
+            } else {
+                Latitude = 31.046051;
+                Longitude = 34.85161199999993;
+            }
+
+            var latlng = new google.maps.LatLng(Latitude, Longitude);
+            var mapOptions = {
+                zoom: 15,
+                center: latlng,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            }
+            map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
+
+
+            var input = (document.getElementById('AddressMap'));
+            var autocomplete = new google.maps.places.Autocomplete(input);
+            autocomplete.bindTo('bounds', map);
+
+            var infowindow = new google.maps.InfoWindow();
+            var marker = new google.maps.Marker({
+                map: map,
+                anchorPoint: new google.maps.Point(0, -29)
+            });
+
+            google.maps.event.addListener(autocomplete, 'place_changed', function () {
+                infowindow.close();
+                marker.setVisible(false);
+                var place = autocomplete.getPlace();
+                if (!place.geometry) {
+                    return;
+                }
+
+                // If the place has a geometry, then present it on a map.
+                if (place.geometry.viewport) {
+                    map.fitBounds(place.geometry.viewport);
+                } else {
+                    map.setCenter(place.geometry.location);
+                    map.setZoom(17);  // Why 17? Because it looks good.
+                }
+                marker.setIcon(/** @type {google.maps.Icon} */({
+                    url: place.icon,
+                    size: new google.maps.Size(71, 71),
+                    origin: new google.maps.Point(0, 0),
+                    anchor: new google.maps.Point(17, 34),
+                    scaledSize: new google.maps.Size(35, 35)
+                }));
+                marker.setPosition(place.geometry.location);
+                marker.setVisible(true);
+
+                var address = '';
+                if (place.address_components) {
+                    address = [
+                      (place.address_components[0] && place.address_components[0].short_name || ''),
+                      (place.address_components[1] && place.address_components[1].short_name || ''),
+                      (place.address_components[2] && place.address_components[2].short_name || '')
+                    ].join(' ');
+                }
+
+                infowindow.setContent('<div><strong>' + place.name + '</strong><br>' + address);
+                infowindow.open(map, marker);
+            });
+
+            // Sets a listener on a radio button to change the filter type on Places
+            // Autocomplete.
+            function setupClickListener(id, types) {
+                var radioButton = document.getElementById(id);
+                google.maps.event.addDomListener(radioButton, 'click', function () {
+                    autocomplete.setTypes(types);
+                });
+            }           
+        }
+    </script>   
+</head>
+<body class="k-rtl">
+    <div style="text-align: center;">       
+        <img src="Images/header.png" />
+    </div>
+
+    <div style="text-align: center;">
+        <input type="text"  style="width: 300px" class="k-textbox" name="AddressMap" placeholder="מה הכתובת שלך?" id="AddressMap" />
+        <input  placeholder="סוג חנות" id="shopType" style="width: 300px" />
+        <button id="submit_btn" type="button">התחל רכישה</button>
+
+
+        <div style="text-align: center; width: 900px; border: 1px solid #c7c4b8; margin: 20px auto; border-radius:4px; ">
+            <div id="map_canvas" style="width: 100%; height: 400px; text-align:center;"></div>
+        </div> 
+
+
+    </div>
+    <div style="text-align: center;">
+        <img src="Images/footer.png" />
+    </div>
+</body>
+</html>

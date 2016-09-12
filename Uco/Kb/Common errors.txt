@@ -1,0 +1,48 @@
+Don't Edit Admin and Infrastructure folders
+
+Don't Edit Admin and Infrastructure folders unless you told to do so.
+Don't work on System... files
+
+SystemPageController?.cs, SystemPagePartController?.cs, SystemPageModels?.cs, SystemDataModels?.cs - if you need to modify any code move it (for example from SystemPageController?.cs to PageController?.cs)
+Delete not needed files from repository
+
+If you created some temp file or put some code in comment - clean it before committing to snv.
+If site in hebrew - use hebrew test data
+
+For Hebrew text use ​http://he.lipsum.com
+Form validation
+
+Always check how form validation will look like and design it.
+
+Example:
+
+.input-validation-error {
+    background-color: #FFA59B;
+}
+.field-validation-error {
+    color: #FF0000;
+    font-weight: bold;
+}
+
+Editor text
+
+Always put editor_html wrapper around editor text
+
+    <div class="editor_html">
+        @Html.Raw(Model.Text)
+    </div>
+    <div class="clear"></div>
+
+On home page create h2, h3, h4, h5, ul li, p and make its look good.
+Form Pages
+
+I every project create form page and check what its look good. Design it if needed.
+Sitemap Pages
+
+I every project sitemap page.
+QA
+
+Do self QA after uploading files to server. Qa on local machine is not Enough.
+On front don't use KendoUI if you don't need to ¶
+
+Use ~/Scripts/front and not ~/Scripts/front_kendo if you don't need kendoUI in front

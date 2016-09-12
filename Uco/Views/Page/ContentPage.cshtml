@@ -1,0 +1,13 @@
+﻿@model Uco.Models.ContentPage
+@{
+    Layout = ViewBag.Layout;
+    ViewBag.HideTopSearch = true;
+}
+
+<h1 class="main_heading_h1_profile">@ViewBag.H1</h1>       
+<div class="content_page">
+    <div class="editor_html">
+        @Html.Raw(Model.Text)
+    </div>
+    <div class="clear"></div>           
+</div>

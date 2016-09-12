@@ -1,0 +1,47 @@
+@model System.String
+
+<img id="img_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))" src="@(ViewData.TemplateInfo.FormattedModelValue.ToString())" alt="@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))" style=" max-width:280px; max-height:40px;" />
+
+@Html.Hidden("", ViewData.TemplateInfo.FormattedModelValue.ToString(), new { @id = "value_" + ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty) })
+
+@(Html.Kendo().Upload()
+        .Name("attachments_" + ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))
+        .Multiple(false)
+        .Async(async => async
+            .Save("Save", "Upload", new { Area = "" })
+            .Remove("Remove", "Upload", new { Area = "" })
+            .AutoUpload(true)
+        )
+        .Events(events => events.Success("OnSuccess_" + ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty)))
+        .HtmlAttributes(new { @class = "file-upload-box", @id = "attachments_" + ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty) })
+)
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        var PARAM_NAME = "attachments";
+        var uploadElement = $("#attachments_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))");
+        uploadElement.data("kendoUpload").name = PARAM_NAME;
+
+        @if(string.IsNullOrEmpty(ViewData.TemplateInfo.FormattedModelValue.ToString()))
+        {
+            <text>
+            $('#img_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))').addClass("dn");
+            </text>
+        }
+    });
+
+    function OnSuccess_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))(e) {
+        if (e.operation == "upload") {
+            $("#value_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))").attr("value", "/Content/UserFiles/Upload/" + e.files[0].name);
+            $('#img_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))').attr("src", "/Content/UserFiles/Upload/" + e.files[0].name);
+            $('#img_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))').removeClass("dn");
+        }
+        else if (e.operation == "remove") {
+            $("#value_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))").attr("value", "");
+            $('#img_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))').attr("src", "");
+            $('#img_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))').addClass("dn");
+        }
+    }
+</script>
+

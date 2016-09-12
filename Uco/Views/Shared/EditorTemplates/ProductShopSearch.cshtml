@@ -1,0 +1,196 @@
+﻿@model string  
+@using Uco.Infrastructure   
+@using Uco.Infrastructure.Livecycle 
+@using Uco.Models
+@{
+    int month = LS.GetRandom();
+    string FieldName = ViewData.TemplateInfo.HtmlFieldPrefix.Replace(".", "_") + month.ToString();
+    TempData["IsSelectGrid"] = true;
+    TempData["GridPrefix"] = FieldName;
+    TempData["SelectGridTitleSelector"] = "#if(Product) { ##= ID #|#= Product.Name # #= Product.SKU ## } #";
+    var gridName = FieldName + "ProductShopgrid";
+   var list = ProductShop.AccessList(new ModelGeneralAttribute());
+   var listIds = new List<int>();
+   if(!string.IsNullOrEmpty(Model))
+   { 
+   listIds = Model.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(x => int.Parse(x)).ToList();
+   }
+   var selectedElements = (from ps in list
+                          join p in LS.CurrentEntityContext.Products
+                          on ps.ProductID equals p.ID
+                           where listIds.Contains(ps.ID)
+                          select new { 
+                          ps.ID,
+                          p.Name,
+                          p.SKU
+                          }).ToList();
+   TempData["TopFilter"] = true;
+
+ //  TempData["FilterList"] = new List<string>() { "Quantity" };
+   TempData["FilterExtendedList"] = new Dictionary<string, object>() { { "Product.Name", "" }
+       , { "Product.SKU", "" }
+       , { "Product.CategoryID", new Category() } }; 
+}
+<a class="k-button" href="#" id="toggle_@(FieldName)">@RP.T("Admin.Common.GridDisplayToggle")</a>
+<div id="wrap_@(FieldName)" style="display:none;">
+    @Html.Action("Grid", "Generic", new { Filed = "", ID = 0, model = "ProductShop" })
+</div>
+
+<input type="hidden" value="@Model" id="@FieldName"
+       name="@ViewData.TemplateInfo.HtmlFieldPrefix.Replace("_",".")"
+       class="hidden_tree_data_@(FieldName)" />
+
+<br />
+<div id="Current_@(FieldName)" style="margin-top:10px; padding-top:6px;">
+    @foreach (var item in selectedElements)
+    {
+        <div id="listitem_@(FieldName + item.ID.ToString())"><input type="checkbox" checked="checked" value="@item.ID|@item.Name @item.SKU" class="inlist" />  @item.Name @item.SKU</div>
+
+    }
+</div>
+<script type="text/javascript">
+     $(document).ready(function () {
+    $('#toggle_@(FieldName)').click(function(event){
+        event.preventDefault();
+        $('#wrap_@(FieldName)').toggle();
+    });
+
+        ////GRID
+        var @(gridName) = $('#@(gridName)').data('kendoGrid');
+    @(gridName).bind("dataBound",function(a,b,c){
+        $('#@(gridName) .checkbox').each(function(i,e){
+            var valueToAdd = $(e).val().split('|');
+            var name = valueToAdd[1];
+            valueToAdd = valueToAdd[0]
+            var valueAll = $(".hidden_tree_data_@(FieldName)").val();
+            if (valueAll.indexOf(",") == -1) valueAll = valueAll + ",";
+            if (valueAll.indexOf("," + valueToAdd + ",") != -1) {
+                $(e).attr('checked', true);
+
+            }
+
+        });
+        $('#@(gridName) .checkbox').change(function(e){
+
+            var checkbox = $(this);
+            var value = checkbox.val();
+            var valueToAdd = value.split('|');
+            var name = valueToAdd[1];
+            value = valueToAdd[0]
+            if (checkbox.is(":checked")) addValue_@(FieldName)(value,name);
+            else removeValue_@(FieldName)(value,name);
+
+        });
+    }); //new search. Set page size to 1
+
+    ///
+
+    $('#Current_@(FieldName)'+' .inlist').change(function(){
+        var checkbox = $(this);
+        var value = checkbox.val();
+        var valueToAdd = value.split('|');
+        var name = valueToAdd[1];
+        value = valueToAdd[0]
+        if (checkbox.is(":checked")) addValue_@(FieldName)(value,name);
+        else removeValue_@(FieldName)(value,name);
+        @(gridName).dataSource.read();
+    });
+    ///
+
+
+    $('#Tree_@(FieldName)').on("change", ":checkbox", function (e) {
+        var treeview = $("#Tree_@(FieldName)").data('kendoTreeView');
+        var checkbox = $(this);
+        var checkbox_item = treeview.dataItem(checkbox);
+        var value = checkbox_item.id;
+        //alert("value: " + value);
+
+        if (checkbox.is(":checked")) addValue_@(FieldName)(value);
+        else removeValue_@(FieldName)(value);
+
+        setNodeChilds_@(FieldName)($(this));
+
+    });
+
+    function setNodeChilds_@(FieldName)(node) {
+        var treeview = $("#Tree_@(FieldName)").data('kendoTreeView');
+        var items = node.closest(".k-item").find(".k-group:first > .k-item > div input[type=checkbox]");
+        if (items.length > 0) {
+            items.each(function () {
+                var getNode = $(this).closest(".k-item");
+                var item = treeview.dataItem(getNode);
+                var value = item.id;
+                if ($(this).is(":checked")) {
+                    addValue_@(FieldName)(value);
+                }
+                else {
+                    removeValue_@(FieldName)(value);
+                }
+                setNodeChilds_@(FieldName)($(this));
+            });
+
+        }
+    }
+    function changeTree_@(FieldName)(valueToAdd)
+    {
+        if($(this).is(":checked"))
+        {
+            addValue_@(FieldName)(value);
+        }else{
+            removeValue_@(FieldName)(value);
+        }
+    }
+    function addValue_@(FieldName)(valueToAdd,name) {
+        //alert("addValue:" + valueToAdd);
+        var valueAll = $(".hidden_tree_data_@(FieldName)").val();
+        if (valueAll.indexOf(",") == -1) valueAll = valueAll + ",";
+        if (valueAll.indexOf("," + valueToAdd + ",") == -1) {
+            $(".hidden_tree_data_@(FieldName)").val(valueAll + valueToAdd + ",");
+            $('#Current_@(FieldName)').append('<div id="listitem_@(FieldName)'+valueToAdd+'"><input type="checkbox" checked="checked" value="'+valueToAdd+'|'+name+'" class="inlist" /> '+name+'</div>');
+            $('#listitem_@(FieldName)'+valueToAdd+' .inlist').change(function(){
+                var checkbox = $(this);
+                var value = checkbox.val();
+                var valueToAdd = value.split('|');
+                var name = valueToAdd[1];
+                value = valueToAdd[0]
+                if (checkbox.is(":checked")) addValue_@(FieldName)(value,name);
+                else removeValue_@(FieldName)(value,name);
+                @(gridName).dataSource.read();
+            });
+        }
+    }
+    function removeValue_@(FieldName)(valueToRomove,name) {
+        //alert("removeValue:" + valueToRomove);
+        var valueAll = $(".hidden_tree_data_@(FieldName)").val();
+        if (valueAll.indexOf(",") == -1) valueAll = valueAll + ",";
+        if (valueAll.indexOf("," + valueToRomove + ",") != -1) {
+            $(".hidden_tree_data_@(FieldName)").val(valueAll.replace(valueToRomove + ",", ""));
+            $('#listitem_@(FieldName)'+valueToRomove).remove();
+        }
+    }
+    //check all
+    $('#@(gridName)e-checkall').click(function (event) {
+        var e = this;
+        if ($(e).is(':checked')) {
+
+            $('#@(gridName) .checkbox').each(function (i, c) {
+                if(!$(c)[0].checked)
+                {
+                    $(c).click();
+                    $(c)[0].checked = true;
+                }
+            });
+
+        } else {
+            $('#@(gridName) .checkbox').each(function (i, c) {
+                if($(c)[0].checked)
+                {
+                    $(c).click();
+                    $(c)[0].checked = false;
+                }
+            });
+
+        }
+    });
+    });
+</script>

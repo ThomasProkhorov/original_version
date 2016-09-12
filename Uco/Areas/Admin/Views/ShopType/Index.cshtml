@@ -1,0 +1,56 @@
+﻿@{
+    ViewBag.Title = RP.T("Admin.Views.ShopType.Index.Title");
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutNoTree.cshtml";
+}
+
+<h2>@RP.T("Admin.Views.ShopType.Index.Title")</h2>
+
+
+
+@(Html.Kendo().Grid<Uco.Models.ShopType>()
+    .Name("Grid")
+    .DataSource(dataSource =>
+        dataSource.Ajax()
+        //.AutoSync(true)
+        
+            .Model(model => { model.Id(item => item.ID); })
+            .Read(r => r.Action("_AjaxIndex", "ShopType"))
+            .Destroy(r => r.Action("_AjaxDelete", "ShopType"))
+                    .Update(r => r.Action("_AjaxSave", "ShopType"))
+                            .Create(r => r.Action("_AjaxInsert", "ShopType"))
+                                .Events(events => 
+                                    {
+                                       // events.Error("error_handler");
+                                        events.Sync("function(e){ this.read(); }");
+                                    })
+    )
+      
+    .Columns(columns =>
+    {
+        columns.Bound(r => r.ID).Width(20);
+        columns.Bound(r => r.Name);
+        columns.Bound(r => r.DisplayOrder).Width(200);
+      
+       // columns.Template(r => r.ID).ClientTemplate(
+      //      "<a class='k-button' href='" + Url.Action("Edit", "ShopType") + "?ID=#= ID #'" + ">" + RP.T("Admin.Views.Command.Edit").ToString() + "</a>"
+     //   ).Width(100);
+        columns.Command(commands =>
+        {
+            commands.Destroy();
+            commands.Edit();
+            
+        }).Width(200);
+    })
+    .Pageable( conf=>conf.Refresh(true))
+    
+    .Sortable()
+    .Filterable()
+        .ToolBar(commands => 
+            commands.Create()
+          
+        )
+    .Groupable()
+    
+)
+<br />
+

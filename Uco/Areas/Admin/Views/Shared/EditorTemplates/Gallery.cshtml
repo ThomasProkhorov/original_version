@@ -1,0 +1,118 @@
+@model System.String
+@{
+    int i1 = 0;
+}
+@if (Model.EndsWith("_0"))
+{
+    <text>@RP.T("Admin.Views.Shared.Editor.CreatePageToUse")</text>
+}
+else
+{
+    string GalleryPath = Server.MapPath(string.Format("~/Content/UserFiles/{0}/{1}", LS.CurrentUser.RoleDefault, Model));
+    List<Uco.Models.ImageGalleryItem> allImages = SF.GalleryFile2List(GalleryPath, 120, 120, false, false);
+
+    <br class="clear" />
+    <div class="gallery_editor_wrap gallery_editor_wrap_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))">
+        @{
+            foreach (Uco.Models.ImageGalleryItem item in allImages.OrderBy(r => r.Order))
+            {
+                i1 = i1 + 1;
+                <div class="gallery_div gallery_div_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty)) gallery_img_@(i1)_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))">
+                    <img src="@Url.Content(item.SmallImageUrl)" alt="@item.Title" />
+                    <input type="checkbox" class="gallery_div_delete gallery_img_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))" id="gallery_img_@(i1)_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))" />
+                    <span for="gallery_img_@(i1)_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))">delete</span>
+                    <input class="gallery_div_order" type="text" value="@item.Order" name="gallery_div_order_@(Url.Encode(item.FileName))" />
+                    <input class="gallery_div_title" type="text" value="@item.Title" name="gallery_div_title_@(Url.Encode(item.FileName))" />
+                </div>
+            }
+            i1++;
+        }
+    </div>
+    <div>
+        <br class="clear" />
+        @RP.T("Admin.Views.Shared.Editor.AddImages")
+        <br class="clear" />
+    </div>
+    @(Html.Kendo().Upload()
+        .Name("attachments_" + ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))
+        .Multiple(true)
+        .Async(async => async
+            .Save("Save", "Gallery", new { name = Model, Area = "Admin" })
+            .Remove("Remove", "Gallery", new { name = Model, Area = "Admin" })
+            .AutoUpload(true)
+        )
+        .Events(events => events.Success("OnSuccess_" + ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty)))
+        .HtmlAttributes(new { @class = "gallery-upload-box" })
+    )
+    <br class="clear" />
+    <br class="clear" />
+    <a id="save_order_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))" class="k-button">@Html.R("SaveOrderAndTitle")</a>
+    <input type="hidden" name="folder" value="@Model" />
+
+    <script type="text/javascript">
+    var i11 = @(i1);
+
+    $(document).ready(function () {
+        var PARAM_NAME = "attachments";
+        var uploadElement = $("#attachments_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))");
+        uploadElement.data("kendoUpload").name = PARAM_NAME;
+
+        $(".gallery_editor_wrap").on("click",".gallery_img_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))", function(){
+            var itemid = $(this).attr("id");
+            var imgPaht = $("." + itemid + " img").attr("src");
+            $.post("@(Url.Content("~/"))Admin/Gallery/RemoveFile", { name: "@Model", fullName: imgPaht } )
+                .success(function(data) {
+                    $("." + itemid).remove();
+                })
+                .error(function() {
+                    alert('Internal Server Error');
+                });
+            return false;
+        });
+
+        $("#save_order_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))").click(function(){
+            var data = $(".gallery_editor_wrap_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty)) input").serializeObject();
+            $.ajax({
+                type: 'POST',
+                url:'@(Url.Content("~/"))Admin/Gallery/_UpdateGalleryDitails?folder=@(Model)',
+                data:data,
+                success: function(msg){
+                    alert(msg);
+                }
+            });
+        });
+
+        $.fn.serializeObject = function()
+        {
+            var o = {};
+            var a = this.serializeArray();
+            $.each(a, function() {
+                if (o[this.name] !== undefined) {
+                    if (!o[this.name].push) {
+                        o[this.name] = [o[this.name]];
+                    }
+                    o[this.name].push(this.value || '');
+                } else {
+                    o[this.name] = this.value || '';
+                }
+            });
+            return o;
+        };
+    });
+
+    function OnSuccess_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))(e) {
+        var filename = e.files[0].name;
+        if (e.operation == "upload") {
+            var imgUrl = "/Image?img=%2f" + encodeURIComponent("Content/UserFiles/@(LS.CurrentUser.RoleDefault)@(Model)/" + filename);
+
+            var divCont = '<div class="gallery_div ' + filename + ' gallery_div_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty)) gallery_img_'+i11+'_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))"><img src="'+imgUrl+'&w=120&h=120&t=0&c=0" alt="" /><input type="checkbox" class="gallery_div_delete  gallery_img_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))" id="gallery_img_'+i11+'_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))" /><span for="gallery_img_'+i11+'_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))">delete</span><input class="gallery_div_order" type="text" value="100" name="gallery_div_order_'+filename+'" /><input class="gallery_div_title" type="text" value="" name="gallery_div_title_'+filename+'" /></div>';
+            $(".gallery_editor_wrap_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))").append(divCont);
+            i11 = i11 + 1;
+        }
+        else if (e.operation == "remove") {
+            $('div[class*="' + filename + '"]').remove();
+        }
+    }
+    </script>
+
+}

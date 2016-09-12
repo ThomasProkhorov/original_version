@@ -1,0 +1,28 @@
+﻿@model IEnumerable<Type>
+@{
+    ViewBag.Title = RP.T("Admin.Views.Main.CreateList.Title");
+    Layout = "~/Areas/Admin/Views/Shared/_ActionLayout.cshtml";
+}
+<div class="action_wrap">
+    <h2>@RP.T("Admin.Views.Main.CreateList.Title")</h2>
+
+    @using (Html.BeginForm()) {
+        foreach (var item in Model)
+        {
+            @Html.RadioButton("MetadataToken", item.MetadataToken, true)
+            @Html.R(item.Name)
+            <br />
+        }
+        if (Model.Count() != 0)
+        {
+            @Html.ValidationSummary(true)
+            <div class="button_div">
+                <input type="submit" class="k-button" value="@RP.T("Admin.Views.Command.Save")" />
+            </div>
+        }
+        else
+        {
+            @RP.T("Admin.Views.Command.CantFindList")
+        }
+    }
+</div>

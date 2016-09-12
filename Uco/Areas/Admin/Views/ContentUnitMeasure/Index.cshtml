@@ -1,0 +1,59 @@
+﻿@{
+    ViewBag.Title = RP.T("Admin.Views.ContentUnitMeasure.Index.Title");
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutNoTree.cshtml";
+    string Lang = ViewBag.Lang;
+}
+<h2>@ViewBag.Title</h2>
+<div class="div_2">
+    <br />
+    @(Html.Kendo().Grid<Uco.Models.Shopping.Measure.ContentUnitMeasure>()
+    .Name("Grid")
+    .DataSource(dataSource =>
+        dataSource
+            .Ajax()
+                    .Model(model => { model.Id(item => item.ID); model.Field(p => p.ID).Editable(false); })
+                            .Read(r => r.Action("_AjaxIndex", "ContentUnitMeasure", new { Lang = Lang }))
+                            .Destroy(r => r.Action("_AjaxDelete", "ContentUnitMeasure", new { Lang = Lang }))
+                            .Update(r => r.Action("_AjaxSave", "ContentUnitMeasure", new { Lang = Lang }))
+                            .Create(r => r.Action("_AjaxInsert", "ContentUnitMeasure", new { Lang = Lang }))
+            .Events(events => events.Error("errorHandlerGrid"))
+    )
+    .Columns(columns =>
+    {
+        columns.Bound(r => r.ID);
+        columns.Bound(r => r.Name);
+        columns.Bound(r => r.DisplayName);
+        columns.Command(commands =>
+        {
+            commands.Edit();
+            commands.Destroy();
+        })
+        .Width(200);
+    })
+    .Pageable()
+    .Sortable()
+    .Filterable()
+    .Groupable()
+    .Editable(editing => editing.Mode(GridEditMode.InLine))
+    .Groupable()
+    .ToolBar(commands => commands.Create())
+    )
+</div>
+
+
+
+<script>
+    function errorHandlerGrid(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            alert(message);
+        }
+    }
+</script>

@@ -1,0 +1,131 @@
+@model System.String
+@{
+    int i1 = 0;
+    string HtmlFieldName = ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty);
+    Uco.Models.Folder fileUpload = new Uco.Models.Folder(Model);
+}
+
+@if (!Model.EndsWith("_0"))
+{
+    List<Uco.Models.Folder.FileItem> allFiles = fileUpload.Folder2List();
+    
+    <br class="clear" />
+    <div class="folder_editor_wrap folder_editor_wrap_@(HtmlFieldName)">
+        @{
+            foreach (Uco.Models.Folder.FileItem item in allFiles.OrderBy(r => r.Order))
+            {
+                i1 = i1 + 1;
+                <div class="folder_row folder_row_@(HtmlFieldName) folder_row_@(i1)_@(HtmlFieldName)">
+                    <div class="folder_cell folder_cell_1"><img data-src="@Html.Encode(item.FileNameNoFolder)" src="@Url.Content(fileUpload.FileExtensionsPath + item.FileType + ".png")" alt="@item.Title" /></div>
+                    <div class="folder_cell folder_cell_2"><a target="_blank" href="@Url.Content(item.FileName)"><span class="folder_row_filename">@(item.FileNameNoFolder)</span></a></div>
+                    <div class="folder_cell folder_cell_3"><input class="folder_row_order k-textbox" type="text" value="@item.Order" name="folder_div_order_@(Url.Encode(item.FileName))" /></div>
+                    <div class="folder_cell folder_cell_4"><input class="folder_row_title k-textbox" type="text" value="@item.Title" name="folder_div_title_@(Url.Encode(item.FileName))" /></div>
+                    <div class="folder_cell folder_cell_5"><input type="checkbox" class="folder_row_delete folder_row_delete_@(HtmlFieldName)" id="folder_row_@(i1)_@(HtmlFieldName)" /><span for="folder_row_@(i1)_@(HtmlFieldName)">@Html.R("Delete")</span></div>
+                </div>
+            }
+            i1++;
+        }
+    </div>
+    <div>
+        <br class="clear" />
+        @Html.R("AddFiles")
+        <br class="clear" />
+    </div>
+    @(Html.Kendo().Upload()
+        .Name("attachments_" + HtmlFieldName)
+        .Multiple(true)
+        .Async(async => async
+            .Save("Save", "Folder", new { name = Model, Area = "Admin" })
+            .Remove("Remove", "Folder", new { name = Model, Area = "Admin" })
+            .AutoUpload(true)
+        )
+        .Events(events => events.Success("OnSuccess_" + HtmlFieldName))
+        .HtmlAttributes(new { @class = "folder-upload-box" })
+    )
+    <br class="clear" />
+    <a id="save_order_@(HtmlFieldName)" class="k-button">@Html.R("SaveOrderAndTitle")</a>
+    <input type="hidden" name="folder" value="@Model" />
+
+    <script type="text/javascript">
+    var i11 = @(i1);
+
+    $(document).ready(function () {
+
+        var PARAM_NAME = "attachments";
+        var uploadElement = $("#attachments_@(HtmlFieldName)");
+        uploadElement.data("kendoUpload").name = PARAM_NAME;
+
+        $(".folder_editor_wrap").on("click",".folder_row_delete_@(HtmlFieldName)", function(){
+            var itemid = $(this).attr("id");
+            var imgPaht = $("." + itemid + " img").attr("data-src");
+            $.post("@(Url.Content("~/"))Admin/Folder/RemoveFile", { FolderName: "@Model", FileName : imgPaht } )
+                .success(function(data) {
+                    $("." + itemid).remove();
+                })
+                .error(function() {
+                    alert("Internal Server Error");
+                });
+            return false;
+        });
+
+        $("#save_order_@(HtmlFieldName)").click(function(){
+            var data = $(".folder_editor_wrap_@(HtmlFieldName) input").serializeObject();
+            $.ajax({
+                type: 'POST',
+                url:'@(Url.Content("~/"))Admin/Folder/_UpdateFolderDitails?folder=@(Model)',
+                data:data,
+                success: function(msg){
+                    alert(msg);
+                }
+            });
+        });
+
+        $.fn.serializeObject = function()
+        {
+            var o = {};
+            var a = this.serializeArray();
+            $.each(a, function() {
+                if (o[this.name] !== undefined) {
+                    if (!o[this.name].push) {
+                        o[this.name] = [o[this.name]];
+                    }
+                    o[this.name].push(this.value || '');
+                } else {
+                    o[this.name] = this.value || '';
+                }
+            });
+            return o;
+        };
+    });
+
+    function OnSuccess_@(HtmlFieldName)(e) {
+        var filename = e.files[0].name;
+        var re = /(?:\.([^.]+))?$/;
+        var extension = re.exec(filename)[1];
+
+        if (e.operation == "upload") {
+            var iconUrl = "@(Url.Content(fileUpload.FileExtensionsPath))" + extension + ".png";
+            var fileUrl = "/Content/UserFiles/@(LS.CurrentUser.RoleDefault)@(Model)/" + filename;
+
+            var divCont = '<div class="folder_row folder_row_@(HtmlFieldName) folder_row_'+i11+'_@(HtmlFieldName)">' +
+                '<div class="folder_cell folder_cell_1"><img data-src="'+fileUrl+'" src="'+iconUrl+'" alt="" /></div>' +
+                '<div class="folder_cell folder_cell_2"><a target="_blank" href="'+fileUrl+'"><span class="folder_row_filename">'+filename+'</span></a></div>' +
+                '<div class="folder_cell folder_cell_3"><input class="folder_row_order k-textbox" type="text" value="100" name="folder_row_order_'+i11+'" /></div>' +
+                '<div class="folder_cell folder_cell_4"><input class="folder_row_title k-textbox" type="text" value="" name="folder_row_title_'+i11+'" /></div>' +
+                '<div class="folder_cell folder_cell_5"><input type="checkbox" class="folder_row_delete folder_row_delete_@(HtmlFieldName)" id="folder_row_'+i11+'_@(HtmlFieldName)" /><span for="folder_row_'+i11+'_@(HtmlFieldName)">@Html.R("Delete")</span></div>' +
+            '</div>';
+
+
+            $(".folder_editor_wrap_@(HtmlFieldName)").append(divCont);
+            i11 = i11 + 1;
+        }
+        else if (e.operation == "remove") {
+            $('div[class*="' + filename + '"]').remove();
+        }
+    }
+    </script>
+}
+else
+{
+    <text>ניתן לעדכן לאחר יצירת העמוד</text>
+}

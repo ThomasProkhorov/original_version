@@ -1,0 +1,14 @@
+﻿<div class="contact_left">
+    <div class="cart2_left_heading"><span class="contact_left_head">@RP.T("Views.Shared._QuestionAnswer.QuestionsAndAnswersTitle")</span></div>
+    <div class="contact_left_listing">
+        <ul>
+            @foreach (var data in ShoppingService.GetQuestionAndAnswers())
+            {
+                <li>
+                    <a href="#">@data.Question</a>
+                    <div class="open_arrow_text">@data.Answer</div>
+                </li>
+            }
+        </ul>
+    </div>
+</div>

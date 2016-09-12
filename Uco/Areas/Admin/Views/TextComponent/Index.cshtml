@@ -1,0 +1,111 @@
+﻿@{
+    ViewBag.Title = RP.T("Admin.Views.TextComponent.Index.Title");
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutNoTree.cshtml";
+}
+
+<h2>@RP.T("Admin.Views.TextComponent.Index.Title")</h2>
+
+
+
+@(Html.Kendo().Grid<Uco.Models.TextComponent>()
+    .Name("Grid")
+    .DataSource(dataSource =>
+        dataSource.Ajax()
+            .Model(model => { model.Id(item => item.ID); })
+            .Read(r => r.Action("_AjaxIndex", "TextComponent"))
+            .Destroy(r => r.Action("_AjaxDelete", "TextComponent"))
+    )
+    .Columns(columns =>
+    {
+        columns.Bound(r => r.ID).Width(20);
+        columns.Bound(r => r.SystemName);
+        columns.Bound(r => r.Description);
+        columns.Bound(r => r.LangCode).Width(140);
+        columns.Template(r => r.ID).ClientTemplate(
+            "<a class='k-button' href='" + Url.Action("Edit", "TextComponent") + "?ID=#= ID #'" + ">" + RP.T("Admin.Views.Command.Edit").ToString() + "</a>"
+        ).Width(100);
+        columns.Command(commands =>
+        {
+            commands.Destroy();
+        }).Width(100);
+    })
+    .Pageable()
+    .Sortable()
+    .Filterable()
+    .Groupable()
+)
+<br />
+
+
+ @Html.ActionLink(RP.T("Admin.Views.Command.Create").ToString(), "Create", null, new { @class = "k-button" })
+
+</br>
+@using (Html.BeginForm("Export","TextComponent",FormMethod.Post, new { enctype="multipart/form-data"})) {
+
+<div class="k-notification-wrap k-header">
+
+<div  class="k-notification-wrap">
+@T("Admin.Views.TextComponent.Index.Export")
+
+</div>
+ <input class="k-button" type="submit" name="export" value="@RP.T("Admin.Views.TextComponent.Index.Export")"  />
+</div>
+}
+</br>
+<div class="import">
+<div class="demo-section k-header">
+@T("Admin.Views.TextComponent.Index.Import")
+</div>
+          <div class="demo-section k-header" id="loadzone">
+
+                    <input name="attachment" id="files" type="file" />
+                </div>
+            </div>
+
+            <script>
+                $(document).ready(function () {
+                    function onError(e) {
+                        $('#loadzone .k-upload-status-total').html("Upload error (Server error: 500)");
+                       // console.log("Error (" + e + ") :: " + getFileInfo(e));
+                    }
+                    function onSuccess(e) {
+                        if (e.response["success"] == "ok") {
+                            //success
+                            $('#loadzone .k-upload-status-total').html(e.response["message"] + '<span class="k-icon k-i-tick"></span>');
+                        } else {
+                            //error
+                            $('#loadzone .k-upload-status-total').html(e.response["message"]);
+                        }
+                    }
+                    function getFileInfo(e) {
+                        return $.map(e.files, function (file) {
+                            var info = file.name;
+
+                            // File size is not available in all browsers
+                            if (file.size > 0) {
+                                info += " (" + Math.ceil(file.size / 1024) + " KB)";
+                            }
+                            return info;
+                        }).join(", ");
+                    }
+                    $("#files").kendoUpload({
+                        async: {
+                            saveUrl: "/Admin/TextComponent/Export",
+                            //  removeUrl: "remove",
+                            autoUpload: false
+                        }
+, error: onError,
+success: onSuccess,
+                        upload: function (e) {
+                            console.log(e);
+                            e.data = {
+                               
+                                import: 'Import',
+                              
+
+                            };
+                        }
+, multiple: false
+                    });
+                });
+            </script>

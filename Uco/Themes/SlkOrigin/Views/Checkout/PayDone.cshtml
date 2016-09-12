@@ -1,0 +1,8 @@
+﻿@{
+    ViewBag.Title = RP.T("Views.Checkout.PayDone.Title");
+    Layout = null;
+    ViewBag.Url = "~/Checkout/PayDone";
+}
+<div style="direction:rtl; text-align:right">
+    @Html.Raw(Uco.Infrastructure.Repositories.RP.GetTextComponent("Checkout.PayDone"))
+</div>

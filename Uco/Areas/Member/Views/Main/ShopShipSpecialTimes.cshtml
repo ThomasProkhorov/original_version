@@ -1,0 +1,296 @@
+﻿@using Uco.Models
+
+<div id="ShopShipSpecialTimes"></div>
+
+
+<script>
+    function IntToTime(i) {
+        var hr = Math.floor(i / 60);
+        var mn = i % 60 ; if(mn<10){mn='0'+mn;}
+       // var part ="AM";
+       // if(hr>12)
+       // {
+       //     hr-=12;
+     //       part="PM";
+      //  }
+        //if(hr == 0){hr = 12;}
+        var time = hr + ":" + mn;// + " " + part;
+        return time;
+    }
+
+
+    var DayOfWeekEnums = {
+        0:'@RP.T("Enums.Sunday")',
+        1:'@RP.T("Enums.Monday")',
+        2:'@RP.T("Enums.Tuesday")',
+        3:'@RP.T("Enums.Wednesday")',
+        4:'@RP.T("Enums.Thursday")',
+        5:'@RP.T("Enums.Friday")',
+        6:'@RP.T("Enums.Saturday")',
+
+    };
+
+    $(document).ready(function () {
+        /*
+        Docs
+        http://docs.telerik.com/kendo-ui/api/javascript/ui/grid
+        */
+
+        $("#ShopShipSpecialTimes").kendoGrid({
+            "toolbar": [    "create"              ],
+            dataSource: {
+
+                type: "json",
+                transport: {
+                    "prefix": "",
+                    read: {
+                        url: "/Member/Manage/ShopShipTime/_AjaxRead",
+                        type: "POST",
+                        dataType: "json",
+                        // data: { filter:'ID~eq~3'  }
+                    },
+
+                    "update": {
+                        "url": "/Member/Manage/ShopShipTime/_AjaxUpdate"
+                    },
+
+                    "create": {
+                        "url": "/Member/Manage/ShopShipTime/_AjaxInsert"
+                    },
+                    "destroy": {
+                        "url": "/Member/Manage/ShopShipTime/_AjaxDelete"
+                    },
+                },
+
+                schema: {
+                    data: "Data",
+                    total: "Total",
+                    errors: "Errors",
+                    model: {
+                        "id": "ID",
+                        fields: {
+                            "ID": { "type": "number" ,defaultValue: 0,editable: false,},
+                            "ShopID": { "type": "number" ,defaultValue: 0},
+                            "Active": { "type": "boolean"  },
+                            "Day": { "type": "number",defaultValue: 0,editable: false  },
+                            "TimeFrom": { "type": "number",defaultValue: 0  },
+                            "TimeTo": { "type": "number",defaultValue: 0  },
+                            "IsSpecial": { "type": "boolean"  },
+                            "Date": { "type": "date" },
+                            // "ID": {"type":"number" ,editable: false}
+                        }
+
+                    }
+                },
+                pageSize: 20,
+                "error": error_handler,
+                "sync":function(e){ this.read(); },
+                "serverPaging": true,
+                "serverSorting": true,
+                "serverFiltering": true,
+                "serverGrouping": true,
+                "serverAggregates": true,
+
+                filter:[
+{ field: "ShopID", operator: "eq", value: @Model.ID }
+,
+                { field: "IsSpecial", operator: "eq", value: true }
+                ],
+
+                "type": "aspnetmvc-ajax",
+            },
+            refresh: true,
+            //  detailTemplate: kendo.template($("#template").html()),
+            // detailInit: detailInit,
+            // dataBound: function () {
+            //this.expandRow(this.tbody.find("tr.k-master-row").first());
+            //   },
+            pageable: {
+                refresh: true,
+                // pageSizes: [10, 20, 50],
+                pageSize: 10
+            },
+
+            columns: [
+{ field: "ID",title: "@M("ShopShipTime", "ID")", sortable: false,filterable: false,hidden: true, editor:'<input id="ID" name="ID" type="hidden" value="3" /><span class="field-validation-valid" data-valmsg-for="ID" data-valmsg-replace="true"></span>', },
+{ field: "ShopID",title: "@M("ShopShipTime", "ShopID")", sortable: false,filterable: false,hidden: true, editor:'<input data-val="true" data-val-number="The field ShopID must be a number." data-val-required="The ShopID field is required." id="ShopID" name="ShopID" type="number" value="0" /><script> \
+	jQuery(function(){jQuery("#ShopID").kendoNumericTextBox({"format":"n0","decimals":0});}); \
+</sc'+'ript> \
+<span class="field-validation-valid" data-valmsg-for="ShopID" data-valmsg-replace="true"></span>', },
+{ field: "Date",title: "@M("ShopShipTime", "Date")" ,format: "{0: dd/MM/yyyy}", sortable: false,filterable: false,editor:'<input data-val="true" data-val-date="The field Date must be a date." data-val-required="The Date field is required." id="Date" name="Date" type="datetime" value="1/1/2015" /><script> \
+	jQuery(function(){jQuery("#Date").kendoDatePicker({"format":"d/M/yyyy","min":new Date(1900,0,1,0,0,0,0),"max":new Date(2099,11,31,0,0,0,0),"interval":30});}); \
+</sc'+'ript><span class="field-validation-valid" data-valmsg-for="Date" data-valmsg-replace="true"></span>',},
+{ field: "Active",title: "@M("ShopShipTime", "Active")",template:" # if(Active) { # @RP.T("Shop.ShipTime.Active") # } else { # @RP.T("Shop.ShipTime.NotActive") # } #",
+    editor: '<select id="active_shiptime" name="Active"><option value="false">@RP.T("Shop.ShipTime.NotActive")</option><option value="true">@RP.T("Shop.ShipTime.Active")</option></select> \
+<script> $("#active_shiptime").kendoDropDownList(); </sc'+'ript>',
+    sortable: false,filterable: false, },
+{ field: "Day",title: "@M("ShopShipTime", "Day")", hidden: true, sortable: false,filterable: false, },
+{ field: "TimeFrom",title: "@M("ShopShipTime", "TimeFrom")", sortable: false,filterable: false,template:" #: IntToTime(TimeFrom) # ", editor:'   \
+<input type="hidden" id="TimeFrom" name="TimeFrom" value="0" />     \
+<input id="TimeFrom_str" name="TimeFrom_str" value="12:00" /> \
+<script> \
+                \
+    $("#TimeFrom_str").kendoTimePicker({ format: "HH:mm"}); \
+    $("#TimeFrom_str").change( \
+function () { \
+     \
+    \
+    var intTime = TimeToInt( $(this).val());; \
+    $("#TimeFrom").val(intTime); \
+    $("#TimeFrom").trigger("change"); \
+} \
+); \
+ \
+    $("#TimeFrom").change(function () { \
+         \
+        var strtime = IntToTime( $(this).val()); \
+       $("#TimeFrom_str").val(strtime); \
+    }); \
+setTimeout(function () { \
+        if ($("#TimeFrom").val() > 0) { \
+ \
+            var strtime = IntToTime($("#TimeFrom").val()); \
+            $("#TimeFrom_str").val(strtime); \
+        } \
+    }, 200); \
+    \
+</sc'+'ript><span class="field-validation-valid" data-valmsg-for="TimeFrom" data-valmsg-replace="true"></span>', },
+{ field: "TimeTo",title: "@M("ShopShipTime", "TimeTo")", sortable: false,filterable: false,template:" #: IntToTime(TimeTo) # ", editor:'   \
+<input type="hidden" id="TimeTo" name="TimeTo" value="0" />     \
+<input id="TimeTo_str" name="TimeTo_str" value="12:00" /> \
+<script> \
+                \
+    $("#TimeTo_str").kendoTimePicker({ format: "HH:mm"}); \
+    $("#TimeTo_str").change( \
+function () { \
+     \
+    \
+    var intTime = TimeToInt( $(this).val());; \
+    $("#TimeTo").val(intTime); \
+    $("#TimeTo").trigger("change"); \
+} \
+); \
+ \
+    $("#TimeTo").change(function () { \
+         \
+        var strtime = IntToTime( $(this).val()); \
+       $("#TimeTo_str").val(strtime); \
+    }); \
+  setTimeout(function () { \
+        if ($("#TimeTo").val() > 0) { \
+ \
+            var strtime = IntToTime($("#TimeTo").val()); \
+            $("#TimeTo_str").val(strtime); \
+        } \
+    }, 200); \
+    \
+</sc'+'ript><span class="field-validation-valid" data-valmsg-for="TimeTo" data-valmsg-replace="true"></span>', },
+{ field: "IsSpecial",title: "@M("ShopShipTime", "IsSpecial")", sortable: false,filterable: false,hidden:true, },
+
+
+
+{
+    "width": "190px",
+    "buttonType": "Image",
+    "command": [
+
+      {  "name": "edit",
+          "buttonType": "Icon",
+          "text": "Edit"
+      },
+
+
+{
+    "name": "destroy",
+    "buttonType": "Image",
+    "text": "Delete"
+},
+
+    ]
+},
+
+            ],
+            //   height: 600,
+            "scrollable": false,
+            filterable: true,
+            sortable: true,
+            "editable": {
+                "confirmation": "Are you sure you want to delete this record?",
+                "confirmDelete": "Delete",
+                "cancelDelete": "Cancel",
+                "mode": "inline",
+                "create": true,
+                "update": true,
+                "destroy": true
+            },
+
+
+
+        });
+        var ShopWorkTimegrid = $("#ShopShipSpecialTimes").data('kendoGrid');
+        ShopWorkTimegrid.dataSource.transport.parameterMap = function(data,type){
+
+            // console.log(type);
+            if(type != "read")
+            {
+                for(var i in data)
+                {
+                    //console.log(Object.prototype.toString.call( data[i] ));
+                    if( Object.prototype.toString.call( data[i] ) === '[object Object]' ) {
+                        delete data[i];
+                    }
+                    if( Object.prototype.toString.call( data[i] ) === '[object Array]' ) {
+                        delete data[i];
+                    }
+                    if( Object.prototype.toString.call( data[i] ) === '[object Date]' ) {
+                        data[i] = kendo.toString(kendo.parseDate(data[i]), "G");// Date.parse(data[i]);
+                    }
+                    //if(i == 'UserID' && !data[i]){
+                    //    data[i]=
+                    // }
+                    //@ViewBag.AdditionalFilterField", operator: "eq", value: 3
+
+                    if(i == 'ShopID')
+                    {
+                        data[i] = @Model.ID ;
+                    }
+                    //IsSpecial
+                    if(i == 'IsSpecial')
+                    {
+                        data[i] = true ;
+                    }
+
+                }
+            }
+
+            kendo.data.transports["aspnetmvc-ajax"](data);
+            data = new kendo.data.transports["aspnetmvc-ajax"]({ prefix: "" }).parameterMap(data, type);
+            //  console.log(data);
+            return data;
+        }
+
+        function error_handler(e) {
+
+            if (e.errors) {
+                e.preventDefault();   // cancel grid rebind if error occurs
+                var message = "Errors:\n";
+                $.each(e.errors, function (key, value) {
+                    if ('errors' in value) {
+                        $.each(value.errors, function () {
+                            message += this + "\n";
+                        });
+                    }
+                });
+                alert(message);
+            }
+        }
+        function detailInit(e) {
+            var detailRow = e.detailRow;
+            console.log(e);
+
+
+        }
+
+    });
+
+</script>

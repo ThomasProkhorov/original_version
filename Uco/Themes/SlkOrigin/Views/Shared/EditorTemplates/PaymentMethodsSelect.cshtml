@@ -1,0 +1,56 @@
+﻿@using Uco.Models
+@model string
+@{
+    var types = Enum.GetValues(typeof(PaymentMethod)).Cast<PaymentMethod>();
+    var IDslist = new List<string>();
+    if(Model!=null)
+    {
+        IDslist = Model.Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+    }
+}
+<div>
+   
+    <input type="hidden" id="PaymentMethodItemIDs" name="@ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty)" value="@Model" />
+    <div style="padding-top:30px;">
+        @foreach(var t in types)
+        {
+            <div>
+        <label>
+            <input type="checkbox" value="@((int)t)" onchange="multiChecks.select(this,@((int)t),'PaymentMethodItemIDs');"
+                   @if (IDslist.Contains(((int)t).ToString())) { <text> checked="checked" </text>   }
+                   name="PaymentMethodItemItem" id="PaymentMethodItemItem@((int)t)">
+
+            @RP.T("Enums.PaymentMethod." + t.ToString())
+                </label>
+            </div>
+        }
+    </div>
+</div>
+<script>
+    var multiChecks = {
+        select: function (e, v, w) {
+            var cur = $(e).val();
+            var all = $('#' + w).val();
+            var arr = all.split(',');
+            console.log(all);
+            console.log(arr);
+            if ($(e).is(':checked')) {
+                arr.push(cur);
+            } else {
+               
+                var index = arr.indexOf(cur);
+                if (index > -1) {
+                    arr.splice(index, 1);
+                }
+            }
+
+            var index2 = arr.indexOf("");
+            if (index2 > -1) {
+                arr.splice(index2, 1);
+            }
+            all =','+ arr.join(',')+',';
+            $('#' + w).val(all);
+        },
+    };
+</script>
+<div class="clear"></div>

@@ -1,0 +1,10 @@
+@model dynamic
+@using Uco.Infrastructure
+@{
+   
+System.Type t = Model.GetType();
+
+var ModelName = t.Name;
+var gridName = t.Name+"grid";
+}
+

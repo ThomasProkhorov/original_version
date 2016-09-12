@@ -1,0 +1,172 @@
+﻿@using Uco.Models.Overview
+@using Uco.Models
+@model Order
+@{
+    ViewBag.Title = RP.T("Views.Profile.OrderDetail.ViewBagTitle");
+    Layout = "~/Themes/SlkOrigin/Views/Shared/_LayoutShop.cshtml";
+    ViewBag.Url = "~/Profile/Orders/";
+}
+@section topmenu{
+    @Html.Action("_TopStatus", "Profile")
+}
+
+<script src="http://cdn.kendostatic.com/2013.2.716/js/cultures/kendo.culture.he-IL.min.js"></script>
+<div data-role="view" id="tabstrip-orderDetail" data-init="mobileListViewEndlessScrolling" data-title="@RP.T("Views.Profile.Menu.OrderDetail")" data-layout="mobile-layout" class="k-rtl">
+    <div data-role="listview" data-style="inset" data-type="" style="line-height:200%">
+
+        @if (Model.RegularOrder && Model.RegularInterval != RegularInterval.NotRegular)
+{
+    <a onclick="Shop.GoTo('@Url.Action("RegularOrders","Profile")');" data-role="button" class="productBackBtn" style="float:left">@RP.T("Views.Profile.OrderDetail.Mobile.BackBtn")</a>
+
+}
+else
+{
+            <a onclick="Shop.GoTo('@Url.Action("Index","Profile")');" data-role="button" class="productBackBtn" style="float:left" >@RP.T("Views.Profile.OrderDetail.Mobile.BackBtn")</a>
+
+        }
+
+
+
+        <div class="head" style="margin-bottom:20px;">
+
+            <div><b>@RP.T("Views.Profile.OrderDetail.Number")@Model.ID</b></div>
+
+            <div class="">@RP.T("Views.Profile.OrderDetail.StatusText") @RP.T("Enums." + Model.OrderStatus.ToString()) </div>
+
+            <div class="">@RP.T("Views.Profile.OrderDetail.TotalCardText") @ShoppingService.FormatPrice(Model.TotalCard)</div>
+
+            <div class="">@RP.T("Views.Profile.OrderDetail.TotalCashText") @ShoppingService.FormatPrice(Model.TotalCash)</div>
+
+            <div class="">@RP.T("Views.Profile.OrderDetail.NameText") @Model.FullName </div>
+
+            <div class="">@RP.T("Views.Profile.OrderDetail.AddressText") @Model.ShipAddress </div>
+            @if (Model.RegularOrder && Model.RegularInterval != RegularInterval.NotRegular)
+            {
+                <form id="detailsform">
+                    <input type="hidden" name="ID" value="@Model.ID" />
+                    <div>@RP.T("Views.Profile.OrderDetail.ActiveText") @Html.EditorFor(m => m.Active)</div>
+                    <div>@RP.T("Views.Profile.OrderDetail.InternalText") @Html.EditorFor(m => m.RegularInterval)</div>
+                    <div>
+                        @RP.T("Views.Profile.OrderDetail.ShipTimeText") <input type="text" name="ShipTime" id="ShipTime" value="@Model.ShipTime" />
+                        <script>
+                            jQuery(function(){jQuery("#ShipTime").kendoDateTimePicker();})
+                        </script>
+                    </div>
+                    <a href="#" onclick="Shop.SaveOrderDetail(this,event)" class="k-button">@RP.T("Views.Profile.OrderDetail.SaveBtnText")</a>
+                </form>
+            }
+            else
+            {
+                <button class="k-button" onclick="Shop.ReOrder(this,event,@Model.ID)">@RP.T("Views.Profile.OrderDetail.Reorder")</button>
+            }
+
+        </div>
+
+
+        <ul id="endless-scrollingdetail" style=""></ul>
+
+    </div>
+
+
+
+    <script type="text/x-kendo-tmpl" id="endless-scrolling-templatedetail">
+        <div class="product" style="margin:10px 0px 10px 10px; padding:10px;">
+            <div style="height: 80px; float: right; width: 20%;">
+                # if (ProductShop && ProductShop.Product) { #  <img height="80" width="80" src="#: ProductShop.Product.Image #" alt="alt" /> # } #
+            </div>
+            @*<a href="/Profile/OrderDetail/#: ID #" data-role="detailbutton" data-icon="more"></a>*@
+
+            <div style="float: left; width: 70%;">
+                # if (ProductShop && ProductShop.Product) { #  #: ProductShop.Product.Name # # } #
+                # if (ProductShop && ProductShop.Product) { #  #: ProductShop.Product.SKU # # } #
+                <br />
+                # if (ProductAttributeOption && ProductAttributeOption.ProductAttribute) { #  #: ProductAttributeOption.ProductAttribute.Name # # } # # if (ProductAttributeOption && ProductAttributeOption.Name) { #  #: ProductAttributeOption.Name # # } #
+                <br />
+                    <div class="k-ltr" style="text-align: right;">
+                        #:kendo.toString(Price, 'c', 'he-IL')  #
+                        / #: Quantity # /
+                        #: kendo.toString(UnitPrice, "c", 'he-IL')  #
+                    </div>
+            </div>
+
+        </div>
+    </script>
+
+    <script>
+        function mobileListViewEndlessScrolling() {
+            var dataSourceDetail = new kendo.data.DataSource({
+                // type: "json",
+                transport: {
+                    "prefix": "",
+                    read: {
+                        url: "/Profile/OrderItemAjaxRead",
+                        type: "POST",
+                        dataType: "json",
+                        // data: { filter:'ID~eq~3'  }
+                    },
+
+                    "update": {
+                        "url": "/Profile/OrderItemAjaxUpdate"
+                    },
+
+                    "create": {
+                        "url": "/Profile/OrderItemAjaxInsert"
+                    },
+                    "destroy": {
+                        "url": "/Profile/OrderItemAjaxDelete"
+                    },
+                },
+                schema: {
+                    data: "Data",
+                    total: "Total",
+                    errors: "Errors",
+                    model: {
+                        "id": "ID",
+                        fields: {
+                            "ID": { "type": "number", editable: false, },
+                            "OrderID": { "type": "number", editable: false, },
+                            "ProductShopID": { "type": "number" },
+                            "ProductShop": { "type": "object", editable: false, nullable: true, },
+                            "ProductAttributeOptionID": { "type": "number", defaultValue: 0 },
+                            "ProductAttributeOption": { "type": "object", editable: false, nullable: true, },
+                            "Price": { "type": "number" },
+                            "Quantity": { "type": "string", defaultValue: 1 },
+                            "UnitPrice": { "type": "number" },
+                            "OrderItemStatusID": { "type": "number", defaultValue: 1 },
+                            "OrderItemStatus": { "type": "object", editable: false, nullable: true, },
+                            // "ID": {"type":"number" ,editable: false}
+                        }
+
+                    }
+                },
+
+                serverPaging: true,
+                "serverSorting": true,
+                "serverFiltering": true,
+                "serverGrouping": true,
+                "serverAggregates": true,
+                pageSize: 20,
+                filter: { field: "OrderID", operator: "eq", value: @Model.ID }  ,
+                "type": "aspnetmvc-ajax",
+            });
+
+            $("#endless-scrollingdetail").kendoMobileListView({
+                dataSource: dataSourceDetail,
+                template: $("#endless-scrolling-templatedetail").html(),
+                endlessScroll: true,
+                virtualViewSize: 100,
+            });
+        }
+    </script>
+</div>
+
+
+@if (Session["ShopID"] != null)
+{
+    @Html.Partial("_StaticViews.Mobile", (int)Session["ShopID"])
+}
+<input type="hidden" name="passwordViewsInit" />
+
+
+
+

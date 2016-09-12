@@ -1,0 +1,103 @@
+﻿@model IEnumerable<Uco.Models.SearchModel>
+@using Kendo.Mvc.UI;
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutNoTree.cshtml";
+}
+
+<h2>ניהול קטגוריות</h2>
+
+@(Html.Kendo().Grid<Uco.Models.SearchModel>()
+                    .Name("Grid")
+                .DataSource(dataSource => dataSource.Ajax()
+                    .Model(model => { model.Id(r => r.ID); })
+                    .Read(r => r.Action("_AjaxIndex", "Search"))
+                    .Create(r => r.Action("_AjaxInsert", "Search"))
+                    .Update(r => r.Action("_AjaxSave", "Search"))
+                    .Destroy(r => r.Action("_AjaxDelete", "Search"))
+                )
+                .ToolBar(commands => commands.Create())
+                .Columns(columns =>
+                {
+                    columns.Bound(r => r.ID);
+                    columns.Bound(r => r.Title);
+                    columns.Bound(r => r.ParentID);
+                    columns.Bound(r => r.SearchSegmentName);
+                    columns.Bound(r => r.LangCode);
+                    columns.Command(commands =>
+                    {
+                        commands.Edit();
+                        commands.Destroy();
+                    }).Width(210).Title("פקודות");
+                })
+                .Editable(editing => editing.Mode(GridEditMode.InLine))
+                .Pageable()
+                .Sortable()
+                .Filterable()
+                .Groupable()
+)
+
+<br /><br /><br />
+    <h2>הוספת רשימה</h2>
+    <br />
+    שים לב: אפשר לעדכן תוכן דרך הטבלה או דרך הוספת רשימה. אין להשתמש בשני השיטות ביחד. בסיום עבודה בשיטה אחד לעשות REFRESH ורק אז להמשיך.
+    <br /><br /><br />
+    <div class="editor-label">פריט תחתיו רוצים להוסיף: </div>
+
+    @using (Html.BeginForm())
+    {
+
+        <div class="editor-field">            
+            @(Html.Kendo().ComboBox()
+            .Name("DDParent")
+            .Suggest(true)
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                {
+                    read.Action("_AjaxLoadingParent", "Search");
+                })
+                .ServerFiltering(true);
+            })
+            .DataTextField("Title")
+            .DataValueField("ID")
+            .Filter(FilterType.StartsWith)      
+            .HighlightFirst(true)
+            )
+
+            @*@(Html.Telerik().ComboBox()
+            .Name("DDParent")
+            .AutoFill(true)
+            .DataBinding(binding => binding.Ajax().Select("_AjaxLoadingParent", "Search"))
+            .Filterable(filtering =>
+            {
+                filtering.FilterMode(AutoCompleteFilterMode.StartsWith);
+            })
+            .HighlightFirstMatch(true)
+            )*@
+
+        </div>
+        <div class="editor-label">שפה: </div>
+        <div class="editor-field">
+            @{
+        SelectList l2 = new SelectList(System.Configuration.ConfigurationManager.AppSettings["Languages"].Split(',').ToList(), Model);
+            }
+            @Html.DropDownList("DDLangCode", l2)
+        </div>
+        <div class="editor-label">רשימה: </div>
+        <div class="editor-field">
+            @{
+        SelectList l3 = new SelectList(System.Configuration.ConfigurationManager.AppSettings["SearchSegments"].Split(',').ToList(), Model);
+            }
+            @Html.DropDownList("DDSegment", l3)
+        </div>
+        <div class="editor-label">ערכים (כל אחד בשורה נפרדת): </div>
+        <div class="editor-field">
+            @Html.TextArea("SeachText", new { @class = "text-box multi-line", @style = "height: 200px;" })
+        </div>
+        <p class="clear" style=" margin-right:200px;">
+            <input type="submit" class="t-button" value="הוספה" />
+        </p>
+
+    }

@@ -1,0 +1,83 @@
+﻿@model int
+
+<div data-role="drawer" id="my-drawer" style="width: 250px" data-position="left"
+     data-views="['drawer-index', 'drawer-product-popup', 'tabstrip-shoppingCart', 'tabstrip-login', 'tabstrip-filters', 'tabstrip-changeStore', 'tabstrip-poll', 'tabstrip-contact', 'tabstrip-shopInfo', 'tabstrip-profile', 'note-modal-view', 'tabstrip-changePassword', 'tabstrip-settings', 'tabstrip-profileAddress', 'tabstrip-orders', 'tabstrip-regularOrders', 'tabstrip-orderDetail', 'tabstrip-noshop', 'tabstrip-formPage', 'tabstrip-contentPage']" class="k-rtl">
+    @Html.Action("_TopMenu", "Shop", new { shopID = Model })
+</div>
+
+<div data-role="view" id="drawer-index" data-init="mobileListViewEndlessScrollingProducts" data-layout="mobile-layout2" data-title="@RP.T("Views.Shop.Index.Mobile.HomeViewTitleText")" class="k-rtl">
+    <div id="list" data-style="inset" data-type="group">
+        <div id="productResultWrapper" class="productResultWrapperClass">
+        </div>
+    </div>
+</div>
+
+<script type="text/x-kendo-tmpl" id="endless-scrolling-template-products">
+    <table style="width:100%" border="0" cellspacing="0" cellpadding="0">
+        #=Value#
+    </table>
+</script>
+
+<div data-role="view" id="drawer-product-popup" data-title="@RP.T("Views.Shop.Index.Mobile.ProductPopupViewTitleText")" data-layout="mobile-layout" data-use-native-scrolling="true" class="k-rtl">
+    <ul data-role="listview" data-style="inset" data-type="group">
+        <li>
+            <div id="productPopupWrapper"></div>
+        </li>
+    </ul>
+</div>
+
+<div data-role="view" id="tabstrip-contact" data-title="@RP.T("Views.Shop.Index.Mobile.ContactViewTitleText")" data-layout="mobile-layout" class="k-rtl">
+    <ul data-role="listview" data-style="inset" data-type="group">
+        <li>
+            @Html.Action("Contact", "Shop", new { ID = Model })
+        </li>
+    </ul>
+</div>
+
+<div data-role="view" id="tabstrip-shopInfo" data-title="@RP.T("Views.Shop.Index.Mobile.ShopInfoViewTitleText")" data-layout="mobile-layout" class="k-rtl">
+    <ul data-role="listview" data-style="inset" data-type="group">
+        <li>
+            @Html.Action("_GetShopInfo", "Shop", new { shopID = Model })
+        </li>
+    </ul>
+</div>
+
+<div data-role="view" id="tabstrip-filters" data-title="@RP.T("Views.Shop.Index.Mobile.FilterViewTitleText")" data-layout="mobile-layout" data-use-native-scrolling="true" class="k-rtl">
+    <ul data-role="listview" data-style="">
+        <li>
+            <div id="shoping_list_box" class="list">
+                <div class="add_shoping_list">
+                    <div class="link2"><a href="javascript:void(0)">@RP.T("Views.Shop._LeftMenu.ShoppingListTitle")</a></div>
+                    <div class="txt2">@RP.T("Views.Shop._LeftMenu.ShoppingListText")</div>
+                    <div class="line_part">
+                        <textarea style="width:100%;" class="k-input" type="text" name="keywords" value=""
+                                  placeholder="@RP.T("Views.Shop._LeftMenu.TextSearchPlaceholder")"
+                                  onkeypress="Shop.TextSearchKeyPress(this,event,@Model);" id="shkeywords"></textarea>
+                    </div>
+                    <div class="search_btn1"><input onclick="Shop.TextSearch(this,event,@Model);" width="108" type="image" height="26" alt="Search" src="~/Content/DesignFiles/search_btn1.png"></div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+        </li>
+    </ul>
+</div>
+
+<div data-role="view" id="tabstrip-changeStore" data-title="@RP.T("Views.Shop.Index.Mobile.ChangeShopViewTitleText")" data-layout="mobile-layout" class="k-rtl">
+    <ul data-role="listview" data-style="inset" data-type="group">
+        <li>
+            @Html.Action("_ChangeShopPopup", "Shop", new { shopID = Model })
+        </li>
+    </ul>
+</div>
+
+<div data-role="view" id="tabstrip-login" data-title="@RP.T("Views.Shop.Index.Mobile.LoginViewTitleText")" data-layout="mobile-layout" data-use-native-scrolling="true" class="k-rtl">
+    <ul data-role="listview" data-style="inset" data-type="group">
+        <li>
+            @Html.Partial("~/Views/Shop/_LoginSignupPopup.Mobile.cshtml")
+        </li>
+    </ul>
+</div>
+
+<input type="hidden" id="productSuccessfullyAdded" value="@RP.T("Views.Shop.Index.Mobile.ProductSuccessfullyAdded")" />
+
+<input type="hidden" name="staticViewsInit" />

@@ -1,0 +1,156 @@
+﻿@{
+    ViewBag.Title = RP.T("Admin.Views.Translation.Index.Title");
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutNoTree.cshtml";
+    string Lang = ViewBag.Lang;
+}
+<h2>@ViewBag.Title</h2>
+@{
+    SelectList Items = new SelectList(System.Configuration.ConfigurationManager.AppSettings["Languages"].Split(',').ToList(), Lang);
+}
+@using (Html.BeginForm("Export","Translation",FormMethod.Post, new { enctype="multipart/form-data"})) {
+
+
+  
+
+@(Html.Kendo().DropDownList()
+    .Name("Languages")
+    .DataTextField("Text")
+    .DataValueField("Value")
+    .BindTo(Items)
+    .Value(Lang)
+)
+ <nobr>  </nobr>
+<span class="k-button" id="showUntranslated">@RP.T("Admin.Views.Translation.Index.ShowUntranslated")</span>
+<br />
+
+
+<div class="div_2">
+    <br />
+    @(Html.Kendo().Grid<Uco.Models.Translation>()
+    .Name("Grid")
+    .DataSource(dataSource =>
+        dataSource
+            .Ajax()
+            .Model(model => { model.Id(item => item.ID); })
+            .Read(r => r.Action("_AjaxIndex", "Translation", new { Lang = Lang ,untranslated = ViewBag.Untranslated }))
+            .Destroy(r => r.Action("_AjaxDelete", "Translation", new { Lang = Lang }))
+            .Update(r => r.Action("_AjaxSave", "Translation", new { Lang = Lang }))
+            .Create(r => r.Action("_AjaxInsert", "Translation", new { Lang = Lang }))
+            .Events(events => events.Error("error_handler"))
+    )
+    .Columns(columns =>
+    {
+        columns.Bound(r => r.SystemName);
+        columns.Bound(r => r.Text);
+        columns.Command(commands =>
+        {
+            commands.Edit();
+            commands.Destroy();
+        })
+        .Width(200);
+    })
+    .Pageable()
+    .Sortable()
+    .Filterable()
+    .Groupable()
+    .Editable(editing => editing.Mode(GridEditMode.InLine))
+    .Groupable()
+    .ToolBar(commands => commands.Create())
+    )
+</div>
+
+<script>
+
+    $(document).ready(function () {
+        $("#Languages").change(function () {
+            window.location = "/Admin/Translation/Index?lang=" + $(this).val();
+        });
+        //showUntranslated
+        $("#showUntranslated").click(function () {
+            window.location = "/Admin/Translation/Index?lang=@(Lang)&untranslated=True";
+        });
+    });
+
+    function error_handler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            alert(message);
+        }
+    }
+</script>
+<br />
+<div class="k-notification-wrap k-header">
+
+<div  class="k-notification-wrap">
+@T("Admin.Views.Translation.Index.Export")
+
+</div>
+ <input class="k-button" type="submit" name="export" value="@RP.T("Admin.Views.Translation.Index.Export")"  />
+</div>
+} 
+</br>
+<div class="import">
+<div class="k-notification-wrap demo-section k-header">
+@T("Admin.Views.Translation.Index.Import")
+</div>
+          <div class="demo-section k-header" id="loadzone">
+
+                    <input name="attachment" id="files" type="file" />
+                </div>
+            </div>
+
+            <script>
+                $(document).ready(function () {
+                    function onError(e) {
+                        $('#loadzone .k-upload-status-total').html("Upload error (Server error: 500)");
+                        // console.log("Error (" + e + ") :: " + getFileInfo(e));
+                    }
+                    function onSuccess(e) {
+                        if (e.response["success"] == "ok") {
+                            //success
+                            $('#loadzone .k-upload-status-total').html(e.response["message"] + '<span class="k-icon k-i-tick"></span>');
+                        } else {
+                            //error
+                            $('#loadzone .k-upload-status-total').html(e.response["message"]);
+                        }
+                    }
+                    function getFileInfo(e) {
+                        return $.map(e.files, function (file) {
+                            var info = file.name;
+
+                            // File size is not available in all browsers
+                            if (file.size > 0) {
+                                info += " (" + Math.ceil(file.size / 1024) + " KB)";
+                            }
+                            return info;
+                        }).join(", ");
+                    }
+                    $("#files").kendoUpload({
+                        async: {
+                            saveUrl: "/Admin/Translation/Export",
+                            //  removeUrl: "remove",
+                            autoUpload: false
+                        }
+,
+                        error: onError,
+                    success: onSuccess,
+                        upload: function (e) {
+                            console.log(e);
+                            e.data = {
+                                EventID: 1,
+                                import: 'Import',
+                                Languages: $('#Languages').val()
+
+                            };
+                        }
+, multiple: false
+                    });
+                });
+            </script>

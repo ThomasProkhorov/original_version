@@ -1,0 +1,225 @@
+﻿@model Uco.Models.Shop
+
+<script type="text/javascript">
+    $(function () {
+        $(".ratingStar").raty({
+            path: '/Scripts/raty-2.7.0/lib/images',
+            half: false,
+            score: $("#shopRate").val(),
+            halfShow: false,
+            readOnly: function () {
+                return false;
+            },
+            click: function (score) {
+                $.ajax({
+                    type: "POST",
+                    dataType: "html",
+                    url: "/Shop/_AddShopRate",
+                    data: { shopID: @Model.ID, score: score },
+                    cache: false,
+                }).done(function (html) {
+
+                });
+                $(".ratingStar").raty("readOnly", true);
+                $("#countVotedPerson").html(parseInt($("#countVotedPerson").html(), 10) + 1);
+            }
+        });
+
+            $(".ratingStarReadOnly").raty({
+                path: '/Scripts/raty-2.7.0/lib/images',
+                half: false,
+                score: $(this).parent(".rating_shops").attr("data-rating"),
+                halfShow: false,
+                readOnly: function () {
+                    return true;
+                }
+            });
+
+            var shopCommentValidator = $("#shopCommentForm").kendoValidator().data("kendoValidator");
+            $("#shopCommentForm").submit(function () {
+                if (shopCommentValidator.validate()) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/Shop/_AddShopComment",
+                        data: {
+                            ShopID: @Model.ID,
+                            UserName: $("#fullName").val(),
+                            Text: $("#commentText").val(),
+                            Title: $("#commentTitle").val(),
+                        },
+
+                        error: function () {
+                            console.log("error");
+                        }
+
+                    }).done(function (html) {
+                        $("#shopCommentForm").toggle();
+                        $("#commentSuccessfullySend").toggle();
+                        
+                        $("#fullName").val("");
+                        $("#commentTitle").val("");
+                        $("#commentText").val("");
+                    });
+                }
+                else {
+                    
+                }                
+                return false;
+            });
+
+            $("#commentSendAgain").on("click", function () {
+                $("#shopCommentForm").toggle();
+                $("#commentSuccessfullySend").toggle();
+            });
+    });
+</script>
+
+<div style="margin: 10px 10px;">
+    <input type="hidden" name="shopRate" id="shopRate" value="@Model.Rate" />
+        <div class="product_popup_heading">
+            <h1 class="prdct_popup_h1">@Model.Name</h1>
+        </div>
+        <div class="popup1_row1">
+            <div class="store_left2">
+                <div class="store_img">
+                    <img alt="" src="@SF.GetImage(Model.Image, 255, 190, true, true)"></div>
+                <div class="store_img_bot">
+                    <ul>
+                        <li>
+                            <ul class="rating_part">
+                                <li>@RP.T("Views.Shop._ShopInfoPopup.StoreRaiting")</li>
+                                @if (ShoppingService.IsCanVoteForShop(Model.ID, LS.CurrentUser.ID))
+                                {
+                                    <li class="ratingStar"></li>
+                                }
+                                else
+                                {
+                                    <li class="ratingStarReadOnly"></li>
+                                }
+                            </ul>
+                            <div class="clear"></div>
+                        </li>
+                        <li>@RP.T("Views.Shop._ShopInfoPopup.PeopleRated")<span id="countVotedPerson">@Model.RateCount</span>@RP.T("Views.Shop._ShopInfoPopup.People")</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="store_left1">
+                <div class="store_left_head1">
+                    @RP.T("Views.Shop._ShopInfoPopup.StoreInformation")
+                </div>
+                <div class="left_sec_new">
+                    <ul>
+                        @{ TimeSpan ts = TimeSpan.FromMinutes(Model.DeliveryTime); }
+                        <li class="one">@String.Format(RP.T("Views.Shop._ShopInfoPopup.OrderTime").ToString(), string.Format("{0:00}:{1:00}", ts.Hours, ts.Minutes))</li>
+                        <li class="two">@String.Format(RP.T("Views.Shop._ShopInfoPopup.PickYourself").ToString(), Model.DeliveryManualDescription)</li>
+                        <li class="three">@String.Format(RP.T("Views.Shop._ShopInfoPopup.CostOfDelivery").ToString(), ShoppingService.FormatPrice(Model.ShipCost))</li>
+                        <li>
+                            <div class="left1_btn2" style="margin-top: 15px; margin-right: -16px;">
+                                <a href="@Url.Action("Contact", "Shop", new { ID = Model.ID })">@RP.T("Views.Shop._LeftMenu.ContactBtn")</a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="right_sec_new">
+                    <ul>
+                        <li><strong>@RP.T("Views.Shop._ShopInfoPopup.ShopAddress")</strong> @Model.AddressMap </li>
+                        <li><strong>@RP.T("Views.Shop._ShopInfoPopup.ShopPhone")</strong> @Model.Phone</li>
+                        <li><strong>@RP.T("Views.Shop._ShopInfoPopup.ShopEmail")</strong> @Model.Email</li>
+
+                        @if (Model.Kosher)
+                        {
+                            <li><strong>@RP.T("Views.Shop._ShopInfoPopup.Kosher")</strong>@RP.T("Views.Shop._ShopInfoPopup.KosherValue")</li>
+                        }
+
+                        @*<li><strong>@RP.T("Views.Shop._ShopInfoPopup.ShopType")</strong> @(Model.ShopType != null ? Model.ShopType.Name : string.Empty)</li>*@
+                        <li><strong>@RP.T("Views.Shop._ShopInfoPopup.ShopWorkTime")</strong></li>
+                        <li>
+                            <table id="shworkttime" style="width:100%;">
+                                @foreach (var st in Model.WorkTimes)
+                                {
+                                    <tr>
+                                        <td>@st.DayStr</td>
+                                        <td>@st.TimeFromeStr</td>
+                                        <td>@st.TimeToStr</td>
+                                    </tr>
+                                }
+                            </table>
+
+                        </li>
+                        <li><strong>@RP.T("Views.Shop._ShopInfoPopup.DeliveryTime")</strong></li>
+                        <li>
+                            <table id="shshipttime" style="width:100%;">
+                                @foreach (var st in Model.ShipTimes)
+                                {
+                                    <tr>
+                                        <td>@st.DayStr</td>
+                                        <td>@st.TimeFromeStr</td>
+                                        <td>@st.TimeToStr</td>
+                                    </tr>
+                                }
+                            </table>
+                        </li>
+                    </ul>
+                </div>
+                <div class="clear"></div>
+            </div>
+            <div class="clear"></div>
+        </div>
+
+        <div class="store_row2">
+                @if (!string.IsNullOrEmpty(Model.FullDescription))
+                {
+                <div>
+                    <div class="store_left_head1">@RP.T("Views.Shop._ShopInfoPopup.FullDescription")</div>
+                    <div class="store_text1">
+                        @Html.Raw(Model.FullDescription)
+                    </div>
+                </div>
+                }
+                @if(!string.IsNullOrEmpty(Model.Youtube))
+                {
+                    <div class="store_ro2_left">
+                        <div class="store_left_head1">@RP.T("Views.Shop._ShopInfoPopup.YouTube")</div>
+                        <div>
+                            @Html.DisplayFor(x => x.Youtube, "Youtube")
+                        </div>
+                    </div>
+                }
+            <div class="clear"></div>
+        </div>
+        @if(!string.IsNullOrEmpty(Model.AddressMap))
+        {
+            <div class="popup1_row1">
+                <div class="store_left_head1">@RP.T("Views.Shop._ShopInfoPopup.AddressMap")</div>
+                <div class="map_pic">
+                    <iframe height="100%" width="100%" scrolling="auto" frameborder="0" src="//maps.google.com/?output=embed&iwloc=&f=q&source=s_q&hl=iw&q=@(Model.AddressMap)&z=15" hspace="0"></iframe>
+                </div>                
+                @*</div>*@
+            </div>
+        }
+
+        <div class="map_contant">
+            <div class="store_left_head1">@RP.T("Views.Shop._ShopInfoPopup.CommentBlockTitle")</div>
+            <div class="shopCommentsBlock">
+                @foreach (var comment in Model.ShopCommentModels)
+                {
+                    @Html.Partial("_ShopComment", comment)
+                }
+            </div>
+        </div>
+        <div class="popup1_form">
+            <form id="shopCommentForm" name="shopCommentForm" method="post" action="" class="form1">
+                <div class="heading">@RP.T("Views.Shop._ShopInfoPopup.AddCommentFormTitle")</div>
+                <div class="left_sec_in_form1">
+                    <input type="text" name="fullName" id="fullName" class="single-line" required data-required-msg="@RP.T("Views.Shop._ShopInfoPopup.FullNameRequired")" placeholder="@RP.T("Views.Shop._ShopInfoPopup.CommentFullNamePlaceholder")" value="">
+                    <input type="text" name="commentTitle" id="commentTitle" class="single-line" required data-required-msg="@RP.T("Views.Shop._ShopInfoPopup.CommentTitleRequired")" placeholder="@RP.T("Views.Shop._ShopInfoPopup.CommentTitlePlaceholder")" value="">
+                    <textarea class="multi-line" rows="5" cols="45" name="commentText" id="commentText" required data-required-msg="@RP.T("Views.Shop._ShopInfoPopup.CommentTextRequired")" placeholder="@RP.T("Views.Shop._ShopInfoPopup.CommentPlaceholder")"></textarea>
+                </div>
+                <div class="clear"></div>
+                <div class="form1_btn"><input type="image" src="~/Content/DesignFiles/form1_btn.png" width="89" height="34" alt="Send"></div>
+            </form>
+            <div id="commentSuccessfullySend" class="dn">
+                @RP.Text("Views.Shop._ShopInfoPopup.CommentSuccessfullySend")
+            </div>
+        </div>
+</div>

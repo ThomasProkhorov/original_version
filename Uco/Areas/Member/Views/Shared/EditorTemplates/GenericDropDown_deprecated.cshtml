@@ -1,0 +1,43 @@
+﻿
+<input id="@ViewData.TemplateInfo.HtmlFieldPrefix"  name="@ViewData.TemplateInfo.HtmlFieldPrefix" value="@Model.ID"/>
+
+<script>
+    $('#@ViewData.TemplateInfo.HtmlFieldPrefix')
+                            .kendoComboBox(
+    {
+        placeholder: "Select ",
+        dataTextField: "Name",
+        dataValueField: "ID",
+
+        filter: "contains",
+        minLength: 1,
+        "autoBind": true,
+        dataSource: {
+            schema: {
+                data: "Data",
+                total: "Total",
+                errors: "Errors",},
+            type: "json",
+            serverFiltering: true,
+            filter: [],
+            transport: {
+                "prefix": "",
+                read: {
+                    url: "@Url.Action("_AjaxAutoComplete", "Generic", new {model = ViewData.TemplateInfo.HtmlFieldPrefix.Replace("ID","") })"
+,
+                    type: "POST",
+                    data: function () {
+                        var data = kendo.ui.ComboBox.requestData('#@ViewData.TemplateInfo.HtmlFieldPrefix');
+                        
+                        /** data["filter"] = "SpecificationAttributeID~eq~1"; 
+                        console.log(data);
+                        **/
+                        return data;
+                    },
+                }
+            }
+        }
+    });
+
+</script>
+

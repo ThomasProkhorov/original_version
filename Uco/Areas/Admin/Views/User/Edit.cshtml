@@ -1,0 +1,42 @@
+﻿@model Uco.Models.User
+@{
+    ViewBag.Title = RP.T("Admin.Views.User.Index.Title");
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutNoTree.cshtml";
+}
+
+<h2>@RP.T("Admin.Views.User.Index.Title")</h2>
+
+@using (Html.BeginForm())
+{
+    @(Html.Kendo().TabStrip()
+    .Name("TabStrip")
+    .Animation(false)
+    .Items(tabstrip =>
+    {
+        tabstrip.Add().Text(RP.T("Admin.User.TabMain").ToString()).Content(@<text>
+@Html.ValidationSummary(true)
+    @Html.EditorForModel();
+     @*@Html.Partial("_EditOrCreate", Model);*@
+    </text>);
+
+        tabstrip.Add().Text(RP.T("Admin.User.DiscountUsage").ToString()).Content(@<text>
+       @Html.Partial("_DiscountUsage", Model);
+        </text>);
+
+        tabstrip.Add().Text(RP.T("Admin.User.TabImpressionate").ToString()).Content(@<text>
+
+    <p>
+        @RP.T("View.Admin.User.Impressionate.Description")
+    </p>
+<input class="k-button" type="submit" name="impressionate" value="@RP.T("View.Admin.User.Impressionate")" />
+</text>);
+    
+    
+    }).SelectedIndex(0))
+    
+    
+    <p class="clear">
+        <input type="submit" name="Save" class="k-button" value="@RP.T("Admin.Views.Command.Save")" /> 
+@Html.ActionLink(RP.T("Admin.Views.Command.BackToList").ToString(), "Index")
+    </p>
+}

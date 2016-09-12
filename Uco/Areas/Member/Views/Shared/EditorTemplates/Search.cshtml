@@ -1,0 +1,70 @@
+@model string
+@using Kendo.Mvc.UI
+
+@{
+    List<Kendo.Mvc.UI.TreeViewItemModel> Items = SF.GetTreeViewItemModel(Model);
+}
+
+@Html.Hidden("", ViewData.TemplateInfo.FormattedModelValue.ToString(), new { @class = "hidden_tree_data_" + ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty) })
+
+@(Html.Kendo().TreeView()
+    .Name("Tree_" + ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))
+    .Checkboxes(settings => settings
+        .CheckChildren(true)
+    )
+    .BindTo(Items)
+)
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        function onChecked_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))(e) {
+            var treeview = $("#Tree_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))").data('tTreeView');
+            var nodeElement = e.item;
+            var value = treeview.getItemValue(nodeElement);
+
+            if(e.checked) addValue_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))(value);
+            else removeValue_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))(value);
+
+            var elementsWithValue = treeview.findByValue(value);
+
+            elementsWithValue.addClass("chachedElement");
+        
+            if(e.checked)
+            {
+                $('.chachedElement .t-item').each(function (index) {
+                    treeview.nodeCheck($(this), true);
+                    addValue_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))(treeview.getItemValue($(this)));
+                });
+            }
+
+            if(!e.checked)
+            {
+                elementsWithValue.parents('.t-item').each(function (index) {
+                    treeview.nodeCheck($(this), false);
+                    removeValue_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))(treeview.getItemValue($(this)));
+                });
+            }
+
+            elementsWithValue.removeClass("chachedElement");
+        }
+
+        function addValue_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))(valueToAdd)
+        {
+            var valueAll = $(".hidden_tree_data_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))").val();
+            if(valueAll.indexOf(",") == -1) valueAll = valueAll + ",";
+            if(valueAll.indexOf("," + valueToAdd + ",") == -1){
+                $(".hidden_tree_data_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))").val(valueAll + valueToAdd + ",");
+            }
+        }
+        function removeValue_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))(valueToRomove)
+        {
+            var valueAll = $(".hidden_tree_data_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))").val();
+            if(valueAll.indexOf(",") == -1) valueAll = valueAll + ",";
+            if(valueAll.indexOf("," + valueToRomove + ",") != -1){
+                $(".hidden_tree_data_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))").val(valueAll.replace(valueToRomove + ",", ""));
+            }
+        }
+    });
+</script>

@@ -1,0 +1,11 @@
+﻿@model List<Uco.Models.Language>
+<div id="header_languages">
+@{
+    foreach(Uco.Models.Language item in Model)
+    {
+    <div class="header_languages_box">
+        <a href="@Url.Content(item.Url)"><img alt="@item.Name" src="@Url.Content(item.Flag)" /></a>
+    </div>
+    }
+}
+</div>

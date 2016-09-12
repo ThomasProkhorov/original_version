@@ -1,0 +1,252 @@
+﻿
+@using System.Reflection
+@using System.Collections.Generic
+@using System.Linq
+@using System.ComponentModel.DataAnnotations
+@{
+System.Type t = Model.GetType();
+var ModelName = t.Name;
+    ViewBag.Title = RP.T("Admin.Views."+ModelName+".Index.Title");
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutNoTree.cshtml";
+  var pDict = t.GetProperties().ToDictionary(x=>x.Name);
+         // assdd=",editable: false"; 
+       // var opt = (ModelAttribute)p.GetCustomAttributes<ModelAttribute>().Where(x=>x.Role == ViewBag.CurrentRole || x.Role==null).OrderByDescending(x=>x.Role).ToList().FirstOrDefault();
+}
+<h2>@RP.T("Admin.Views."+ModelName+".Index.Title")</h2>
+@using (Html.BeginForm())
+{
+    @Html.ValidationSummary(true)
+   
+
+if (ViewData.TemplateInfo.TemplateDepth > 1)
+{
+    if (Model == null)
+    {
+        @ViewData.ModelMetadata.NullDisplayText
+    }
+    else
+    {
+        @ViewData.ModelMetadata.SimpleDisplayText
+    }
+}
+else
+{
+ //   ViewData.Clear();
+    <text>
+    @(Html.Kendo().TabStrip()
+    .Name("TabStrip")
+    .Animation(false)
+    .Items(tabstrip =>
+    {
+        foreach (var prop0 in ViewData.ModelMetadata.Properties.Where(pm =>  !ViewData.TemplateInfo.Visited(pm) && pm.Watermark != null).OrderBy(r => r.Order).Select(r => r.Watermark).Distinct())
+        {
+            string Watermark = prop0;
+            if ((Watermark == "Permissions" || Watermark == "הרשאות") && (SF.UsePermissions() != true || !Uco.Infrastructure.Livecycle.LS.CurrentUser.IsInRole("Admin"))) { continue; }
+
+
+            if (Watermark == "Hidden") continue;
+            tabstrip.Add().Text(Watermark).Content(@<text>
+                @foreach (var prop in ViewData.ModelMetadata.Properties.Where(pm =>  !ViewData.TemplateInfo.Visited(pm) && pm.Watermark == Watermark).OrderBy(r => r.Order))
+                {
+                    if (!prop.IsComplexType)
+        {
+if(pDict.ContainsKey(prop.PropertyName)){
+var opt = pDict[prop.PropertyName].GetCustomAttributes<ModelAttribute>().Where(x=>x.Role == ViewBag.CurrentRole || x.Role==null).OrderByDescending(x=>x.Role).ToList().FirstOrDefault();
+if(opt!=null){
+
+if(!opt.Show && !opt.Edit){
+if(prop.PropertyName.Contains("ID") && pDict.ContainsKey(prop.PropertyName.Replace("ID",""))){
+            continue;
+        }
+@Html.Hidden(prop.PropertyName)
+continue;
+}
+if( !opt.Edit){
+if(prop.PropertyName.Contains("ID") && pDict.ContainsKey(prop.PropertyName.Replace("ID",""))){
+            continue;
+        }
+<div class="editor-label">@Html.Label(prop.PropertyName) @(prop.IsRequired ? "*" : "")</div>
+ <div class="editor-field">@Html.Display(prop.PropertyName) <nobr>&nbsp;&nbsp;</nobr> @Html.Hidden(prop.PropertyName) @Html.ValidationMessage(prop.PropertyName)</div>
+           
+
+continue;
+}
+}else{
+
+}
+}
+            if (prop.HideSurroundingHtml)
+            {
+            @Html.Editor(prop.PropertyName)
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(Html.Label(prop.PropertyName).ToHtmlString()))
+                {
+                <div class="editor-label">@Html.Label(prop.PropertyName) @(prop.IsRequired ? "*" : "")</div>
+                }
+
+            <div class="editor-field">@Html.Editor(prop.PropertyName) @Html.ValidationMessage(prop.PropertyName)</div>
+            }
+        }else{
+<div>
+
+
+@if(pDict.ContainsKey(prop.PropertyName)){
+var opt = pDict[prop.PropertyName].GetCustomAttributes<ModelAttribute>().Where(x=>x.Role == ViewBag.CurrentRole || x.Role==null).OrderByDescending(x=>x.Role).ToList().FirstOrDefault();
+
+if(opt!=null){
+
+if(!opt.Show && !opt.Edit){
+@Html.Hidden(prop.PropertyName)
+continue;
+}
+if( !opt.Edit){
+<div class="editor-label">@Html.Label(prop.PropertyName) @(prop.IsRequired ? "*" : "")</div>
+ <div class="editor-field">@Html.Display(prop.PropertyName) <nobr>&nbsp;&nbsp;</nobr> @Html.Hidden(prop.PropertyName) @Html.ValidationMessage(prop.PropertyName)</div>
+           
+
+continue;
+}
+}else{
+
+}
+if(pDict[prop.PropertyName].PropertyType.Name == "List`1"){
+
+@Html.Action("Grid", "Generic", new { Filed=ModelName+"ID",ID=Model.ID, model=pDict[prop.PropertyName].PropertyType.GenericTypeArguments[0].Name })
+
+}else if(pDict[prop.PropertyName].PropertyType.Namespace =="Uco.Models")
+        {
+
+  ViewData.TemplateInfo.HtmlFieldPrefix = prop.PropertyName + "ID";
+            string editorTemplate = "GenericDropDown";
+            var UIhint = (UIHintAttribute)pDict[prop.PropertyName].GetCustomAttribute<UIHintAttribute>();
+            if (UIhint != null)
+            {
+                editorTemplate = UIhint.UIHint;
+            }
+            var newModel = Activator.CreateInstance(pDict[prop.PropertyName].PropertyType);
+            var refP = pDict[prop.PropertyName + "ID"];
+            pDict[prop.PropertyName].PropertyType.GetProperty("ID").SetValue(newModel, (object)refP.GetValue(Model));
+            <div class="editor-label">@Html.Label(prop.PropertyName) @(prop.IsRequired ? "*" : "")</div>
+<div class="editor-field">
+@Html.Partial("EditorTemplates/" + editorTemplate, newModel)
+</div>
+            ViewData.TemplateInfo.HtmlFieldPrefix = "";
+}
+}
+
+</div>
+}
+                    }
+            </text>);
+        }
+    }).SelectedIndex(0))
+    </text>
+    
+    foreach (var prop in ViewData.ModelMetadata.Properties.Where(pm => !ViewData.TemplateInfo.Visited(pm) && pm.Watermark == null).OrderBy(r => r.Order))
+    {
+        if (!prop.IsComplexType)
+        {
+if(pDict.ContainsKey(prop.PropertyName)){
+var opt = pDict[prop.PropertyName].GetCustomAttributes<ModelAttribute>().Where(x=>x.Role == ViewBag.CurrentRole || x.Role==null).OrderByDescending(x=>x.Role).ToList().FirstOrDefault();
+if(opt!=null){
+
+if(!opt.Show && !opt.Edit){
+if(prop.PropertyName.Contains("ID") && pDict.ContainsKey(prop.PropertyName.Replace("ID",""))){
+            continue;
+        }
+@Html.Hidden(prop.PropertyName)
+continue;
+}
+if( !opt.Edit){
+if(prop.PropertyName.Contains("ID") && pDict.ContainsKey(prop.PropertyName.Replace("ID",""))){
+            continue;
+        }
+<div class="editor-label">@Html.Label(prop.PropertyName) @(prop.IsRequired ? "*" : "")</div>
+ <div class="editor-field">@Html.Display(prop.PropertyName) <nobr>&nbsp;&nbsp;</nobr> @Html.Hidden(prop.PropertyName) @Html.ValidationMessage(prop.PropertyName)</div>
+           
+
+continue;
+}
+}else{
+
+}
+}
+            if (prop.HideSurroundingHtml)
+            {
+            @Html.Editor(prop.PropertyName)
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(Html.Label(prop.PropertyName).ToHtmlString()))
+                {
+                <div class="editor-label">@Html.Label(prop.PropertyName) @(prop.IsRequired ? "*" : "")</div>
+                }
+
+            <div class="editor-field">@Html.Editor(prop.PropertyName) @Html.ValidationMessage(prop.PropertyName)</div>
+            }
+        }else{
+<div>
+
+
+@if(pDict.ContainsKey(prop.PropertyName)){
+var opt = pDict[prop.PropertyName].GetCustomAttributes<ModelAttribute>().Where(x=>x.Role == ViewBag.CurrentRole || x.Role==null).OrderByDescending(x=>x.Role).ToList().FirstOrDefault();
+
+if(opt!=null){
+
+if(!opt.Show && !opt.Edit){
+ 
+@Html.Hidden(prop.PropertyName)
+continue;
+}
+if( !opt.Edit){
+
+<div class="editor-label">@Html.Label(prop.PropertyName) @(prop.IsRequired ? "*" : "")</div>
+ <div class="editor-field">@Html.Display(prop.PropertyName) <nobr>&nbsp;&nbsp;</nobr> @Html.Hidden(prop.PropertyName) @Html.ValidationMessage(prop.PropertyName)</div>
+           
+
+continue;
+}
+}else{
+
+}
+if(pDict[prop.PropertyName].PropertyType.Name == "List`1"){
+
+@Html.Action("Grid", "Generic", new { Filed=ModelName+"ID",ID=Model.ID, model=pDict[prop.PropertyName].PropertyType.GenericTypeArguments[0].Name })
+
+}else if(pDict[prop.PropertyName].PropertyType.Namespace =="Uco.Models")
+        {
+
+            ViewData.TemplateInfo.HtmlFieldPrefix = prop.PropertyName + "ID";
+            string editorTemplate = "GenericDropDown";
+            var UIhint = (UIHintAttribute)pDict[prop.PropertyName].GetCustomAttribute<UIHintAttribute>();
+            if (UIhint != null)
+            {
+                editorTemplate = UIhint.UIHint;
+            }
+            var newModel = Activator.CreateInstance(pDict[prop.PropertyName].PropertyType);
+            var refP = pDict[prop.PropertyName + "ID"];
+            pDict[prop.PropertyName].PropertyType.GetProperty("ID").SetValue(newModel, (object)refP.GetValue(Model));
+            <div class="editor-label">@Html.Label(prop.PropertyName) @(prop.IsRequired ? "*" : "")</div>
+<div class="editor-field">
+@Html.Partial("EditorTemplates/" + editorTemplate, newModel)
+</div>
+            ViewData.TemplateInfo.HtmlFieldPrefix = "";
+}
+}
+
+</div>
+}
+    }
+}
+
+
+
+@* @Html.EditorForModel()*@
+
+    <p class="clear">
+        <input type="submit" class="k-button" value="@RP.T("Admin.Views.Command.Save")" />
+ @Html.ActionLink(@RP.T("Admin.Views.Command.BackToList").ToString(), "Index")
+    </p>
+}

@@ -1,0 +1,67 @@
+﻿@using Uco.Models.Overview
+
+@model UserModel
+@{
+    //ViewBag.Title = RP.T("Views.Profile.Settings.ViewBagTitle");
+    Layout = "~/Themes/SlkOrigin/Views/Shared/_LayoutShop.cshtml";
+    ViewBag.Url = "~/Profile/Orders/";
+}
+
+<div data-role="view" id="tabstrip-settings" data-title="@RP.T("Views.Profile.Settings.Mobile.SettingsViewTitleText")" data-layout="mobile-layout" class="k-rtl">
+    <div id="list" data-style="inset"  style="padding:10px;">
+        <h2 class="">@RP.T("Views.Profile.Menu.Setting")</h2>
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "form3", style = "" }))
+        {
+            if (TempData["SuccessMessage"] != null)
+            {
+                <div class="success">
+                    <p> @TempData["SuccessMessage"] </p>
+                </div>
+            }
+            <div class="row">
+                @Html.LabelFor(m => m.FirstName)
+                <b>*</b>
+                @Html.EditorFor(m => m.FirstName, new { @class = "k-input" })
+                @Html.ValidationMessageFor(m => m.FirstName)
+            </div>
+
+            <div class="row">
+                @Html.LabelFor(m => m.LastName)
+                <b>*</b>
+                @Html.EditorFor(m => m.LastName, new { @class = "k-input" })
+                @Html.ValidationMessageFor(m => m.LastName)
+            </div>
+
+            <div class="row">
+                @Html.LabelFor(m => m.Email)
+                <b>*</b>
+                @Html.EditorFor(m => m.Email, new { @class = "k-input" })
+                @Html.ValidationMessageFor(m => m.Email)
+            </div>
+
+            <div class="row">
+                @Html.LabelFor(m => m.Phone)
+                <b>*</b>
+                @Html.EditorFor(m => m.Phone, new { @class = "k-input" })
+                @Html.ValidationMessageFor(m => m.Phone)
+            </div>
+
+            <div class="row">
+                @Html.LabelFor(m => m.CompanyName)
+
+                @Html.EditorFor(m => m.CompanyName, new { @class = "k-input" })
+                @Html.ValidationMessageFor(m => m.CompanyName)
+            </div>          
+
+            <div class="buttons-wrap">
+                <input type="submit" value="@RP.T("Views.Profile.Settings.Save")" class="k-button" />
+            </div>
+        }
+    </div>
+</div>
+
+@if (Session["ShopID"] != null)
+{
+    @Html.Partial("_StaticViews.Mobile", (int)Session["ShopID"])
+}
+<input type="hidden" name="passwordViewsInit" />

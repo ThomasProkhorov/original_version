@@ -1,0 +1,116 @@
+﻿@model Uco.Models.Overview.ShoppingCartOverviewModel
+@{
+var half = (int)Math.Ceiling(((decimal)Model.Count / 2));
+}
+ @* Do NOT Delete this !!!*@
+    <script>
+        
+        setTimeout(function () {
+            $('.sh_cartsubtotal, .sh_carttotal, .sh_carttotalwithoutship').html('@Model.TotalWithoutShipStr');
+            $('.sh_cartcount').html('@Model.Count');
+        }, 100);
+          
+       
+       </script>
+    <div class="stripmain" >
+@if(Model.IsLogined)
+{
+ <div class="strip" style="overflow: hidden; display:inline-block;">
+@if(Model.Count > 0)
+{
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>@RP.T("Views.ShoppingCart._CartTable.TableHeadFirst")</th>
+                            <th>@RP.T("Views.ShoppingCart._CartTable.TableHeadSecond")</th>
+                            <th>@RP.T("Views.ShoppingCart._CartTable.TableHeadThird")</th>
+                            <th>@RP.T("Views.ShoppingCart._CartTable.TableHeadFourth")</th>
+                            <th>@RP.T("Views.ShoppingCart._CartTable.TableHeadFifth")</th>
+                        </tr>
+                            </thead>
+                        <tbody>
+@for(var i=0; i<Model.Count; i++)
+{
+
+if( i == half)
+{
+@Html.Raw("</tbody></table></div><div class=\"strip\" style=\"overflow: hidden; display:inline-block;\"><table><thead><tr><th>שם</th><th>מחיר ליחידה</th><th>כמות יחידות</th><th>מחיר כולל</th><th>מחק</th></tr></thead><tbody>");
+}
+var item = Model.Items[i];
+bool shoDecimals = false;
+if (!string.IsNullOrEmpty(item.MeasureUnit) && item.QuantityPriceType == Uco.Models.QuantityType.Default)
+{
+    shoDecimals = true;
+}
+<tr class="sh_cartitem" data-productshopid="@item.ProductShopID" data-productid="@item.ID">
+    <td style="max-width:132px;">@item.Name <br><i class="shAttributeDescription">@item.AttributeDescription</i></td>
+    <td><strong class="shPrice">@ShoppingService.FormatPrice(item.Price)@(item.MeasureUnit != null ? " / " + item.MeasureUnit : "")</strong></td>
+    <td>
+        <div class="prdct_qty_part">
+            <div class="prdct_qty_minus"><a href="#" onclick="Shop.CartDecrease(this,event,@item.ID, 1);"></a></div>
+            <div class="prdct_qty_show"><input type="text" onblur="Shop.BuyKeyCart(this,{which : 13},@item.ProductShopID);" onkeypress="Shop.BuyKeyCart(this,event,@item.ProductShopID);" class="single-line" value="@(shoDecimals ? item.Quantity.ToString("0.00") : item.Quantity.ToString("0"))" id="textfield" name="Quantity"></div>
+            <div class="prdct_qty_plus">
+                <a href="#" onclick="Shop.CartIncreas(this,event, @item.ID, 1);"></a>
+            </div>
+            <input type="hidden" name="ProductShopID" value="@item.ProductShopID">
+            <input type="hidden" name="ShopID" value="@item.ShopID">
+            <div class="clear"></div>
+        </div>
+    </td>
+    <td><strong class="shUnitPrice">@ShoppingService.FormatPrice(item.UnitPrice)</strong></td>
+    <td><img src="~/Content/DesignFiles/tabcross.png" alt="" onclick="Shop.CartDelete(this, event, @item.ID);" /></td>
+</tr>
+
+
+}
+</tbody>
+  </table>
+}
+else
+{
+@RP.T("ShoppingCart._CartTable.NoItems")
+    <script>
+        Shop.emptycart = true;
+    </script>
+}
+                </div>
+
+}
+else
+{
+@RP.T("ShoppingCart._CartTable.YouNotLogined")
+}
+
+         
+                <div class="footer_bott_left">
+                    <div class="closefootercart"><span onclick="$('.fTab').click();"><img src="/Content/DesignFiles/popup_cartclose.png" alt=""></span></div>
+                    <div class="footer_price_total"><span>@RP.T("Views.ShoppingCart._CartTable.Total")</span> <span id="sh_carttotalmain" class="sh_carttotalmain sh_carttotalwithoutship">@Model.TotalWithoutShipStr<span></span></div><div class="clear"></div>
+                    <div class="footer_cart_btn">@if (!Model.IsLogined)
+                                                 { <a href="javascript:void(0);" onclick="Shop.ShowLoginReg();">@RP.T("Views.Shared._Footer.Cart")</a> }
+                                                 else
+                                                 {
+<a href="@Url.Action("Index", "ShoppingCart", new { ID = Model.ShopID })" >@RP.T("Views.Shared._Footer.Cart")</a>
+}</div>
+                    <div class="clear"></div>
+
+                    <div class="cart2_shipping footercartshipping">
+                        <div class="shiptopspace"></div>
+                        @if (Model.SubTotal >= Model.Shop.FreeShipFrom)
+                        {
+                            <div class="shipfree shiping_text1 pading0">@RP.T("Views.ShoppingCart.Index.FreeShippingText")</div>
+                            <div class="shiping_text1 dn shipnotfree pading0">@String.Format(RP.T("Views.ShoppingCart.Index.ShipCost").ToString(), ShoppingService.FormatPrice(Model.Shop.ShipCost))</div>
+                            <div class="shiping_text2 dn shipnotfree pading0">@String.Format(RP.T("Views.ShoppingCart.Index.FreeShipFromWhatPrice").ToString(), ShoppingService.FormatPrice(Model.Shop.FreeShipFrom)) </div>
+                        }
+                        else
+                        {
+                            <div class="dn shipfree shiping_text1 pading0">@RP.T("Views.ShoppingCart.Index.FreeShippingText")</div>
+                            <div class="shiping_text1 shipnotfree pading0">@String.Format(RP.T("Views.ShoppingCart.Index.ShipCost").ToString(), ShoppingService.FormatPrice(Model.Shop.ShipCost))</div>
+                            <div class="shiping_text2 shipnotfree pading0">@String.Format(RP.T("Views.ShoppingCart.Index.FreeShipFromWhatPrice").ToString(), ShoppingService.FormatPrice(Model.Shop.FreeShipFrom)) </div>
+                        }
+                    </div>
+                     <div class="clear"></div>
+                    <div class="product_brown_btn cleancartbutton"><a href="#" onclick="Shop.ClearCart(this,event,@Model.ShopID,'@RP.S("Views.Shared._Footer.AreYouSureToClearCart")');">@RP.T("Views.Shared._Footer.ClearCart")</a></div>
+                    <div class="clear"></div>
+                </div>
+
+            </div>

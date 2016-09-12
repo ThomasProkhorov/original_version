@@ -1,0 +1,65 @@
+﻿@model Uco.Models.Newsletter
+@using Telerik.Web.Mvc.UI
+<a href="#" id="openNewsletterWindow"><img alt="הרשמה לניוזלטר" src="@Url.Content("~/Content/DesignFiles/newsletter_register.png")" /></a>
+
+@{ Html.Telerik().Window()
+        .Name("NewsletterWindow")
+        .Visible(false)
+        .Title("הרשמה לניוזלטר")
+        .Draggable(true)
+        .Buttons(b => b.Close())
+        .Content(@<text>
+
+            @using (Ajax.BeginForm("_NewsletterAdd", "PagePart", new AjaxOptions
+            {
+                UpdateTargetId = "newsletter_popup_update",
+                InsertionMode = InsertionMode.Replace,
+                LoadingElementId = "newsletter_popup_loading",
+                HttpMethod = "POST"
+            }))
+            {
+                <div class="popup_content"  id="newsletter_popup_update">
+                    @Html.ValidationSummary(true)
+                    <div class="editor-label">@Html.LabelFor(model => model.NewsletterName)</div>
+                    <div class="editor-field">
+                        @Html.EditorFor(model => model.NewsletterName)
+@*                        @Html.ValidationMessageFor(model => model.NewsletterName)*@
+                    </div>
+
+                    <div class="editor-label">@Html.LabelFor(model => model.NewsletterEmail)</div>
+                    <div class="editor-field">
+                        @Html.EditorFor(model => model.NewsletterEmail)
+@*                        @Html.ValidationMessageFor(model => model.NewsletterEmail)*@
+                    </div>
+
+                    <div class="editor-field">
+                        <input type="checkbox" id="isTermsAccepted" name="isTermsAccepted" data-val="true" data-val-mandatory="חובה לאשר את התקנון"/>
+                        <label for="isTermsAccepted"><a href="/c/law" target="_blank">מאשר את תקנון האתר</a></label>
+                        <span data-valmsg-replace="true" data-valmsg-for="isTermsAccepted" class="field-validation-valid"></span>
+                        @*<div class="div_validation"></div>*@
+                    </div>
+
+                    <div class="popup_content">
+                        @Html.Partial("_InvisibleCaptcha", new Uco.Models.InvisibleCaptcha())
+                        <input type="submit" class="t-button t-state-default" value="הרשמה" />
+                        <span id="newsletter_popup_loading" class="dn">...Loading...</span> 
+                    </div>
+                </div>
+            }
+
+        </text>)
+        .Width(320)
+        .Height(140)
+        .Render();
+}
+@{ Html.Telerik().ScriptRegistrar()
+    .OnDocumentReady(@<text>
+        var windowElement = $('#NewsletterWindow');
+        var undoButton = $('#openNewsletterWindow');
+        undoButton
+            .bind('click', function(e) {
+                windowElement.data('tWindow').open();
+            })
+            .toggle(!windowElement.is(':visible'));
+    </text>);
+}

@@ -1,0 +1,10 @@
+﻿@model System.Int32
+@{
+    string Title = "";
+    Uco.Models.CustomMenuItem cm = RP.GetMenuRepository().FirstOrDefault(r => r.ID == Model);
+    if (cm != null)
+    {
+        Title = cm.Title;
+    }
+}
+@Title

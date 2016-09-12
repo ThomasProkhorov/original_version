@@ -1,0 +1,10 @@
+D:\Web\Old\SAL\Cms\DynamicLinq\bin\Release\DynamicLinq.dll
+D:\Web\Old\SAL\Cms\DynamicLinq\bin\Release\DynamicLinq.pdb
+D:\Web\Old\SAL\Cms\DynamicLinq\obj\Release\DynamicLinq.dll
+D:\Web\Old\SAL\Cms\DynamicLinq\obj\Release\DynamicLinq.pdb
+D:\Web\Old\SAL\Cms\DynamicLinq\obj\Release\DynamicLinq.csprojResolveAssemblyReference.cache
+d:\YandexDisk\Slk\Cms\DynamicLinq\bin\Release\DynamicLinq.dll
+d:\YandexDisk\Slk\Cms\DynamicLinq\bin\Release\DynamicLinq.pdb
+d:\YandexDisk\Slk\Cms\DynamicLinq\obj\Release\DynamicLinq.csprojResolveAssemblyReference.cache
+d:\YandexDisk\Slk\Cms\DynamicLinq\obj\Release\DynamicLinq.dll
+d:\YandexDisk\Slk\Cms\DynamicLinq\obj\Release\DynamicLinq.pdb

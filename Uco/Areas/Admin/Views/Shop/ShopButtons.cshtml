@@ -1,0 +1,15 @@
+@model dynamic
+@using Uco.Infrastructure
+@{
+   
+System.Type t = Model.GetType();
+
+var ModelName = t.Name;
+var gridName = t.Name+"grid";
+}
+
+
+{
+    "width": "100px",
+    "template": "<a class=\"k-button\" href=\"/Admin/Shop/EditAsMember/#: ID #\" >@RP.T("Admin.Shop.EditAsMember")</a>"
+},

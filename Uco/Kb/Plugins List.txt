@@ -1,0 +1,37 @@
+Plugins List
+Uco.Shop?
+
+Basic shop.
+Uco.LongTailShop?
+
+Basic shop with longtail search.
+Uco.LongTailArticles?
+
+Longtail articles search.
+Uco.AdvancedSearch?
+
+Search using LevenshteinDistance? algoritm.
+Uco.ExpertsForum?
+
+Experts forum.
+Uco.Forum?
+
+Forum.
+Uco.Social?
+
+Social platform.
+Uco.Chat?
+
+Chat.
+Uco.Board?
+
+Car, Real estate, job, secondhand board.
+Uco.CompanyList?
+
+Company list including long tail search.
+Uco.Saas?
+
+Multi users Saas template.
+Uco.DocList?
+
+Documents table.

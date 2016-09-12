@@ -1,0 +1,242 @@
+﻿@model object
+@using System.Reflection
+@using System.Collections.Generic
+@using System.Linq
+@using System.ComponentModel.DataAnnotations
+@{
+   
+System.Type t = Model.GetType();
+var ModelName = t.Name;
+var gridName = t.Name+"grid2";
+  ViewBag.Title = RP.T("Admin.Views."+ModelName+".Index.Title");
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutNoTree.cshtml";
+
+//var dnAttribute = typeof(Model).GetCustomAttributes(  typeof(ModelGeneralAttribute), true  ).FirstOrDefault() as ModelGeneralAttribute;
+}
+
+@*<h2>@ViewBag.Title</h2>*@
+@Html.Partial("Grid",Model)
+@{
+return;
+//make return, Grid one for all objects
+}
+<div id="Grid"></div>
+<div id="@(gridName)"></div>
+
+
+<script>
+
+    $(document).ready(function () {
+        /*
+        Docs  
+        http://docs.telerik.com/kendo-ui/api/javascript/ui/grid
+        */
+
+        $("#@(gridName)").kendoGrid({
+            dataSource: {
+                type: "json",
+                transport: {
+                    read: {
+                        url: "@Url.Action("_AjaxRead", "Generic", new {model = ModelName })",
+                    type: "POST",
+                    dataType: "json",
+                    // data: additionalData
+                }
+
+            },
+            schema: {
+                data: "Data",
+                total: "Total",
+                errors: "Errors",
+                model: {
+                    fields: {
+                    @foreach (var p in t.GetProperties())
+                                            {
+                                                var assdd="";
+       
+           // assdd=",editable: false"; 
+        var opt = (ModelAttribute)p.GetCustomAttributes<ModelAttribute>().Where(x=>x.Role == ViewBag.CurrentRole || x.Role==null).OrderByDescending(x=>x.Role).ToList().FirstOrDefault();
+         if(opt!=null )
+         {
+             if(!opt.AjaxEdit)
+             {
+                 if(!opt.Show){
+                     continue;
+                 }
+                 assdd=",editable: false,";
+            // continue;
+             }
+            
+         }
+          if(p.PropertyType.IsGenericType){
+             continue;
+         }
+         if(p.Name.Contains("ID")){
+             if(p.Name == "ID"){
+                 assdd=",editable: false,";
+             }
+             if(p.PropertyType.Name=="Guid")
+             {
+@Html.Raw("  \""+p.Name+"\": { \"type\": \"string\" "+assdd+"}, \n")
+             }else{
+            @Html.Raw("  \""+p.Name+"\": { \"type\": \"number\" "+assdd+"}, \n")
+             } 
+        }else if(p.Name.Contains("Date")){
+            @Html.Raw("  \""+p.Name+"\": { \"type\": \"date\" "+assdd+"}, \n") 
+        }
+            //PropertyType.FullName
+        else if(p.PropertyType.Name=="Decimal"){
+            @Html.Raw("  \""+p.Name+"\": { \"type\": \"number\" "+assdd+" }, \n")  
+        }
+        else if(p.PropertyType.Name=="Boolean"){
+                   @Html.Raw("  \""+p.Name+"\": { \"type\": \"boolean\" "+assdd+" }, \n")  
+        }
+        else if(p.PropertyType.Name=="DateTime"){
+                           @Html.Raw("  \""+p.Name+"\": { \"type\": \"date\" "+assdd+" }, \n")  
+        }else if(p.PropertyType.Namespace =="Uco.Models")
+                 {
+  @Html.Raw("  \""+p.Name+"\": { \"type\": \"object\" "+assdd+" }, \n")  
+                 // continue;
+                 }
+        else{
+            @Html.Raw("  \""+p.Name+"\": { \"type\": \"string\" "+assdd+" }, \n")  
+        }
+    } 
+// "ID": {"type":"number" ,editable: false}
+    }
+
+                }
+            },
+            pageSize: 20,
+ 
+            "serverPaging": true,
+            "serverSorting": true,
+            "serverFiltering": true,
+            "serverGrouping": true,
+            "serverAggregates": true,
+            "type": "aspnetmvc-ajax",
+        },
+            refresh: true,
+        //  detailTemplate: kendo.template($("#template").html()),
+        // detailInit: detailInit,
+        // dataBound: function () {
+        //this.expandRow(this.tbody.find("tr.k-master-row").first());
+        //   },
+        pageable: {
+            refresh: true,
+           // pageSizes: [10, 20, 50],
+            pageSize: 10
+        },
+        columns: [
+@{
+
+    foreach (var p in t.GetProperties())
+      {
+
+ var attr = (DisplayAttribute)p.GetCustomAttribute(typeof(DisplayAttribute));
+        var fTitle = p.Name;
+        if (attr != null)
+        {
+            fTitle = attr.Name;
+        }
+        var opt = (ModelAttribute)p.GetCustomAttributes<ModelAttribute>().Where(x=>x.Role == ViewBag.CurrentRole || x.Role==null).OrderByDescending(x=>x.Role).ToList().FirstOrDefault();
+        var addAttrString = "sortable: false, filterable: false ,";
+        if(opt!=null )
+        {
+            addAttrString="";
+            if(!opt.Sort){
+                addAttrString+="sortable: false,";
+            }
+            if(!opt.Filter){
+                addAttrString+="filterable: false,";
+            }
+            if(!opt.Show)
+            {
+                addAttrString+="hidden: true, ";
+                if(!opt.AjaxEdit)
+                {
+                    continue;
+                    }
+            }
+            if(false && opt.AjaxEdit)
+            {
+                addAttrString+="editor:'"+(Html.Editor(p.Name).ToHtmlString() + Html.ValidationMessage(p.Name).ToHtmlString())
+   .Replace(System.Environment.NewLine,"")
+   .Replace("'","\\'")
+   .Replace("</script>","</sc'+'ript>")
++"',";
+            }
+         //   continue;
+        }
+        
+       if(p.PropertyType.Namespace =="Uco.Models")
+        {
+addAttrString+="template:\"# if ("+p.Name+") { #  #: "+p.Name+".Name # # } #\", ";
+       // continue;
+        }else if(p.PropertyType.IsGenericType){
+continue;
+}
+        if(p.PropertyType.Name=="DateTime"){
+                    @Html.Raw("{ field: \""+p.Name+"\",title: \""+fTitle+"\" ,format: \"{0: dd/MM/yyyy HH:mm}\", "+addAttrString+"},\n")  
+        }else
+            //if(!p.Name.Contains("ID"))
+            {
+                       @Html.Raw("{ field: \""+p.Name+"\",title: \""+fTitle+"\", "+addAttrString+" },\n")  
+                //+" "+p.PropertyType.Name
+            } 
+        }
+
+        }
+ {
+            "width": "100px",
+            "template": "<a class=\"k-button\" href=\"@Url.Action("Edit", "Generic", new {model = ModelName })/#= ID #\">Edit</a>"
+        },
+ {
+     "width": "100px",
+ "buttonType": "Image",
+     "command": [
+//{
+ //        "name": "edit",
+ //        "buttonType": "Icon",
+ //        "text": ""
+ //    }
+//, 
+{
+         "name": "destroy",
+         "buttonType": "Image",
+         "text": "Delete"
+     }]
+    }  
+    ],
+    //   height: 600,
+        "scrollable": false,
+            filterable: true,
+            sortable: true,
+"editable": {
+    "confirmation": "Are you sure you want to delete this record?",
+   "confirmDelete": "Delete",
+   "cancelDelete": "Cancel",
+    "mode": "popup",
+  //  "create": true,
+    "update": true,
+    "destroy": true
+},
+
+        });
+
+
+        function detailInit(e) {
+            var detailRow = e.detailRow;
+            console.log(e);
+
+
+        }
+
+    });
+
+</script>
+
+<br />
+
+
+ @Html.ActionLink(RP.T("Admin.Views.Command.Create").ToString(), "Create", null, new { @class = "k-button" })

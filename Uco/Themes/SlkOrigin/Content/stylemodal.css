@@ -1,0 +1,158 @@
+@import url(//fonts.googleapis.com/earlyaccess/alefhebrew.css);
+
+
+.specialcss .no_padding{padding: 0px !important;}
+.specialcss .rtl{direction: rtl;}
+
+/*Modal Custom Design*/
+
+.specialcss .modal-content {
+
+    min-height: 481px !important;
+    position: fixed;
+    margin-top: 13%;
+    position: relative;
+}
+.specialcss .modal-footer {
+    min-height: 38px !important;
+    background-color: #ffffff;
+    border-radius: 5px;
+    text-align: center;
+    font-family: "Alef Hebrew";
+    margin-top: 10px;
+    padding: 0 !important;
+
+}
+.specialcss .modal-footer p{
+    font-size: 25.484px;
+    font-family: "Alef Hebrew";
+    color: rgb(100, 73, 72);
+    line-height: 0.781;
+    text-align: center;
+    padding-top: 5px;
+}
+.specialcss .modal_clear{
+    clear: top !important;
+    height: 10px;
+    background-color: transparent !important;
+}
+.specialcss form{
+    direction: rtl;
+
+}
+.specialcss form p{
+    color: #000000;
+    font-family:"Alef Hebrew" ;
+    margin: 0 !important;
+
+}
+.specialcss .underline{
+    text-decoration: underline;
+}
+.specialcss form a{
+    color: #2b3990;
+    font-family:"Alef Hebrew" ;
+    text-decoration: none;
+    list-style: none;
+    margin-right: 6px;
+}
+.specialcss .no_padding{
+    padding: 0 !important;
+}
+.specialcss .clear20 {
+    clear: both;
+    height: 20px;
+}
+.specialcss .clear10{
+    clear: both;
+    height: 10px;
+}
+.specialcss .form-control {
+    border-width: 1px !important;
+    border-color: #b2a4a4 !important;
+    border-style: solid !important;
+    border-radius: 5px !important;
+    background-color: rgb(255, 255, 254)!important;
+    height: 38px !important;
+    font-size: 13.517px !important;
+    font-family: "Alef Hebrew";
+    color: rgb(65, 64, 66) !important;
+    line-height: 1.471 !important;
+}
+.specialcss .org_btn{
+    background-color: #f36c26;
+    border-radius: 5px;
+    height: 38px;
+    font-size: 18px;
+    font-family: "Alef Hebrew";
+    color: rgb(236, 232, 221);
+    line-height: 0.708;
+    text-align: center;
+}
+.specialcss .fb_btn{
+    background-color: #263b91;
+    border-radius: 5px;
+    height: 38px;
+    font-size: 19px;
+    font-family: "Alef Hebrew";
+    color: rgb(236, 232, 221);
+    text-align: center;
+}
+.specialcss .googl_btn{
+    background-color: #295eac;
+    border-radius: 5px;
+    height: 38px;
+    font-size: 19px;
+    font-family: "Alef Hebrew";
+    color: rgb(236, 232, 221);
+    text-align: center;
+}
+.specialcss .size-32 {
+    font-size: 32px;
+}
+.specialcss .step {
+    display: inline-block;
+    line-height: 0;
+    position: relative;
+    width: 10%;
+}
+.specialcss hr{
+    color: #000;
+}
+/*End of Modal Custom Design*/
+
+
+.fade {
+    opacity: 0;
+    -webkit-transition: opacity .15s linear;
+    -o-transition: opacity .15s linear;
+    transition: opacity .15s linear;
+}
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 10040;
+    background-color: #000;
+}
+.modal-backdrop.in {
+    filter: alpha(opacity=50);
+    opacity: .5;
+}
+#facebookbutton {
+    text-align: center;
+}
+.logologin{
+    
+}
+.logologin img {
+padding-top: 20px;
+    padding-bottom: 10px;
+}
+.showfarfaraway
+{
+    position:absolute;
+    top:-9000px;
+}

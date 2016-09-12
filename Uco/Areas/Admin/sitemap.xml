@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<siteMap>
+    <siteMapNode title="Home" controller="Home" action="Overview">
+      <siteMapNode title="Content" Resource="Admin.Menu.Content" ImageUrl="~/Areas/Admin/Content/icons/application.png">
+        <siteMapNode title="Pages" Resource="Admin.Menu.Pages" controller="Main" action="Index"  />
+        <siteMapNode title="Products" Resource="Admin.Menu.Products" url="/Admin/Manage/Product"  />
+        <siteMapNode title="Category" Resource="Admin.Menu.Category" url="/Admin/Manage/Category" />
+        <siteMapNode title="Manufacturer" Resource="Admin.Menu.Manufacturer" url="/Admin/Manage/Manufacturer" />
+        <siteMapNode title="ShopType" Resource="Admin.Menu.ShopType" url="/Admin/Manage/ShopType"  />
+
+        <siteMapNode title="ShopType" Resource="Admin.Menu.SpecificationAttribute" url="/Admin/Manage/SpecificationAttribute"  />
+        <siteMapNode title="ShopType" Resource="Admin.Menu.SpecificationAttributeOption" url="/Admin/Manage/SpecificationAttributeOption"  />
+        <siteMapNode title="ProductSkuMap" Resource="Admin.Menu.ProductSkuMap" url="/Admin/Manage/ProductSkuMap"  />
+        <siteMapNode title="Measure" Resource="Admin.Menu.Measure" url="/Admin/Manage/Measure"  />
+         <siteMapNode title="MergeSku" Resource="Admin.Menu.MergeSku" url="/Admin/Product/MergeSku"  />
+        <siteMapNode title="ContentUnitMeasures" Resource="Admin.Menu.ContentUnitMeasures" url="/Admin/ContentUnitMeasure/Index"  />
+        <siteMapNode title="ContentUnitMeasureMaps" Resource="Admin.Menu.ContentUnitMeasureMaps" url="/Admin/ContentUnitMeasuresMaps/Index"  />
+
+      </siteMapNode>
+
+      <siteMapNode title="Shops" Resource="Admin.Menu.Shops" ImageUrl="~/Areas/Admin/Content/icons/building.png">
+        <siteMapNode title="Shops" Resource="Admin.Menu.Shops" url="/Admin/Manage/Shop" />
+        <siteMapNode title="ShopComment" Resource="Admin.Menu.ShopComment" url="/Admin/Manage/ShopComment" />
+        <siteMapNode title="ShopRate" Resource="Admin.Menu.ShopRate" url="/Admin/Manage/ShopRate" />
+        <siteMapNode title="Poll" Resource="Admin.Menu.Poll" url="/Admin/Manage/Poll" />
+        <siteMapNode title="Discount" Resource="Admin.Menu.Discount" url="/Admin/Discount" />
+        <siteMapNode title="UserCredit" Resource="Admin.Menu.UserCredit" url="/Admin/manage/usercredit"></siteMapNode>
+        <siteMapNode title="UserAddressSearchActivity" Resource="Admin.Menu.UserAddressSearchActivity" url="/Admin/Manage/UserAddressSearchActivity"></siteMapNode>
+        <siteMapNode title="ProcessError" Resource="Admin.Menu.ProcessError" url="/Admin/Manage/ProcessError"></siteMapNode>
+        <siteMapNode title="PlanedTask" Resource="Admin.Menu.PlanedTask" url="/Admin/Manage/PlanedTask"></siteMapNode>
+        <siteMapNode title="UserCredit" Resource="Admin.Menu.CategoryMenu" url="/Admin/CategoryMenu/Index"></siteMapNode>
+        <siteMapNode title="ShopDesign" Resource="Admin.Menu.ShopDesign" url="/Admin/Manage/ShopDesign"></siteMapNode>
+        
+      </siteMapNode>
+
+      <siteMapNode title="Orders" Resource="Admin.Menu.Orders" ImageUrl="~/Areas/Admin/Content/icons/basket.png" url="/Admin/Manage/Order"></siteMapNode>
+
+      <siteMapNode title="Reports" Resource="Admin.Menu.Reports" ImageUrl="~/Areas/Admin/Content/icons/chart_pie.png">
+        <siteMapNode title="ReportsShopPayments"  controller="Main" action="PaymentReport" Resource="Admin.Menu.ReportsShopPayments" />
+        <siteMapNode title="SkuReport"  url="/admin/product/SkuReport" Resource="Admin.Menu.SkuReport" />
+
+        
+      </siteMapNode>
+
+      <siteMapNode title="Account" Resource="Admin.Menu.Account" ImageUrl="~/Areas/Admin/Content/icons/user.png" controller="User" action="Index"></siteMapNode>
+      
+      <siteMapNode title="Contact" Resource="Admin.Menu.Contact" ImageUrl="~/Areas/Admin/Content/icons/email_open.png" controller="Contact" action="Index"></siteMapNode>
+      
+      <siteMapNode title="System" Resource="Admin.Menu.System" ImageUrl="~/Areas/Admin/Content/icons/cog.png">
+        <siteMapNode title="ClearCache" Resource="Admin.Menu.ClearCache" controller="Settings" action="AplicationClear" />
+        <siteMapNode title="Newsletter" Resource="Admin.Menu.NewsletterList" controller="Newsletter" action="Index" />
+        <siteMapNode title="MessageTemplate" Resource="Admin.Menu.MessageTemplate" url="/Admin/Manage/MessageTemplate" />
+        
+        <siteMapNode title="Role" Resource="Admin.Menu.Role" controller="Role" action="Index" />
+        <siteMapNode title="Domain" Resource="Admin.Menu.Domain" controller="Domain" action="Index"  />
+        <siteMapNode title="Errors" Resource="Admin.Menu.SystemErrors" controller="Errors" action="Index" />
+        <siteMapNode title="תרגום" Resource="Admin.Menu.Translation" controller="Translation" action="Index"  />
+        <siteMapNode title="Banner" Resource="Admin.Menu.Banner" url="/admin/manage/banner" />
+        <siteMapNode title="TextComponent" Resource="Admin.Menu.TextComponent" controller="TextComponent" action="Index"  />
+        <siteMapNode title="Menu" Resource="Admin.Menu.Menu" controller="Menu" action="Index"  />
+        <siteMapNode title="מנהל קבצים" Resource="Admin.Menu.FileManager" url="~/ckfinder/ckfinder.html?langCode=he" />
+      </siteMapNode>
+
+      <siteMapNode title="Help" Resource="Admin.Menu.Help" ImageUrl="~/Areas/Admin/Content/icons/information.png"  url="http://support.uco.co.il"></siteMapNode>
+    </siteMapNode>
+</siteMap>
+

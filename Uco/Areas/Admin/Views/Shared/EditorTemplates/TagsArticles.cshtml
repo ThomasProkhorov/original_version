@@ -1,0 +1,34 @@
+@model string
+
+
+@{
+    List<string> l = new List<string>();
+    using (Uco.Models.Db _db = new Uco.Models.Db())
+    {
+        foreach(string item1 in _db.ArticlePages.Select(r => r.Tags))
+        {
+            if (!string.IsNullOrEmpty(item1))
+            {
+                foreach(string item2 in item1.Split(','))
+                {
+                    l.Add(item2.Trim());
+                }
+            }
+        }
+    }
+    l = l.Distinct().OrderBy(r => r).ToList();
+}
+
+@(Html.Kendo().AutoComplete()
+        .Name(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))
+        .Value(Model)
+        //.Encode(false)
+        .BindTo(l)
+        //.AutoFill(false)
+        .HtmlAttributes(new { @class = "text-box single-line" })
+        .HighlightFirst(true)
+        //.Multiple(multi =>
+        //{
+        //    multi.Separator(", ").Enabled(true);
+        //})
+)

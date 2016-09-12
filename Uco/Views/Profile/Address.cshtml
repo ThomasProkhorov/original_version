@@ -1,0 +1,264 @@
+﻿@using Uco.Models.Overview
+@using Uco.Models
+@model User
+@{
+    ViewBag.Title = @RP.T("Views.Profile.Address.ViewBagTitle");
+
+    Layout = "~/Views/Shared/_LayoutShop.cshtml";
+    ViewBag.Url = "~/Profile/Address/";
+}
+@*rewrite shopping cart footer*@
+@*@section FooterZone{
+
+    }*@
+@section topmenu{
+    @Html.Action("_TopStatus", "Profile")
+}
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true&libraries=places&language=iw"></script>
+
+<script type="text/javascript">
+    var geocoder = new google.maps.Geocoder();
+    var Latitude, Longitude;
+    var parseUrlResult = {};
+
+    $(document).ready(function () {
+        ParseUrl();
+        Initialize();
+        $("#shopType").kendoDropDownList({
+            dataTextField: "Name",
+            dataValueField: "ID",
+            optionLabel: "בחר סוג חנות",
+            dataSource: {
+                transport: {
+                    read: {
+                        dataType: "json",
+                        url: "/Shop/_GetShopTypeList",
+                    }
+                }
+            }
+        });
+
+        $("#AddressMap").keyup(function (event) {
+            if (event.keyCode == 13) {
+                var result = GetGeocode($("#AddressMap").val());
+                $("#submit_btn").click();
+            }
+        });
+
+        $("#submit_btn").kendoButton({
+            click: function () {
+                if ($("#AddressMap").val() == "") {
+                    alert("הכנס כתובת");
+                    return fasle;
+                }
+                if ($("#shopType").val() == "") {
+                    alert("בחר סוג חנות");
+                    return fasle;
+                }
+                if (Latitude != null && Longitude != null) {
+                    RedirectToUrl();
+                }
+
+            }
+        });
+
+        $("#AddressMap").on('blur', function () {
+            var result = GetGeocode($("#AddressMap").val());
+        })
+        $('#savebutton').click(function () {
+
+            if (Latitude != null && Longitude != null) {
+                var coor = {};
+                coor['Latitude'] = Latitude;
+                coor['Longitude'] = Longitude;
+                coor['AddressMap'] = $("#AddressMap").val();
+                $.ajax({
+                    type: "POST",
+                    dataType: "json",
+                    url: "/Profile/AddressSave",
+                    data: coor,
+                    cache: false,
+                    error: function () { alert('Server error'); }
+                }).done(function (data) {
+                    if (data.result == "ok") {
+                        $('#responsetext').html('Saved');
+                    } else {
+                        //data.message - errors
+                        Shop.ShowErrors(data, $('#responsetext'));
+                    }
+                });
+            }
+
+        });
+    });
+
+    function ParseUrl() {
+        try {
+            var result = GetGeocode($("#AddressMap").val());
+        }
+        catch (e) {
+            console.log('error = ' + e.name)
+        }
+    }
+
+    function RedirectToUrl() {
+        $.ajax({
+            type: "Post",
+            url: "/Shop/LandingSelectShop",
+            data: { shopType: $("#shopType").val(), address: $("#AddressMap").val(), Latitude: Latitude, Longitude: Longitude },
+            async: false,
+            success: function (data) {
+                $(location).attr('href', data);
+            }
+
+        });
+    }
+
+    function GetGeocode(v) {
+        var cur_val = v;
+        $('#responsetext').html('');
+        geocoder.geocode({ 'address': cur_val }, function (results, status) {
+            if (status == google.maps.GeocoderStatus.OK) {
+
+                $('#savebutton').show();
+                Latitude = results[0].geometry.location.lat();
+                Longitude = results[0].geometry.location.lng();
+                console.log(Longitude);
+
+                map.setCenter(results[0].geometry.location);
+                var marker = new google.maps.Marker({
+                    map: map,
+                    position: results[0].geometry.location
+                });
+
+            }
+            else {
+                // $('#savebutton').hide();
+                // $('#responsetext').html("לא מצליח למצוא את הכתובת: " + status);
+                //alert("לא מצליח למצוא את הכתובת: " + status);
+            }
+
+        });
+    }
+    function Initialize() {
+        //console.log(parseUrlResult);
+        geocoder = new google.maps.Geocoder();
+        if (parseUrlResult || parseUrlResult.latitude || parseUrlResult.longitude) {
+            Latitude = 31.046051;
+            Longitude = 34.85161199999993;
+        } else {
+            Latitude = parseUrlResult.latitude;
+            Longitude = parseUrlResult.longitude;
+        }
+
+        var latlng = new google.maps.LatLng(Latitude, Longitude);
+        var mapOptions = {
+            zoom: 8,
+            center: latlng,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        }
+        map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
+
+
+        var input = (document.getElementById('AddressMap'));
+        var autocomplete = new google.maps.places.Autocomplete(input);
+        autocomplete.bindTo('bounds', map);
+
+        var infowindow = new google.maps.InfoWindow();
+        var marker = new google.maps.Marker({
+            map: map,
+            anchorPoint: new google.maps.Point(0, -29)
+        });
+
+        google.maps.event.addListener(autocomplete, 'place_changed', function () {
+            infowindow.close();
+            marker.setVisible(false);
+            var place = autocomplete.getPlace();
+            if (!place.geometry) {
+                return;
+            }
+
+            // If the place has a geometry, then present it on a map.
+            if (place.geometry.viewport) {
+                map.fitBounds(place.geometry.viewport);
+            } else {
+                map.setCenter(place.geometry.location);
+                map.setZoom(17);  // Why 17? Because it looks good.
+            }
+            marker.setIcon(({
+                url: place.icon,
+                size: new google.maps.Size(71, 71),
+                origin: new google.maps.Point(0, 0),
+                anchor: new google.maps.Point(17, 34),
+                scaledSize: new google.maps.Size(35, 35)
+            }));
+            marker.setPosition(place.geometry.location);
+            marker.setVisible(true);
+
+            var address = '';
+            if (place.address_components) {
+                address = [
+                  (place.address_components[0] && place.address_components[0].short_name || ''),
+                  (place.address_components[1] && place.address_components[1].short_name || ''),
+                  (place.address_components[2] && place.address_components[2].short_name || '')
+                ].join(' ');
+            }
+
+            infowindow.setContent('<div><strong>' + place.name + '</strong><br>' + address);
+            infowindow.open(map, marker);
+        });
+
+        // Sets a listener on a radio button to change the filter type on Places
+        // Autocomplete.
+        function setupClickListener(id, types) {
+            var radioButton = document.getElementById(id);
+            google.maps.event.addDomListener(radioButton, 'click', function () {
+                autocomplete.setTypes(types);
+            });
+        }
+    }
+</script>
+<div class="midd_section">
+    <div class="center_div">
+        <div class="container one">
+            <div class="container one">
+                 <table class="shoparea"><tr>
+                <td class="leftcol">
+            @* Menu *@
+            @Html.Partial("_Menu")
+                </td>
+                <td class="contentcol">
+                <div class="profile_left_container">
+                    <div class="right_sec">
+
+
+                        <h1 class="main_heading_h1_profile main_heading_h1_profile_br">@RP.T("Views.Profile.Menu.Address")</h1>
+                        <div style="text-align: center;">
+
+                            <input type="text" style="width: 300px" class="k-textbox"
+                                   value="@Model.AddressMap"
+                                   name="AddressMap" placeholder="@RP.T("Views.Profile._TopStatus.Address.AddressMapPlaceholder")" id="AddressMap" />
+                            <div id="" style="height:54px; padding-top:6px; overflow:hidden;">
+
+                                <button id="savebutton" class="k-button">@RP.T("Views.Profile.Address.Save")</button>
+                                <div id="responsetext"></div>
+                            </div>
+
+
+                            <div style="text-align: center; width: 100%; border: 1px solid #c7c4b8; margin: 20px auto; border-radius:4px; ">
+                                <div id="map_canvas" style="width: 100%; height: 400px; text-align:center;"></div>
+                            </div>
+
+
+                        </div>
+
+
+                    </div>
+                </div>
+
+
+                  </td></tr></table>
+            </div>
+            <div class="clear"></div>
+        </div>
+    </div>

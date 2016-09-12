@@ -1,0 +1,173 @@
+﻿@model Uco.Models.Shop
+
+
+
+
+
+<div class="left_sec" id="left_sec">
+    <div id="bannerWrapper">
+        <div class="left_part2">
+            <a href="javascript:void(0)" id="shoping_list">@RP.T("Views.Shop._LeftMenu.ShoppingListBtn")</a>
+           
+        </div>
+        
+        @if (Session["OpenedFromHomePage" + Model.ID.ToString()] != null 
+    && ((DateTime)Session["OpenedFromHomePage" + Model.ID.ToString()]) > DateTime.UtcNow.AddHours(-2))
+{ 
+        <div class="left_part4">
+            <a href="javascript:void(0)">@RP.T("Views.Shop._LeftMenu.ChangeShopBtn")</a>
+        </div>
+        
+        @*<div class="left_part3">
+            <div class="left_part3_heading">@RP.T("Views.Shop._LeftMenu.SelectShopType")</div>
+            <input type="hidden" id="changeShopText" value="@RP.T("Views.Shop._LeftMenu.ChangeShopText")" />
+            <input type="hidden" id="noShopText" value="@RP.T("Views.Shop._LeftMenu.NoShopsText")" />
+            <div class="left_part3_drop">
+                <input id="shopType" style="width: 100%" />
+            </div>
+        </div>*@
+        }
+        
+        <div class="clear"></div>
+        </br>
+        <div class="left_part1">
+            <div class="left_part1_heading">
+                <a href="javascript:void(0)" style="color:#fff;" title="@RP.T("Views.Shop._LeftMenu.TooltipText")" class="leftmenutool parentcssTooltip">&nbsp;</a>
+                <script>
+                    $('.leftmenutool').poshytip({
+                        className: 'tip-green',
+                        offsetX: -7,
+                        offsetY: 16,
+                        alignX: 'inner-left',
+                        allowTipHover: true
+                    });
+                </script>
+                <span>@RP.T("Views.Shop._LeftMenu.ShopNameText")</span>
+                @*<div role="tooltip" id="shopInfoTip" aria-hidden="true"
+                         style="font-size: 12px; color: rgb(102, 102, 102) !important; top: -88px !important; right: 20px; position: relative; bottom: 16px; z-index: 999;">
+                        @RP.T("Views.Shop._LeftMenu.TooltipText")
+                    </div>*@
+
+            </div>
+            <div class="left_part1_in">
+                <div class="online_logo">
+                    @if(String.IsNullOrEmpty(Model.Image))
+                    { 
+                        <span class="shop_name">@Model.Name</span>
+                    }
+                    else
+                    { 
+                        <img src="@SF.GetImage(Model.Image, 177, 160, true, true)" alt="">
+                    }
+                </div>
+                <div class="left_icons_part1">
+                    <ul>
+                        <li class="first">   @String.Format(RP.T("Views.Shop._LeftMenu.OrderTime").ToString(), ((Model.DeliveryTime / 60).ToString("00") + ":" + (Model.DeliveryTime % 60).ToString("00")))</li>
+                        <li class="second">@String.Format(RP.T("Views.Shop._LeftMenu.PickYourself").ToString(), Model.DeliveryManualDescription)</li>
+                        <li class="third">@String.Format(RP.T("Views.Shop._LeftMenu.CostOfDelivery").ToString(), ShoppingService.FormatPrice(Model.FreeShipFrom))</li>
+                    </ul>
+                </div>               
+                <div class="left1_phne_icon"><span>@RP.T("Views.Shop._LeftMenu.PhoneText") @Model.Phone</span></div>
+                <div id="shopInfo" class="left1_btn">
+                    <a href="javascript:void(0)">@RP.T("Views.Shop._LeftMenu.ShopPopupBtn")</a>
+                </div>
+                <div class="left_part_cartbutton">
+        <div class="footer_cart_btn">
+                <a href="@Url.Action("Index", "ShoppingCart",new { ID = Model.ID })" >@RP.T("Views.Shared._Footer.Cart") <span class="sh_carttotalwithoutship"></span></a>
+               </div>
+               
+            </div>
+            </div>
+        </div>
+        <div class="clear"></div>
+        
+        @*<div class="left_part5">
+            <a href="@Url.Action("_ChangeShop")">@RP.T("Views.Shop._LeftMenu.ChangeShopBtn2")</a>
+        </div>*@
+
+        <div class="left_orange_img_part">
+             @Html.Action("_Banner", "PagePart", new { Num = 10, BannerGroup = "ShopLeft" })
+
+          
+        </div>
+        <div class="left_orange_img_part">
+             @Html.Action("_Banner", "PagePart", new { Num = 10, BannerGroup = "ShopRight" })
+          
+        </div>
+    </div>
+</div>
+
+
+
+
+<div class="specialcss specialbootstrap" style="position:absolute;">
+    <div id="shoping_list_box" class="modal fade list dn"  role="dialog" style="display:none;">
+        <div class="modal-dialog">
+
+            <div class="col-lg-9 col-md-9  col-sm-9  col-xs-12 col-lg-offset-2  col-sm-offset-2  modal-content" style="min-height:318px!important; margin-top:30%;">
+
+                <div class="col-lg-12 no_padding" >
+                    <h4> @RP.T("Views.Shop._LeftMenu.ShoppingListText")</h4>
+                </div>
+                    <div class="col-lg-12 no_padding" >
+                           <textarea style="width:100%; height:200px!important;" class="form-control input_blok" type="text" name="keywords" value=""
+                                  placeholder=""
+                                  onkeypress="Shop.TextSearchKeyPress(this,event,@Model.ID);" id="shkeywords"></textarea>
+                    </div>
+                     <div class="col-lg-12 no_padding" >
+                           <div class="close_box1"><a href="javascript:void(0)" style="display:none;" onclick="Shop.TextSearchClear(this,event,@Model.ID);" id="shclearkeywords"><img alt="" src="~/Content/DesignFiles/close_box1.png"></a></div>
+                    <div class="search_btn1"><input onclick="Shop.TextSearch(this,event,@Model.ID);" width="108" type="image" height="26" alt="Search" src="~/Content/DesignFiles/search_btn1.png"></div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+    </div>
+</div>
+</div>
+<script>
+    var haveWrite = false;
+    $("#shoping_list, #shoping_list_top").click(function () {
+        $('#shoping_list_box').modal('show');
+        setTimeout(function () {
+            if (!haveWrite && !$('#shoping_list_box textarea').val()) {
+                $('#shoping_list_box textarea').val('@Json.Encode(RP.S("Views.Shop._LeftMenu.TextSearchPlaceholder"))'.replace("&quot;", "").replace("&quot;", "").replace("&quot;", "")
+                    ).attr('style', $('#shoping_list_box textarea').attr('style')+'color: #BFBFBF!important;' );
+                $('#shoping_list_box textarea')[0].focus();
+                resetCursor($('#shoping_list_box textarea')[0]);
+            } else {
+                $('#shoping_list_box textarea')[0].focus();
+                resetCursor($('#shoping_list_box textarea')[0]);
+            }
+            //   $('#shoping_list_box textarea')[0].select();
+        }, 300);
+        // $("#shoping_list_box").toggleClass("dn");
+    });
+    $('#shoping_list_box textarea')[0].onclick = function (e) {
+        if (!haveWrite) {
+            $('#shoping_list_box textarea').val('');//$('#shoping_list_box textarea').val().substring(0,1)
+            $('#shoping_list_box textarea').attr('style', $('#shoping_list_box textarea').attr('style').replace('color: #BFBFBF!important;', ''));
+            haveWrite = true;
+            $('#shoping_list_box textarea')[0].onkeydown = null;
+            $('#shoping_list_box textarea')[0].onclick = null;
+        }
+    };
+    $('#shoping_list_box textarea')[0].onkeydown = function (e) {
+        if (!haveWrite) {
+            $('#shoping_list_box textarea').val('');//$('#shoping_list_box textarea').val().substring(0,1)
+            $('#shoping_list_box textarea').attr('style', $('#shoping_list_box textarea').attr('style').replace('color: #BFBFBF!important;',''));
+            haveWrite = true;
+            $('#shoping_list_box textarea')[0].onkeydown = null;
+            $('#shoping_list_box textarea')[0].onclick = null;
+        }
+    };
+    function resetCursor(txtElement) {
+        if (txtElement.setSelectionRange) {
+            txtElement.focus();
+            txtElement.setSelectionRange(0, 0);
+        } else if (txtElement.createTextRange) {
+            var range = txtElement.createTextRange();
+            range.moveStart('character', 0);
+            range.select();
+        }
+    }
+ 
+ </script>

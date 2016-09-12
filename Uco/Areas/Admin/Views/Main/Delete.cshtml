@@ -1,0 +1,14 @@
+﻿@model Uco.Models.AbstractPage
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_ActionLayout.cshtml";
+}
+<div class="action_wrap">
+    <h3>@RP.T("Admin.Views.Command.ToDelete")</h3>
+    @Html.R("Title"): @ViewBag.Title
+    @using (Html.BeginForm())
+    {
+        <div class="button_div">
+            <input type="submit" value="@RP.T("Admin.Views.Command.Delete")" class="k-button" />
+        </div>
+    }
+</div>

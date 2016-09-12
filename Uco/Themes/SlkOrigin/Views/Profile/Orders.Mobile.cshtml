@@ -1,0 +1,81 @@
+﻿@using Uco.Models.Overview
+@using Uco.Models
+@model User
+@{
+    ViewBag.Title = RP.T("Views.Profile.Orders.ViewBagTitle");
+    Layout = "~/Themes/SlkOrigin/Views/Shared/_LayoutShop.cshtml";
+    ViewBag.Url = "~/Profile/Orders/";
+}
+
+<div data-role="view" id="tabstrip-orders" data-layout="mobile-layout" data-init="mobileListViewEndlessScrolling" data-title="@RP.T("Views.Profile.Orders.Mobile.OrdersViewTitleText")" class="k-rtl">
+    <ul id="endless-scrolling"></ul>
+</div>
+
+<script type="text/x-kendo-tmpl" id="endless-scrolling-template">
+    <div class="product" style="border-bottom: 1px solid rgb(165, 165, 209);">
+        <div style="min-height:30px">
+            <span>\##: ID # </span> #: TotalStr #
+            <a onclick="Shop.GoTo('/Profile/OrderDetail/#: ID #');" data-role="detailbutton" data-icon="more">@*@RP.T("Views.Profile.Orders.Details")*@</a>
+        </div>
+        <div style="min-height:30px">#: OrderStatusStr #</div>
+        <div style="min-height:30px">#: FullName # #: ShipAddress #</div>
+    </div>
+</script>
+
+<script>
+    function mobileListViewEndlessScrolling() {
+        var dataSource = new kendo.data.DataSource({
+          //  type: "json",
+            transport: {
+                read: {
+                    url: "@Url.Action("OrderAjax","Profile")",
+                    type: "POST",
+                dataType: "json",
+                }
+            },
+            schema: {
+                data: "Data",
+                total: "Total",
+                errors: "Errors",
+                model: {
+                    "id": "ID",
+                    fields: {
+                        "ID": { "type": "number", editable: false, },
+                        "User": { "type": "object", editable: false, nullable: true, },
+                        "TotalCard": { "type": "number" },
+                        "TotalCash": { "type": "number" },
+                        "RegularInterval": { "type": "number" },
+                        "ShipAddress": { "type": "string" },
+                        "CreateOn": { "type": "date" },
+                        "OrderStatus": { "type": "number" },
+                        // "OrderStatus": { "type": "object", editable: false, nullable: true, },
+                        // "ID": {"type":"number" ,editable: false}
+                    }
+
+                }
+            },
+           
+            serverPaging: true,
+            "serverSorting": true,
+            "serverFiltering": true,
+            "serverGrouping": true,
+            "serverAggregates": true,
+            pageSize: 20,
+            filter: { field: 'OrderStatus', operator: "eq", value: 1 },
+                                    "type": "aspnetmvc-ajax",
+        });
+
+        $("#endless-scrolling").kendoMobileListView({
+            dataSource: dataSource,
+            template: $("#endless-scrolling-template").text(),
+            endlessScroll: true,
+           
+        });
+    }
+</script>
+
+@if (Session["ShopID"] != null)
+{
+    @Html.Partial("_StaticViews.Mobile", (int)Session["ShopID"])
+}
+<input type="hidden" name="passwordViewsInit" />

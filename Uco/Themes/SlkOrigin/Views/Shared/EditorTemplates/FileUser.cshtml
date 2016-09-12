@@ -1,0 +1,35 @@
+@model System.String
+
+@Html.Hidden("", ViewData.TemplateInfo.FormattedModelValue.ToString(), new { @id = "value_" + ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty) })
+
+@(Html.Kendo().Upload()
+        .Name("attachments_" + ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))
+        .Multiple(false)
+        .Async(async => async
+            .Save("SaveAnonim", "UploadUser", new { Area = "" })
+            .Remove("RemoveAnonim", "UploadUser", new { Area = "" })
+            .AutoUpload(true)
+        )
+        .Events(events => events.Success("OnSuccess_" + ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty)))
+        .HtmlAttributes(new { @class = "file-upload-box", @id = "attachments_" + ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty) })
+)
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        var PARAM_NAME = "attachments";
+        var uploadElement = $("#attachments_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))");
+        uploadElement.data("kendoUpload").name = PARAM_NAME;
+    });
+
+    function OnSuccess_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))(e) {
+        if (e.operation == "upload") {
+            $("#value_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))").attr("value", "/Content/UserFiles/Users/" + e.files[0].name);
+        }
+        else if (e.operation == "remove") {
+            $("#value_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))").attr("value", "");
+        }
+    }
+
+</script>
+

@@ -1,0 +1,23 @@
+@model string
+@{
+    string RequiredTitle = (string)ViewData["RequiredTitle"];
+    string Placeholder = (string)ViewData["Placeholder"];
+    if (!string.IsNullOrEmpty(RequiredTitle))
+    {
+        List<string> items_list = new List<string>(RequiredTitle.Split(',').ToList());
+        <select class="drop-down" name="@ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty)" id="@ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty)">
+            <option value="" disabled selected style='display:none;'>@Placeholder</option>
+            @foreach (string item in items_list)
+            {
+                <option value="@item">@item</option>
+            }
+        </select>
+    }
+
+}
+
+
+
+
+
+        

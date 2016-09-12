@@ -1,0 +1,52 @@
+﻿@model object
+@using System.Reflection
+@using System.Collections.Generic
+@using System.Linq
+@using System.ComponentModel.DataAnnotations
+@using Uco.Models
+@{
+    System.Type t = Model.GetType();
+    var ModelName = t.Name;
+
+    ViewBag.HideButtons = true;
+}
+<div id="ruleaddwrap">
+    @{
+        var prefix = "template" + LS.GetRandom();
+        ViewData.TemplateInfo.HtmlFieldPrefix = prefix;
+    }
+    @Html.Partial("_EditOrCreate", Model)
+    @{
+        ViewData.TemplateInfo.HtmlFieldPrefix = "";
+    }
+   
+
+    <button id="saveruletodiscount" class="k-button">@RP.T("Admin.Common.Save")</button>
+    <button id="rulecancel" class="k-button">@RP.T("Admin.Common.Cancel")</button>
+
+</div>
+<script>
+    $('#rulecancel').click(function () {
+        $('#ruleaddwrap').remove();
+    });
+
+    $('#saveruletodiscount').click(function () {
+        var data = $('#ruleaddwrap form').serialize();
+          
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "/Admin/Discount/SaveNewRule/" + $('#ID').val() + "?systemName=" + $('#systemName').val()
+            + "&prefix=@prefix",
+            data: data,
+            cache: false,
+            error: function () {  }
+        }).done(function (data) {
+            refreshList();
+            $('#ruleaddwrap').remove();
+        });
+
+
+    });
+</script>
+<div class="clear"></div>

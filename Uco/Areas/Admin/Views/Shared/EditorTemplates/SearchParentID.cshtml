@@ -1,0 +1,16 @@
+﻿@model System.Int32
+@(Html.Kendo().ComboBox()
+    .Name(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))
+    .Suggest(true)
+    .Value(Model.ToString())
+    .DataSource(source => {
+        source.Read(read =>
+        {
+            read.Action("_AjaxLoadingParent", "Search");
+        });
+    })
+    .DataTextField("Title")
+    .DataValueField("ID")
+    .Filter(FilterType.StartsWith)
+    .HighlightFirst(true)
+)

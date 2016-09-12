@@ -1,0 +1,24 @@
+﻿@using Uco.Models.Overview
+@using Uco.Models
+@{
+    var currentPage = ViewContext.RouteData.GetRequiredString("action");
+}
+<div class="profile_sec" id="left_sec">
+    <div class="left_part1">
+        <div class="left_part1_heading left_part1_heading_profile">
+            @RP.T("Views.Profile.Menu.Title")
+        </div>
+        <div class="left_part1_in profile-menu">
+            <ul>
+                <li @if (currentPage == "Index") { @Html.Raw("class=\"current\"")  ; }><a href="@Url.Action("Index","Profile")">@RP.T("Views.Profile.Menu.Orders")</a></li>
+                <li @if (currentPage == "RegularOrders")
+                    { @Html.Raw("class=\"current\"")   ; }><a href="@Url.Action("RegularOrders", "Profile")">@RP.T("Views.Profile.Menu.RegularOrders")</a></li>
+                 <li @if (currentPage == "DiscountHistory") { @Html.Raw("class=\"current\"") ; }><a href="@Url.Action("DiscountHistory","Profile")">@RP.T("Views.Profile.Menu.DiscountHistory")</a></li>
+            
+                <li @if (currentPage == "Address") { @Html.Raw("class=\"current\"") ; }><a href="@Url.Action("Address","Profile")">@RP.T("Views.Profile.Menu.Address")</a></li>
+                <li @if (currentPage == "Settings") { @Html.Raw("class=\"current\"") ; }><a href="@Url.Action("Settings","Profile")">@RP.T("Views.Profile.Menu.Setting")</a></li>
+                <li @if (currentPage == "Password") { @Html.Raw("class=\"current\"") ; }><a href="@Url.Action("Password","Profile")">@RP.T("Views.Profile.Menu.Password")</a></li>
+           </ul>
+        </div>
+    </div>
+</div>

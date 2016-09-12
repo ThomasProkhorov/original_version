@@ -1,0 +1,15 @@
+    Copy Uco.PluginExample? folder and change it name. Must start with "Uco.".
+    Rename Uco.PluginExample?.csproj and Uco.PluginExample?.csproj.user to same name.
+    In project property's change "Assembly name", "Default namespace", "Assembly information" to same name.
+    On Controllers and models change namespace to same name.
+    In Uco project -> Plugins -> ActivePlugins?.txt add Assembly name.
+    In Uco project -> web.config -> appSettings set DbDataLoss? to false.
+    Add plugin related page models. Pages to PageModels?.cs. Page name must end with "...Page". Use "[AddToEntityModel?]" if you like to add it to Db.
+    Add plugin related data models. Pages to DataModels?.cs. Page name must end with "...Data". Use "[AddToEntityModel?]" if you like to add it to Db.
+    Add plugin related controllers to PageController?.cs and DataController?.cs. Use _db.Set<ClassName?>() to work with entity.
+    Add views to Views folder. If not nesesary don't create _Layout page. The system will use _Layout page from main progect.
+    Add controlers and views to admin Area.
+    Edit AdminAreaRegistration?.cs. Change context.MapRoute?.
+    Add design file, js, css. Add reference to this files in views. Use Section("HeaderHtml?") and Section("FooterHtml?") to add references that configured in Uco project->_Layout.
+    Build the project and copy dll from project bin folder to Uco project bin folder.
+    Rebuild Uco project and confirm what tables created. 

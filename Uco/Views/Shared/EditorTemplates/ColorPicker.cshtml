@@ -1,0 +1,31 @@
+﻿@model string
+@{
+  int month = LS.GetRandom();
+  string FieldID = ViewData.TemplateInfo.HtmlFieldPrefix.Replace(".", "_");
+}
+
+<div>
+    <div id="@FieldID@(month)_prew" style="display:inline-block;width:18px;height:18px;vertical-align: middle;border:2px solid black;background-color:@Model;"></div>
+<input id="@FieldID@(month)" data-zero="false" name="@ViewData.TemplateInfo.HtmlFieldPrefix.Replace("_",".")" value="@Model" />
+    </div>
+<script>
+    $('#@FieldID@(month)').ColorPicker({
+        color: '@Model',
+        onSubmit: function (hsb, hex, rgb, el) {
+            $(el).val('#' + hex);
+            $(el).ColorPickerHide();
+        },
+        onShow: function (colpkr) {
+            $(colpkr).fadeIn(500);
+            return false;
+        },
+        onHide: function (colpkr) {
+            $(colpkr).fadeOut(500);
+            return false;
+        },
+        onChange: function (hsb, hex, rgb) {
+            $('#@FieldID@(month)_prew').css('backgroundColor', '#' + hex);
+            $('#@FieldID@(month)').val('#' + hex);
+        }
+    });
+</script>

@@ -1,0 +1,74 @@
+﻿@using System.Reflection
+@using System.Collections.Generic
+@using System.Linq
+@using System.ComponentModel.DataAnnotations
+@using Uco.Models
+@using Uco.Models.Shopping
+@{
+    ViewBag.Title = RP.T("Admin.Views.MergeSku.Index.Title");
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutNoTree.cshtml";
+    string Lang = ViewBag.Lang;
+}
+<h2>@RP.T("Admin.Views.MergeSku.Index.Title")</h2>
+<div class="import">
+    <div class="k-notification-wrap demo-section k-header">
+        @T("Admin.Views.Product.Index.MergeFile")
+    </div>
+    <div class="demo-section k-header" id="loadzone4">
+        <input name="attachment" id="files4" type="file" />
+    </div>
+  <div id="importerrors4"></div>
+</div>
+<script>
+ $(document).ready(function () {
+        function onError4(e) {
+            $('#loadzone3 .k-upload-status-total').html("@RP.T("Admin.Product.Import.500Error")");
+            // console.log("Error (" + e + ") :: " + getFileInfo(e));
+        }
+        function onSuccess4(e) {
+            $('#importerrors4').html('');
+            if (e.response["success"] == "ok") {
+                //success
+                $('#loadzone4 .k-upload-status-total').html(e.response["message"] + '<span class="k-icon k-i-tick"></span>');
+               // StatusChecker.check('ProductAdminImport');
+                if (e.response.errors) {
+                    $('#importerrors3').html(e.response.errors.replace(/(?:\r\n|\r|\n)/g, '<br />'));
+                }
+            } else {
+                //error
+                $('#loadzone4 .k-upload-status-total').html(e.response["message"]);
+            }
+        }
+        function getFileInfo4(e) {
+            return $.map(e.files, function (file) {
+                var info = file.name;
+
+                // File size is not available in all browsers
+                if (file.size > 0) {
+                    info += " (" + Math.ceil(file.size / 1024) + " KB)";
+                }
+                return info;
+            }).join(", ");
+        }
+        $("#files4").kendoUpload({
+            async: {
+                saveUrl: "/Admin/Product/MergeSkuPost",
+                //  removeUrl: "remove",
+                autoUpload: false
+            }
+,
+            error: onError4,
+            success: onSuccess4,
+            upload: function (e) {
+                console.log(e);
+                e.data = {
+                    EventID: 1,
+                    import: 'Import',
+
+
+                };
+            }
+, multiple: false
+        });
+    });
+</script>

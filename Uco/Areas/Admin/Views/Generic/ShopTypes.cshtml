@@ -1,0 +1,58 @@
+﻿@using Uco.Models
+@model Uco.Models.Shop
+@{
+    var types = LS.Get<ShopType>();
+    var IDslist = new List<string>();
+    if(Model.ShopTypeIDs!=null)
+    {
+        IDslist = Model.ShopTypeIDs.Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+    }
+}
+<div>
+   
+    <input type="hidden" id="ShopTypeIDs" name="ShopTypeIDs" value="@Model.ShopTypeIDs" />
+    <div>
+        @foreach(var t in types)
+        {
+            <div>
+        <label>
+            <input type="checkbox" value="@t.ID" onchange="multiChecks.select(this,@t.ID,'ShopTypeIDs');"
+                   @if(IDslist.Contains(t.ID.ToString()))
+                   {
+                       <text>checked="checked"</text>
+                   }
+                    name="ShopTypeItem" id="ShopTypeItem@(t.ID)">
+            @t.Name
+                </label>
+            </div>
+        }
+    </div>
+</div>
+<script>
+    var multiChecks = {
+        select: function (e, v, w) {
+            var cur = $(e).val();
+            var all = $('#' + w).val();
+            var arr = all.split(',');
+            console.log(all);
+            console.log(arr);
+            if ($(e).is(':checked')) {
+                arr.push(cur);
+            } else {
+               
+                var index = arr.indexOf(cur);
+                if (index > -1) {
+                    arr.splice(index, 1);
+                }
+            }
+
+            var index2 = arr.indexOf("");
+            if (index2 > -1) {
+                arr.splice(index2, 1);
+            }
+            all =','+ arr.join(',')+',';
+            $('#' + w).val(all);
+        },
+    };
+</script>
+<div class="clear"></div>

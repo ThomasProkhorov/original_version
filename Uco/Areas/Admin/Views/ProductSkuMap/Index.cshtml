@@ -1,0 +1,533 @@
+﻿@{
+    ViewBag.Title = RP.T("Admin.Views.ProductSkuMap.Index.Title");
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutNoTree.cshtml";
+}
+
+<h2>@RP.T("Admin.Views.ProductSkuMap.Index.Title")</h2>
+
+<div id="ProductSkuMapgridfilterbox" class="gridfilterbox">
+
+            <div class="editor-label">
+<label for="Shop">חנות</label></div>
+            <div class="editor-field">
+
+
+
+<input id="ShopID138759580" data-zero="false" name="ShopID" value="0" />
+
+<script>
+    $('#ShopID138759580')
+                            .kendoComboBox(
+    {
+        placeholder: "Select ",
+        dataTextField: "Name",
+        dataValueField: "ID",
+
+        filter: "contains",
+        minLength: 1,
+        "autoBind": true,
+        dataSource: {
+            schema: {
+                data: "Data",
+                total: "Total",
+                errors: "Errors",
+            },
+            type: "json",
+            serverFiltering: true,
+            filter: [],
+            transport: {
+                "prefix": "",
+                read: {
+                    url: "/Admin/Manage/Shop/_AjaxAutoComplete?keyFiled=ID"
+,
+                    type: "POST",
+                    data: function () {
+                        var data = kendo.ui.ComboBox.requestData('#ShopID138759580');
+
+                        /** data["filter"] = "SpecificationAttributeID~eq~1";
+                        console.log(data);
+                        **/
+                        return data;
+                    },
+                }
+            }
+        }
+    });
+
+</script>
+
+            </div>
+            <div class="editor-label">
+<label for="ShortSKU">מק`ט קצר</label></div>
+            <div class="editor-field">
+<input class="k-textbox" data-val="true" data-val-length="The field מק`ט קצר must be a string with a maximum length of 400." data-val-length-max="400" id="ShortSKU" name="ShortSKU" type="text" value="" />            </div>
+            <div class="editor-label">
+<label for="ImportProductName">ImportProductName</label></div>
+            <div class="editor-field">
+<input class="k-textbox" id="ImportProductName" name="ImportProductName" type="text" value="" />            </div>
+            <div class="editor-label">
+<label for="ProductSKU">SLK מק`ט</label></div>
+            <div class="editor-field">
+
+
+
+<input id="ProductSKU158923459" data-zero="false" name="ProductSKU" />
+
+<script>
+    $('#ProductSKU158923459')
+                            .kendoComboBox(
+    {
+        placeholder: "Select ",
+        dataTextField: "Name+' '+d.SKU",
+        dataValueField: "SKU",
+
+        filter: "contains",
+        template: '<span class="k-state-default" style="vertical-align:middle; background-image: url(#:data.Image#); no-repeat center center fixed; ' +
+  '-webkit-background-size: cover;  -moz-background-size: cover; -o-background-size: cover; background-size: cover; width:60px; height:60px; display:inline-block; "></span>' +
+                  '<span class="k-state-default" style="margin-right:5px; margin-left:5px;display:inline-block; vertical-align:middle;">#: data.Name # <br/> #: data.SKU #  </span>',
+
+        minLength: 1,
+        "autoBind": true,
+        height: 320,
+        dataSource: {
+            schema: {
+                data: "Data",
+                total: "Total",
+                errors: "Errors",
+            },
+            type: "json",
+            serverFiltering: true,
+            filter: [],
+            transport: {
+                "prefix": "",
+                read: {
+                    url: "/Admin/Product/_AjaxDetailAutoComplete"
+,
+                    type: "POST",
+                    data: function () {
+                        var data = kendo.ui.ComboBox.requestData('#ProductSKU158923459');
+                       
+
+                        /** data["filter"] = "SpecificationAttributeID~eq~1";
+                        console.log(data);
+                        **/
+                        return data;
+                    },
+                }
+            }
+        }
+    });
+
+</script>
+
+            </div>
+    
+    <div class="button-wrap">
+        <a href="javascript:void(0);" class="k-button" onclick="ProductSkuMapgridFiltering.filter('ProductSkuMapgridfilterbox');">חיפוש</a>
+        <a href="javascript:void(0);" class="k-button" onclick="ProductSkuMapgridFiltering.clear();">נקה</a>
+        <a href="javascript:void(0);" class="k-button" onclick="ProductSkuMapgridFiltering.exportcsv();">@RP.T("Admin.Views.Main.PaymentReport.Export")</a>
+    </div>
+
+</div>
+<br/>
+
+<div id="ProductSkuMapgrid"></div>
+
+<script>
+
+    var ProductSkuMapgridFiltering = {
+        filter: function (id) {
+            var data = { logic: "and", filters: [] };
+            //{ field: "name", operator: "startswith", value: "Jane" }
+            var grid = $("#ProductSkuMapgrid").data('kendoGrid');
+            //  console.log(grid.dataSource.options.schema.model);
+            $('#' + id + ' input').each(function (i, e) {
+                if ($(e).attr('name') && $(e).val())
+                {
+                    var inpname = $(e).attr('name');
+                    var objname = inpname.split(".")[0];
+                    if(objname in grid.dataSource.options.schema.model.fields)
+                    {
+
+                        var model = grid.dataSource.options.schema.model.fields[objname];
+                        if(model.type == 'number' || model.type == 'object'){
+                            if($(e).attr('data-zero') && $(e).val() < 1)
+                            {
+                                return;
+                            }
+                        }
+                        var operator = 'eq';
+                        if(model.type == 'date'){
+                            operator = 'gt'; // >
+                            var todate = $('#' + id + ' input[name="'+inpname+'_dateto"]');
+                            if(todate.length >0)
+                            {
+                                data.filters.push({ field: $(e).attr('name'), operator: 'lte', value: model.parse(todate.val()) });
+                            }
+                        }
+                        if(model.type == 'string'){
+                            operator = 'contains'; // .startswith
+                        }
+                        //lte <=
+                        //  console.log(model);
+                        var parseVal = $(e).val();
+                        if(model.type != 'object')
+                        {
+                            parseVal =model.parse(parseVal);
+                        }
+                        data.filters.push({ field: $(e).attr('name'), operator: operator, value: parseVal });
+                    }
+
+                }
+            });
+
+            grid.dataSource.filter(data);
+
+        },
+        clear: function () {
+            var grid = $("#ProductSkuMapgrid").data('kendoGrid');
+            grid.dataSource.filter({});
+        },
+        setFilter: function (name, value) {
+            var grid = $("#ProductSkuMapgrid").data('kendoGrid');
+            grid.dataSource.filter({ field: name, operator: "eq", value: value });
+            //grid.dataSource.page(1);
+            // alert(name + value);
+        },
+        exportcsv: function () {
+            ProductSkuMapgridFiltering.filter('ProductSkuMapgridfilterbox');
+            //make simple kendo request query string
+            var grid = $("#ProductSkuMapgrid").data('kendoGrid');
+
+            data = { filter: grid.dataSource.filter() };
+
+            data = new kendo.data.transports["aspnetmvc-ajax"]({ prefix: "" }).parameterMap(data, 'read');
+
+            location.href = "/Admin/ProductSkuMap/CSVExport?filter=" + data.filter;
+        }
+    };
+
+    function IntToTime(i) {
+        var hr = Math.floor(i / 60);
+        var mn = i % 60 ; if(mn<10){mn='0'+mn;}
+        //  var part ="AM";
+        // if(hr>12)
+        //  {
+        //    hr-=12;
+        //     part="PM";
+        // }
+        // if(hr == 0){hr = 12;}
+        var time = hr + ":" + mn;// + " " + part;
+        return time;
+    }
+    $(document).ready(function () {
+        /*
+        Docs
+        http://docs.telerik.com/kendo-ui/api/javascript/ui/grid
+        */
+        var gridLocal = function(){
+            if('messages' in kendo.ui.Grid.prototype.options){
+                return  kendo.ui.Grid.prototype.options.messages.commands.create;
+            }else{
+                return "Add new";
+            }
+        }
+        $("#ProductSkuMapgrid").kendoGrid({
+            "toolbar": [   { name: "create" ,text:gridLocal()
+
+            },             ],
+
+            dataSource: {
+
+                type: "json",
+                transport: {
+                    "prefix": "",
+                    read: {
+                        url: "/Admin/Manage/ProductSkuMap/_AjaxRead",
+                        type: "POST",
+                        dataType: "json",
+                        // data: { filter:'ID~eq~3'  }
+                    },
+
+                    "update": {
+                        "url": "/Admin/Manage/ProductSkuMap/_AjaxUpdate"
+                    },
+
+                    "create": {
+                        "url": "/Admin/Manage/ProductSkuMap/_AjaxInsert"
+                    },
+                    "destroy": {
+                        "url": "/Admin/Manage/ProductSkuMap/_AjaxDelete"
+                    },
+                },
+
+                schema: {
+                    data: "Data",
+                    total: "Total",
+                    errors: "Errors",
+                    model: {
+                        "id": "ID",
+                        fields: {
+                            "ID": { "type": "number" ,defaultValue: 0,editable: false,},
+                            "ShopID": { "type": "number" ,defaultValue: 0},
+                            "Shop": { "type": "object" ,editable: false,nullable: true, },
+                            "ShortSKU": { "type": "string", validation: { required: true, min: 1 } },
+                            "ImportProductName": { "type": "string" },
+                            "Price": { "type": "number" },
+
+
+                            "ProductSKU": { "type": "string", validation: { required: true, min: 1 } },
+                            "Product": { "type": "object" ,editable: false,nullable: true, },
+                            // "ID": {"type":"number" ,editable: false}
+                        }
+
+                    }
+                },
+                requestEnd: function(e) {
+                    if($('#ProductSkuMapgride-checkall').length > 0)
+                    {
+                        $('#ProductSkuMapgride-checkall')[0].checked = false;
+                    }
+                },
+                pageSize: 20,
+                "error": error_handler,
+                "sync":function(e){ this.read(); },
+                "serverPaging": true,
+                "serverSorting": true,
+                "serverFiltering": true,
+                "serverGrouping": true,
+                "serverAggregates": true,
+                "filter": [],
+                "type": "aspnetmvc-ajax",
+
+                sort: [],
+            },
+            refresh: true,
+            //  detailTemplate: kendo.template($("#template").html()),
+            // detailInit: detailInit,
+            // dataBound: function () {
+            //this.expandRow(this.tbody.find("tr.k-master-row").first());
+            //   },
+            pageable: {
+                refresh: true,
+                pageSize: 10
+            },
+
+            columns: [
+{ field: "ID",title: "ID", sortable: false,filterable: false,editor:'<input data-val="true" data-val-number="The field ID must be a number." data-val-required="The ID field is required." id="ID" name="ID" type="hidden" value="0" /><span class="field-validation-valid" data-valmsg-for="ID" data-valmsg-replace="true"></span>', },
+{ field: "ShopID",title: "חנות", sortable: false,filterable: false,template:"# if (Shop) { #  #: Shop.Name # # } #",  editor: ' \
+ \
+ \
+<input id="ShopID123924756" data-zero="false" name="ShopID" value="0" /> \
+ \
+<script> \
+    $(\'#ShopID123924756\') \
+                            .kendoComboBox( \
+    { \
+        placeholder: "Select ", \
+        dataTextField: "Name", \
+        dataValueField: "ID", \
+ \
+        filter: "contains", \
+        minLength: 1, \
+        "autoBind": true, \
+        dataSource: { \
+            schema: { \
+                data: "Data", \
+                total: "Total", \
+                errors: "Errors", \
+            }, \
+            type: "json", \
+            serverFiltering: true, \
+            filter: [], \
+            transport: { \
+                "prefix": "", \
+                read: { \
+                    url: "/Admin/Manage/Shop/_AjaxAutoComplete?keyFiled=ID" \
+, \
+                    type: "POST", \
+                    data: function () { \
+                        var data = kendo.ui.ComboBox.requestData(\'#ShopID123924756\'); \
+ \
+                        /** data["filter"] = "SpecificationAttributeID~eq~1"; \
+                        console.log(data); \
+                        **/ \
+                        return data; \
+                    }, \
+                } \
+            } \
+        } \
+    }); \
+ \
+</sc'+'ript> \
+ \
+', },
+{ field: "ShortSKU",title: "מק`ט קצר", sortable: false,filterable: false,editor:'<input class="k-textbox" data-val="true" data-val-length="The field מק`ט קצר must be a string with a maximum length of 400." data-val-length-max="400" id="ShortSKU" name="ShortSKU" type="text" value="" /><span class="field-validation-valid" data-valmsg-for="ShortSKU" data-valmsg-replace="true"></span>', },
+{ field: "ProductSKU",title: "SLK מק`ט", sortable: false,filterable: false,editor:' \
+ \
+ \
+<input id="ProductSKU74128221" data-zero="false" name="ProductSKU" /> \
+ \
+<script> \
+    $(\'#ProductSKU74128221\') \
+                            .kendoComboBox( \
+    { \
+        placeholder: "Select ", \
+        dataTextField: "Name+\' \'+d.SKU", \
+        dataValueField: "SKU", \
+ \
+        filter: "contains", \
+        template: \'<span class="k-state-default" style="vertical-align:middle; background-image: url(#:data.Image#); no-repeat center center fixed; \' + \
+  \'-webkit-background-size: cover;  -moz-background-size: cover; -o-background-size: cover; background-size: cover; width:60px; height:60px; display:inline-block; "></span>\' + \
+                  \'<span class="k-state-default" style="margin-right:5px; margin-left:5px;display:inline-block; vertical-align:middle;">#: data.Name # <br/> #: data.SKU # </span>\', \
+ \
+        minLength: 1, \
+        "autoBind": true, \
+        height: 320, \
+        dataSource: { \
+            schema: { \
+                data: "Data", \
+                total: "Total", \
+                errors: "Errors", \
+            }, \
+            type: "json", \
+            serverFiltering: true, \
+            filter: [], \
+            transport: { \
+                "prefix": "", \
+                read: { \
+                    url: "/Admin/Product/_AjaxDetailAutoComplete" \
+, \
+                    type: "POST", \
+                    data: function () { \
+                        var data = kendo.ui.ComboBox.requestData(\'#ProductSKU74128221\'); \
+ \
+                        /** data["filter"] = "SpecificationAttributeID~eq~1"; \
+                        console.log(data); \
+                        **/ \
+                        return data; \
+                    }, \
+                } \
+            } \
+        } \
+    }); \
+ \
+</sc'+'ript> \
+ \
+<span class="field-validation-valid" data-valmsg-for="ProductSKU" data-valmsg-replace="true"></span>', },
+{ field: "Name",title: "שם מוצר",  sortable: false, filterable: false,template:"# if (Product && Product.Name) { # #: Product.Name # # } #", editor: function(tr,d){ $(tr).html(''); } },
+{ field: "ImportProductName", title: "@M("ProductSkuMap", "ImportProductName")", sortable: false, filterable: false },
+{ field: "Price", title: "@M("ProductSkuMap", "Price")", sortable: false, filterable: false },
+{ field: "Image", title: "תמונה", sortable: false, filterable: false, template: "# if (Product && Product.Image) { # <img height=\"30\"  src=\"#: Product.Image #\" alt=\"alt\" /> # } #", editor: function (tr, d) { $(tr).html(''); } },
+{ field: "ProductManufacturer",title: "שם היצרן",  sortable: false, filterable: false,template:"# if (Product && Product.ProductManufacturer) { # #: Product.ProductManufacturer.Name # # } #", editor: function(tr,d){ $(tr).html(''); } },
+{ field: "Category",title: "קטגוריה",  sortable: false, filterable: false,template:"# if (Product && Product.Category) { # #: Product.Category.Name # # } #", editor: function(tr,d){ $(tr).html(''); } },
+
+
+
+
+{
+    "width": "190px",
+    "buttonType": "Image",
+    "command": [
+
+      {  "name": "edit",
+          "buttonType": "Icon",
+          "text": "עריכה"
+      },
+
+
+{
+    "name": "destroy",
+    "buttonType": "Image",
+    "text": "מחיקה"
+},
+
+    ]
+},
+
+            ],
+            //   height: 600,
+            "scrollable": false,
+            filterable:true,
+            sortable: true,
+            "editable": {
+                "confirmation": "האם אתה בטוח?",
+                "confirmDelete": "מחיקה",
+                "cancelDelete": "בטל",
+                "mode": "inline",
+                "create": true,
+                "update": true,
+                "destroy": true
+            },
+
+
+
+        });
+        var ProductSkuMapgrid = $("#ProductSkuMapgrid").data('kendoGrid');
+        ProductSkuMapgrid.dataSource.transport.parameterMap = function(data,type){
+
+            // console.log(type);
+            if(type != "read")
+            {
+                for(var i in data)
+                {
+                    //console.log(Object.prototype.toString.call( data[i] ));
+                    if( Object.prototype.toString.call( data[i] ) === '[object Object]' ) {
+                        delete data[i];
+                    }
+                    if( Object.prototype.toString.call( data[i] ) === '[object Array]' ) {
+                        delete data[i];
+                    }
+                    if( Object.prototype.toString.call( data[i] ) === '[object Date]' ) {
+                        data[i] = kendo.toString(kendo.parseDate(data[i]), "G");// Date.parse(data[i]);
+                    }
+                    if (i == 'ProductSKU' && !data[i]) {
+                        alert('@RP.T("View.Admin.Validate.Required")');
+                    return false;
+                }
+                if (i == 'ShortSKU' && !data[i]) {
+                    alert('@RP.T("View.Admin.Validate.Required")');
+                    return false;
+                }
+                //@ViewBag.AdditionalFilterField", operator: "eq", value: ''
+            }
+        }
+        console.log(data);
+        if (type !== "read" && data.models) {
+
+            data.models = kendo.stringify(data.models);
+            console.log(data);
+
+        }
+        kendo.data.transports["aspnetmvc-ajax"](data);
+        data = new kendo.data.transports["aspnetmvc-ajax"]({ prefix: "" }).parameterMap(data, type);
+
+        //  console.log(data);
+        return data;
+    }
+
+    function error_handler(e) {
+
+        if (e.errors) {
+            e.preventDefault();   // cancel grid rebind if error occurs
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            alert(message);
+        }
+    }
+    function detailInit(e) {
+        var detailRow = e.detailRow;
+        console.log(e);
+
+
+    }
+
+    });
+
+</script>

@@ -1,0 +1,210 @@
+﻿@model Discount
+@using System.Reflection
+@using System.Collections.Generic
+@using System.Linq
+@using System.ComponentModel.DataAnnotations
+@using Uco.Models
+@{
+    System.Type t = Model.GetType();
+    var ModelName = t.Name;
+    ViewBag.Title = RP.T("Admin.Views.ProductShop.Index.Title");
+    Layout = "~/Areas/" + LS.GetArea() + "/Views/Shared/_LayoutNoTree.cshtml";
+   
+}
+<h2>@RP.T("Admin.Views." + ModelName + ".Edit.Title")</h2>
+
+@(Html.Kendo().TabStrip()
+    .Name("TabStrip")
+    .Animation(false)
+    .Items(tabstrip =>
+    {
+        tabstrip.Add().Text(RP.T("Admin.Discount.TabMain").ToString()).Content(@<text>
+<div id="maindata">
+    <div> <label><input type="checkbox" value="true" id="forallshopcheck" />@RP.T("Admin.Views.Discount.ForAllShop")</label></div>
+   <p> <br/> </p>
+     @Html.Partial("_EditOrCreate", Model)
+
+    <button type="submit" id="savebutton" class="k-button">@RP.T("Admin.Views.Command.Save")</button>
+    <div id="mainstatus"></div>
+</div>
+</text>);
+
+        tabstrip.Add().Text(RP.T("Admin.Discount.TabRules").ToString()).Content(@<text>
+
+
+@Html.Action("Rules", "Discount", new { ID = Model.ID })
+</text>);
+    
+    
+    }).SelectedIndex(0))
+
+<script>
+    /**** Toggle discount fields ****/
+    var DiscountPulse = {
+        wrap: '#maindata',
+        forall: function () {
+            var checkbox = $('#forallshopcheck', $(DiscountPulse.wrap));
+            var form = $('form:eq(0)', $(DiscountPulse.wrap));
+            if (checkbox.is(":checked")) {
+                $('.editor-field, .editor-label', form).each(function (i, e) {
+                    if (i >= 0 && i < 2) {
+                        $(e).hide();
+                    }
+                });
+                var kshopid = $('[name="ShopID"]').data('kendoComboBox');
+                kshopid.value(0);
+                var typedrop = $('#DiscountType').data('kendoDropDownList');
+                if (typedrop.value() == '0') {
+                    typedrop.value(1);
+                    DiscountPulse.toggle();
+                }
+            } else {
+                $('.editor-field, .editor-label', form).each(function (i, e) {
+                    if (i >= 0 && i < 2) { $(e).show(); }
+                });
+            }
+        },
+        toggle: function () {
+
+            if (DiscountPulse.active()) {
+                DiscountPulse.IsPercent();
+                DiscountPulse.IsCodeRequired();
+                DiscountPulse.LimitType();
+                DiscountPulse.DiscountType();
+
+            }
+        },
+        active: function () {
+            var checkbox = $('#Active', $(DiscountPulse.wrap));
+            var form = checkbox.parents('form:eq(0)');
+            if (checkbox.is(":checked")) {
+                $('.editor-field, .editor-label', form).each(function (i, e) {
+                    if (i >= 6) { $(e).show(); }
+                });
+                return true;
+            } else {
+                $('.editor-field, .editor-label', form).each(function (i, e) {
+                    if (i >= 6) { $(e).hide(); }
+                });
+            }
+            return false;
+        },
+        IsPercent: function () {
+            var checkbox = $('#IsPercent', $(DiscountPulse.wrap));
+            var form = checkbox.parents('form:eq(0)');
+            if (checkbox.is(":checked")) {
+                $('.editor-field, .editor-label', form).each(function (i, e) {
+                    if (i >= 8 && i <= 9) { $(e).hide(); }
+                    if (i >= 10 && i <= 11) { $(e).show(); }
+                });
+            } else {
+                $('.editor-field, .editor-label', form).each(function (i, e) {
+                    if (i >= 8 && i <= 9) { $(e).show(); }
+                    if (i >= 10 && i <= 11) { $(e).hide(); }
+                });
+            }
+        },
+        IsCodeRequired: function () {
+            var checkbox = $('#IsCodeRequired', $(DiscountPulse.wrap));
+            var form = checkbox.parents('form:eq(0)');
+            if (checkbox.is(":checked")) {
+                $('.editor-field, .editor-label', form).each(function (i, e) {
+                    if (i >= 14 && i <= 15) { $(e).show(); }
+                });
+            } else {
+                $('.editor-field, .editor-label', form).each(function (i, e) {
+                    if (i >= 14 && i <= 15) { $(e).hide(); }
+                });
+            }
+        },
+        LimitType: function () {
+            var checkbox = $('#LimitType', $(DiscountPulse.wrap));
+            var form = checkbox.parents('form:eq(0)');
+            if (checkbox.val() != '0') {
+                $('.editor-field, .editor-label', form).each(function (i, e) {
+                    if (i >= 18 && i <= 19) { $(e).show(); }
+                });
+            } else {
+                $('.editor-field, .editor-label', form).each(function (i, e) {
+                    if (i >= 18 && i <= 19) { $(e).hide(); }
+                });
+            }
+        },
+        DiscountType: function () {
+            var checkbox = $('#DiscountType', $(DiscountPulse.wrap));
+            var form = checkbox.parents('form:eq(0)');
+            if (checkbox.val() == '0') {
+                $('.editor-field, .editor-label', form).each(function (i, e) {
+                    if (i >= 22 && i <= 25) { $(e).show(); }
+
+                });
+            } else {
+                $('.editor-field, .editor-label', form).each(function (i, e) {
+                    if (i >= 22 && i <= 25) { $(e).hide(); }
+                });
+            }
+        },
+    };
+    DiscountPulse.toggle();
+    $('#Active', $(DiscountPulse.wrap)).click(DiscountPulse.toggle);
+    $('#IsPercent', $(DiscountPulse.wrap)).click(DiscountPulse.toggle);
+    $('#IsCodeRequired', $(DiscountPulse.wrap)).click(DiscountPulse.toggle);
+    $('#LimitType', $(DiscountPulse.wrap)).change(DiscountPulse.toggle);
+    $('#DiscountType', $(DiscountPulse.wrap)).change(DiscountPulse.toggle);
+
+    /**** END Toggle discount fields ****/
+
+    $('#savebutton').click(function () {
+        $('#mainstatus').html('');
+        var data = $('#maindata form').serialize();
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "/Admin/Discount/Edit/" + $('#ID').val(),
+            data: data,
+            cache: false,
+            error: function () { $('#mainstatus').html('@RP.T("Admin.Common.ServerError")'); }
+        }).done(function (data) {
+            if (data.result == "ok") {
+                $('#mainstatus').html('@RP.T("Admin.Common.SaveSuccess")');
+            } else {
+                //data.message - errors
+                $('#mainstatus').html('@RP.T("Admin.Common.SaveError")');
+            }
+        });
+    });
+    function setShopID() {
+        var data = { logic: "and", filters: [] };
+        var kshopid = $('[name="ShopID"]').data('kendoComboBox');
+
+        var grid = $('[data-role="grid"]:eq(0)').data('kendoGrid');
+        var data = grid.dataSource.filter();
+        if (!data)
+        {
+            data = { logic: "and", filters: [] };
+        }
+        data.filters.push({ field: 'ShopID', operator: 'eq', value: kshopid.value() });
+        grid.dataSource.filter(data);
+    };
+    var kshopid = $('[name="ShopID"]').data('kendoComboBox');
+    kshopid.bind("change", setShopID);
+    setTimeout(function () {
+        setShopID();
+        if ($('[name="ShopID"]').val() == '0') {
+            $('#forallshopcheck')[0].checked = true;
+            DiscountPulse.forall();
+        }
+    }, 800);
+    $('.gridfilterbox a').click(function () {
+        setTimeout(function () {
+            setShopID();
+
+        }, 10);
+    });
+    $('#forallshopcheck', $(DiscountPulse.wrap)).click(DiscountPulse.forall);
+    
+</script>
+
+<p class="clear">
+ @Html.ActionLink(@RP.T("Admin.Views.Command.BackToList").ToString(), "Index")
+</p>

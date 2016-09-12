@@ -1,0 +1,82 @@
+﻿@{
+    ViewBag.Title = Html.R("Title");
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutNoTree.cshtml";
+    string CurrentSegment = ViewBag.CurrentSegment;
+    string NavigationSegments = RP.GetAdminCurrentSettingsRepository().NavigationSegments;
+    if (NavigationSegments == null) { NavigationSegments = string.Empty; }
+    SelectList l = new SelectList(NavigationSegments.Split(',').ToList(), CurrentSegment);
+}
+<h2>@Html.R("Title")</h2>
+@(Html.Kendo().DropDownList()
+    .Name("NavigationDataSegment")
+    .DataTextField("Text")
+    .DataValueField("Value")
+    .BindTo(l)
+    .HtmlAttributes(new { style = "width:200px;" })
+)
+<br />
+<div class="div_2">
+    <br />
+    @(Html.Kendo().Grid<Uco.Models.NavigationData>()
+    .Name("Grid")
+    .DataSource(dataSource =>
+        dataSource
+            .Ajax()
+            .Model(model => { model.Id(item => item.ID); })
+            .Read(r => r.Action("_AjaxIndex", "NavigationData", new { Segment = CurrentSegment }))
+            .Destroy(r => r.Action("_AjaxDelete", "NavigationData", new { Segment = CurrentSegment }))
+            .Update(r => r.Action("_AjaxSave", "NavigationData", new { Segment = CurrentSegment }))
+            .Create(r => r.Action("_AjaxInsert", "NavigationData", new { Segment = CurrentSegment }))
+            .Events(events => events.Error("error_handler"))
+    )
+    .Columns(columns =>
+    {
+        columns.Bound(r => r.ID);
+        columns.Bound(r => r.ParentID);
+        columns.Bound(r => r.Order);
+        columns.Bound(r => r.Title);
+        columns.Bound(r => r.Url);
+        columns.Bound(r => r.LangCode);
+        columns.Bound(r => r.CustumClass);
+        columns.Command(commands =>
+        {
+            commands.Edit().Text("");
+            commands.Destroy().Text("");
+        })
+        .Width(200);
+    })
+    .Pageable()
+    .Sortable()
+    .Filterable()
+    .Groupable()
+    .Editable(editing => editing.Mode(GridEditMode.InLine))
+    .Groupable()
+    .ToolBar(commands => commands.Create())
+    )
+</div>
+
+<script>
+
+    $(document).ready(function () {
+        $("#NavigationDataSegment").change(function () {
+            window.location = "/Admin/NavigationData?Segment=" + $(this).val();
+        });
+    });
+
+</script>
+
+<script type="text/javascript">
+    function error_handler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            alert(message);
+        }
+    }
+</script>

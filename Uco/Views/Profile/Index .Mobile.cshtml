@@ -1,0 +1,79 @@
+﻿@using Uco.Models.Overview
+@using Uco.Models
+@model User
+@{
+    ViewBag.Title = RP.T("Views.Profile.Index.ViewBagTitle");
+    Layout = "~/Views/Shared/_LayoutShop.cshtml";
+    ViewBag.Url = "~/Profile/Index/";
+}
+@*rewrite shopping cart footer*@
+@*@section FooterZone{
+
+    }*@
+@section topmenu{
+    @Html.Action("_TopStatus", "Profile")
+}
+<div class="midd_section">
+    <div class="center_div">
+        <div class="container one">
+            <div class="item profile_left_container">
+                <div class="right_sec">
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                    <p>content content</p>
+                </div>
+            </div>
+
+
+            @* Menu *@
+            @Html.Partial("_Menu")
+        </div>
+        <div class="clear"></div>
+    </div>
+</div>

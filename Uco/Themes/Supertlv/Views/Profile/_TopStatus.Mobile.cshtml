@@ -1,0 +1,39 @@
+﻿@using Uco.Models.Overview
+@using Uco.Models
+@model ProfileStatusLine
+@{
+    var currentPage = ViewContext.RouteData.GetRequiredString("action");
+    return;
+}
+<div class="nav">
+    <div class="center_div profile-status-line">
+        @if (Model.Orders.Count > 0)
+        {
+            foreach (var item in Model.Orders)
+            {
+                <div class="profile-line">
+                    <span class="orderid">@item.OrderID</span>
+                    &#8656;
+                    <span class="orderdate step-line">@item.OrderDate</span>
+                    &#8656;
+                    <span class="ordertotal step-line">@item.OrderTotal</span>
+                    @*&#8656;
+                        <span class="@(item.StepStatus == 1 ? "current-status" :"") step-line-auto">Wait for paid</span>*@
+                    &#8656;
+                    <span class="@(item.StepStatus == 2 ? "current-status" :"") step-line-auto">@RP.T("Views.Profile._TopStatus.PaidText")</span>
+                    &#8656; @* add paid date (show time only)*@
+                    <span class="@(item.StepStatus == 3 ? "current-status" :"") step-line-auto">@RP.T("Views.Profile._TopStatus.PackingText") </span>
+                    &#8656;
+                    <span class="@(item.StepStatus == 4 ? "current-status" :"") step-line-auto">@RP.T("Views.Profile._TopStatus.DeliveringText") </span>
+                    &#8656;
+                    <span class="@(item.StepStatus > 3 ? "current-status" :"") step-line-auto">@RP.T("Views.Profile._TopStatus.FinishedText") @item.OrderEndDate @*show time only*@</span>
+                </div>
+            }
+        }
+        else
+        {
+            @RP.T("Views.Profile._TopStatus.NoOrders")
+        }
+
+    </div>
+</div>

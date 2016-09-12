@@ -1,0 +1,26 @@
+﻿@model string
+@{
+    string GalleryPath = Server.MapPath("~/Content/UserFiles/" + Model + "/");
+    List<Uco.Models.ImageGalleryItem> allImages = SF.GalleryFile2List(GalleryPath, 91, 60, true, false);
+}
+@if (allImages.Count > 0)
+{
+    <ul>
+        @foreach (Uco.Models.ImageGalleryItem item in allImages)
+        {
+            <li><a href="@Url.Content(item.BigImageUrl)"><img src="@Url.Content(item.SmallImageUrl)" alt="@item.Title" /></a></li>
+        }
+    </ul>
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        var images = [ @foreach (Uco.Models.ImageGalleryItem item0 in allImages)
+        {<text>'@Url.Content(item0.BigImageUrl)',</text>} ];
+
+        $(images).each(function () {
+            var image = $('<img />').attr('src', this);
+        });
+
+    });
+</script>

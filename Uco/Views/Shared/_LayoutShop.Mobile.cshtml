@@ -1,0 +1,114 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <link href="~/Content/Kendo/2014.1.318/kendo.common.min.css" rel="stylesheet">
+    <link href="~/Content/Kendo/2014.1.318/kendo.rtl.min.css" rel="stylesheet">
+    <link href="~/Content/Kendo/2014.1.318/kendo.default.min.css" rel="stylesheet">
+    <link href="~/Content/Kendo/2014.1.318/kendo.dataviz.min.css" rel="stylesheet">
+    <link href="~/Content/Kendo/2014.1.318/kendo.dataviz.default.min.css" rel="stylesheet">
+    <link href="~/Content/Kendo/2014.1.318/kendo.mobile.all.min.css" rel="stylesheet" />
+    <link href="~/Scripts/raty-2.7.0/lib/jquery.raty.css" rel="stylesheet" />
+
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script src="~/Scripts/Kendo/2014.1.318/kendo.all.min.js"></script>
+    <script src="~/Scripts/Kendo/2014.1.318/kendo.aspnetmvc.min.js"></script>
+    <script src="~/Scripts/Custum/custum.Mobile.js"></script>
+    <script src="~/Scripts/Custum/shopapi.js"></script>
+    <script src="~/Scripts/ivupdown.js"></script>
+    <script src="~/Scripts/raty-2.7.0/lib/jquery.raty.js"></script>
+
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+     <script src="~/Scripts/quagga/quagga.min.js"></script>
+    <link href="~/Content/Site.Mobile.css" rel="stylesheet">
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    <meta content="@ViewBag.Keywords" name="keywords" />
+    <meta content="@ViewBag.Description" name="description" />
+    <meta name="google-signin-client_id" content="377308744841-p7jii04ukvgfo05qthpu35lhsvn3lkih.apps.googleusercontent.com" />
+
+    <link href="http://@(Request.ServerVariables["HTTP_HOST"])@(Url.Content(ViewBag.Url))" rel="canonical" />
+    <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css' />
+    @Style.RenderHead()
+    @Script.RenderHead()
+    @RenderSection("HeaderHtml", required: false)
+    @Html.Action("_HeaderScripts", "PagePart")
+    <script type="text/javascript">
+        kendo.culture("@(SF.GetLangCodeThreading())");
+        Shop.isMobile = true;
+        ga('require', 'ecommerce');
+    </script>
+    <!--[if lt IE 9]> <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script><script src="http://css3-mediaqueries-js.googlecode.com/svn/trunk/css3-mediaqueries.js"></script><![endif]-->
+</head>
+<body>
+    <!--[if lt IE 7]><div class="ie67"><p style='font-weight:bold; font-size:20px; padding:0 10px; text-align:center; margin:20px 0 20px; color:red;'>Your using old and unsuported browser. Upgrade you browser!<br/><a href='http://www.microsoft.com/windows/internet-explorer/default.aspx'>Click here to upgrade.</a></p></div><![endif]-->
+    @if (System.Configuration.ConfigurationManager.AppSettings["Profiler"].ToString() == "true")
+    { @StackExchange.Profiling.MiniProfiler.RenderIncludes() }
+    @RenderSection("topmenu", required: false)
+    @RenderBody() 
+    <style>
+        .km-barcode:after, .km-barcode:before {
+    content: "\e085";
+}
+    </style>
+    <div data-role="layout" data-id="mobile-layout" data-init="tabstripOnInit">
+        <div data-role="header">
+            <div data-role="tabstrip" data-selected-index="0" class="tabstrip">
+                <a href="#drawer-index" data-role="button" id="homeBaseBtn" data-icon="home">@RP.T("Views.Shared._LayoutShop.Mobile.HomeText")</a>
+                <a class="dnImportant" onclick="Shop.GoTo('/Shop/Index#drawer-index');" data-role="button" id="homeBtn" data-icon="home">@RP.T("Views.Shared._LayoutShop.Mobile.HomeText")</a>
+              
+                  <a href="#tabstrip-shoppingCart" data-role="button" data-icon="cart" class="tabstrip-shoppingCart" id="switchCart">@RP.T("Views.Shared._LayoutShop.Mobile.CartText") <span class="sh_cartcount"></span></a>
+                <a class="dnImportant" onclick="Shop.GoTo('/Shop/Index#tabstrip-shoppingCart');" data-role="button" id="cartBtn" data-icon="cart">@RP.T("Views.Shared._LayoutShop.Mobile.CartText")</a>
+               
+                 <a href="#tabstrip-filters?bar=true" data-role="button" id="filterBaseBtnBar" data-icon="barcode">@RP.T("Views.Shared._LayoutShop.Mobile.BarCodeSearch")</a>
+                <a class="dnImportant" onclick="Shop.GoTo('/Shop/Index#tabstrip-filters');" data-role="button" id="filterBtnBar" data-icon="search">@RP.T("Views.Shared._LayoutShop.Mobile.BarCodeSearch")</a>
+                
+                
+                 <a href="#tabstrip-filters" data-role="button" id="filterBaseBtn" data-icon="search">@RP.T("Views.Shared._LayoutShop.Mobile.FiltersText")</a>
+                <a class="dnImportant" onclick="Shop.GoTo('/Shop/Index#tabstrip-filters');" data-role="button" id="filterBtn" data-icon="search">@RP.T("Views.Shared._LayoutShop.Mobile.FiltersText")</a>
+                <a href="#my-drawer" id="drawerBaseBtn" data-role="button" data-rel="drawer" data-icon="drawer-button" data-align="left">@RP.T("Views.Shared._LayoutShop.Mobile.MenuText")</a>
+                <a class="dnImportant" id="drawerBtn" onclick="Shop.GoTo('/Shop/Index');" data-role="button" data-icon="drawer-button" data-align="left">@RP.T("Views.Shared._LayoutShop.Mobile.MenuText")</a>
+            </div>
+        </div>       
+    </div>
+
+    <div data-role="layout" data-id="mobile-layout2" data-init="tabstripOnInit">
+        <div data-role="header">
+            <div data-role="tabstrip" data-selected-index="0" class="tabstrip">
+                <a href="#drawer-index" data-role="button" id="homeBaseBtn" data-icon="home">@RP.T("Views.Shared._LayoutShop.Mobile.HomeText")</a>
+                <a class="dnImportant" onclick="Shop.GoTo('/Shop/Index#drawer-index');" data-role="button" id="homeBtn" data-icon="home">@RP.T("Views.Shared._LayoutShop.Mobile.HomeText")</a>
+               
+                 <a href="#tabstrip-shoppingCart" data-role="button" data-icon="cart" class="tabstrip-shoppingCart" id="switchCart2">@RP.T("Views.Shared._LayoutShop.Mobile.CartText") <span class="sh_cartcount"></span></a>
+                <a class="dnImportant" onclick="Shop.GoTo('/Shop/Index#tabstrip-shoppingCart');" data-role="button" id="cartBtn2" data-icon="cart">@RP.T("Views.Shared._LayoutShop.Mobile.CartText")</a>
+                
+                 <a href="#tabstrip-filters?bar=true" data-role="button" id="filterBaseBtnBar" data-icon="barcode">@RP.T("Views.Shared._LayoutShop.Mobile.BarCodeSearch")</a>
+                <a class="dnImportant" onclick="Shop.GoTo('/Shop/Index#tabstrip-filters');" data-role="button" id="filterBtnBar" data-icon="search">@RP.T("Views.Shared._LayoutShop.Mobile.BarCodeSearch")</a>
+                
+                <a href="#tabstrip-filters" data-role="button" id="filterBaseBtn" data-icon="search">@RP.T("Views.Shared._LayoutShop.Mobile.FiltersText")</a>
+                <a class="dnImportant" onclick="Shop.GoTo('/Shop/Index#tabstrip-filters');" data-role="button" id="filterBtn" data-icon="search">@RP.T("Views.Shared._LayoutShop.Mobile.FiltersText")</a>
+                <a href="#my-drawer" id="drawerBaseBtn" data-role="button" data-rel="drawer" data-icon="drawer-button" data-align="left">@RP.T("Views.Shared._LayoutShop.Mobile.MenuText")</a>
+                <a class="dnImportant" id="drawerBtn" onclick="Shop.GoTo('/Shop/Index');" data-role="button" data-icon="drawer-button" data-align="left">@RP.T("Views.Shared._LayoutShop.Mobile.MenuText")</a>
+            </div>
+            <div data-role="navbar" class="navbar_layout2">
+                <input type="search" id="searchProducts" style=" width: 66%;" placeholder="@RP.T("Views.Shared._LayoutShop.Mobile.SearchProductPlaceholder")" />
+                <a href="#" id="searchProductBtn" class="button_search" data-role="button" data-click="searchProductBtn">
+                    @RP.T("Views.Shop.Index.Mobile.SearchBtn")
+                </a>
+                <div id="workCategoryText"></div>
+                <div id="popupNotification"></div>
+            </div>
+        </div>
+    </div>
+    @if (LS.isLogined())
+    { 
+        <script>
+            if (Shop)
+                Shop.isLogined = true;
+        </script>
+    }
+     @Html.Partial("CustomDesign")
+</body>
+</html>

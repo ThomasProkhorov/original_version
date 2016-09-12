@@ -1,0 +1,12 @@
+@model string
+@{
+    List<string> Roles = Uco.Infrastructure.SF.GetRoleList();
+    Roles.Remove("Anonymous");
+    SelectList Items = new SelectList(Roles, Model);
+}
+@(Html.Kendo().DropDownListFor(model => model)
+    .DataTextField("Text")
+    .DataValueField("Value")
+    .BindTo(Items)
+    .Value(Model)
+)

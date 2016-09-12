@@ -1,0 +1,450 @@
+﻿.k-ltr {
+    direction: ltr;
+}
+html
+{
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    font-size:14px;
+}
+body
+{
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    font-family: Arial,Helvetica,sans-serif;
+}
+h1, h2, h3, h4, h5
+{
+    letter-spacing: 1px;
+    margin: 0 0 5px;
+    padding: 0 5px 0 0;
+    font-weight: normal;
+}
+.clear
+{
+    clear: both;
+}
+.dn {
+    display:none;
+}
+
+#page
+{
+    height: 100%;
+}
+
+#header {
+    font-size:16px;
+    overflow:visible;
+}
+#header_logof
+{
+    display: block;
+    font-size: 12px;
+    height: 20px;
+    position: absolute;
+    right: 10px;
+    text-align: right;
+    top: 3px;
+    z-index: 200;
+}
+#header_logof form {
+    display: inline;
+}
+#header_logof a
+{
+    padding-left: 10px;
+    text-decoration: none;
+}
+#header_logof a img
+{
+    border: medium none;
+}
+.menuPanel {
+    overflow:visible !important;
+}
+#header .tosite_link
+{
+    padding-left: 10px;
+}
+
+
+#right {
+    font-size:13px;
+    height: 100%;
+}
+#right .k-treeview
+{
+    height: 100%;
+}
+
+#content
+{ 
+    font-size: 14px; 
+    height: 100%;
+}
+.in_content, .action_wrap
+{
+    padding: 10px 10px;
+}
+.button_div {
+    margin-top:10px;
+}
+
+.multi-line
+{
+    width: 600px;
+    border: solid 1px #94C0D2;
+    line-height: 1.6em;
+    outline: 0 none;
+    padding: 2px 4px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+.k-textbox
+{
+    width: 350px;
+}
+.k-editor {
+    clear:both;
+}
+
+.display-label, .editor-label
+{
+    float: left;
+    margin-bottom: 10px;
+    width: 150px;
+    clear: both;
+}
+.display-field
+{
+    margin-bottom: 10px;
+    float: left;
+}
+.editor-field
+{
+    margin-bottom: 10px;
+}
+
+.validation-summary-valid
+{
+    display: none;
+}
+
+
+.k-menu .k-item > .k-link {
+    padding: 2px 1.1em;
+}
+
+
+.gallery_editor_wrap .gallery_div
+{
+    background-color: #fff;
+    border: 1px solid #bebebe;
+    float: left;
+    height: 170px;
+    margin: 0 2px 2px;
+    padding: 9px 8px 0;
+    position: relative;
+    text-align: center;
+    width: 122px;
+}
+.gallery_editor_wrap .gallery_div img
+{
+    border: 1px solid #bebebe;
+    display: block;
+    height: 120px;
+    overflow: hidden;
+    width: 120px;
+}
+.gallery_editor_wrap .gallery_div input.gallery_div_delete
+{
+    bottom: 5px;
+    display: block;
+    position: absolute;
+    left: 5px;
+}
+.gallery_editor_wrap .gallery_div input.gallery_div_order
+{
+    border: 1px solid #B1B1B1;
+    height: 14px;
+    right: 8px !important;
+    position: absolute;
+    left: auto;
+    text-align: center;
+    width: 25px;
+    bottom: 5px;
+}
+.gallery_editor_wrap .gallery_div input.gallery_div_title
+{
+    border: 1px solid #B1B1B1;
+    height: 14px;
+    left: 8px !important;
+    position: absolute;
+    right: auto;
+    text-align: center;
+    width: 120px;
+    bottom:27px;
+}
+.gallery_editor_wrap .gallery_div span
+{
+    bottom: 7px;
+    display: block;
+    position: absolute;
+    left: 28px;
+}
+
+
+.folder_editor_wrap
+{
+    display:table;
+    width:100%;
+    border-collapse: collapse;
+}
+.folder_editor_wrap .folder_row {
+    background-color: #fff;
+    border: 1px solid #bebebe;
+    display:table-row;
+    margin: 0 0 5px;
+    padding: 5px;
+    width: 100%;
+    -moz-box-sizing: padding-box;
+    box-sizing: padding-box;
+}
+.folder_editor_wrap .folder_cell {
+    border: 1px solid #bebebe;
+    display: table-cell;
+    padding: 5px;
+    vertical-align: top;
+}
+
+.folder_editor_wrap .folder_row_order {
+    width:50px;
+    text-align:center;
+}
+.folder_editor_wrap .folder_row_title {
+    width:200px;
+}
+.folder_editor_wrap .folder_cell_1 img{
+    display: block;
+    height: 2.17em;
+    margin: 0;
+    padding: 0;
+}
+
+
+.roles {
+    float:left;
+}
+.field-validation-error {
+    font-weight:bold;
+    font-size:14px;
+    margin:0 0 0 150px;
+    color:red;
+}
+.message_red {
+    background-color:#ff9595;
+    border:solid 1px #ff9595;
+    padding:10px;
+    color:#000;
+    font-weight:bold;
+}
+.message_yellow {
+    background-color:#f2ee42;
+    border:solid 1px #f2ee42;
+    padding:10px;
+    color:#000;
+    font-weight:bold;
+}
+.message_green {
+    background-color:#b9ffab;
+    border:solid 1px #b9ffab;
+    padding:10px;
+    color:#000;
+    font-weight:bold;
+}
+.k-autocomplete, .k-combobox, .k-numerictextbox, .k-dropdown, .k-selectbox, .k-textbox {
+    width:350px;
+}
+.k-editor-toolbar .k-combobox{
+	width:auto;
+}
+.k-ff {
+    overflow: inherit !important;
+}
+
+/* Info template */
+.k-notification-info.k-group {
+    background: rgba(0%,0%,0%,.7) !important;
+    color: #fff;
+}
+
+.u-notification-info {
+    width: 300px;
+    height: 60px;
+    color:#fff;
+}
+
+    .u-notification-info h3 {
+        font-size: 1.2em;
+        padding: 10px 10px 5px;
+        margin:0;
+    }
+    .u-notification-info p {
+        font-size: 1em;
+        padding: 0 10px 0 0;
+        margin:0;
+    }
+
+    .u-notification-info img {
+        float: right;
+        margin: 10px;
+    }
+
+/* Error template */
+.k-notification-error.k-group {
+    background: rgba(100%,0%,0%,.7) !important;
+    color: #ffffff;
+}
+
+.u-notification-error {
+    width: 300px;
+    height: 60px;
+    color:#fff;
+}
+
+    .u-notification-error h3 {
+        font-size: 1.2em;
+        padding: 10px 10px 5px;
+        margin:0;
+    }
+    .u-notification-error p {
+        font-size: 1em;
+        padding: 0 10px 0 0;
+        margin:0;
+    }
+
+    .u-notification-error img {
+        float: right;
+        margin: 10px;
+    }
+
+/* Success template */
+.k-notification-success.k-group {
+    background: rgba(0%,60%,0%,.7) !important;
+    color: #fff;
+}
+
+.u-notification-success {
+    width: 300px;
+    height: 60px;
+    color:#fff;
+}
+
+    .u-notification-success h3 {
+        font-size: 1.2em;
+        padding: 20px 10px;
+        margin:0;
+    }
+
+    .u-notification-success img {
+        float: right;
+        margin: 10px;
+    }
+
+/* Top drop down */
+#header_logof .k-dropdown-wrap .k-input {
+    height: 1.2em;
+    line-height: 1.3em;
+}
+#header_logof .k-dropdown-wrap .k-select {
+    line-height: 1.5em;
+}
+.LangSelectList .k-dropdown{
+    width: 6em;
+}
+.SkinSelectList .k-dropdown {
+    width: 9em;
+}
+.ShopSelectList .k-dropdown {
+    width: 9em;
+}
+.DomainSelectList .k-dropdown {
+    width: 12em;
+}
+
+.u-min-grid .k-grid{
+    width: -moz-min-content;
+    width: -webkit-min-content;
+}
+.u-max-grid .k-grid{
+    width: -moz-max-content;
+    width: -webkit-max-content;
+}
+.field-validation-error {
+display:none;
+
+}
+
+.tip-twitter {
+	opacity:0.8;
+	z-index:1000;
+	text-align:left;
+	border-radius:4px;
+	-moz-border-radius:4px;
+	-webkit-border-radius:4px;
+	padding:8px 8px;
+	max-width:200px;
+	color:#fff;
+	background-color:#000;
+	/**
+	 * - If you set a background-image, border/padding/background-color will be ingnored.
+	 *   You can set any padding to .tip-inner instead if you need.
+	 * - If you want a tiled background-image and border/padding for the tip,
+	 *   set the background-image to .tip-inner instead.
+	 */
+}
+.tip-twitter .tip-inner {
+	font:bold 11px/14px 'Lucida Grande',sans-serif;
+}
+
+/* Configure an arrow image - the script will automatically position it on the correct side of the tip */
+.tip-twitter .tip-arrow-top {
+	margin-top:-5px;
+	margin-left:-5px; /* approx. half the width to center it */
+	top:0;
+	left:50%;
+	width:9px;
+	height:5px;
+	background:url(tip-twitter_arrows.gif) no-repeat;
+}
+.tip-twitter .tip-arrow-right {
+	margin-top:-4px; /* approx. half the height to center it */
+	margin-left:0;
+	top:50%;
+	left:100%;
+	width:5px;
+	height:9px;
+	background:url(tip-twitter_arrows.gif) no-repeat -9px 0;
+}
+.tip-twitter .tip-arrow-bottom {
+	margin-top:0;
+	margin-left:-5px; /* approx. half the width to center it */
+	top:100%;
+	left:50%;
+	width:9px;
+	height:5px;
+	background:url(tip-twitter_arrows.gif) no-repeat -18px 0;
+}
+.tip-twitter .tip-arrow-left {
+	margin-top:-4px; /* approx. half the height to center it */
+	margin-left:-5px;
+	top:50%;
+	left:0;
+	width:5px;
+	height:9px;
+	background:url(tip-twitter_arrows.gif) no-repeat -27px 0;
+}

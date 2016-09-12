@@ -1,0 +1,5 @@
+@model string
+@{
+    SelectList Items = new SelectList(System.Configuration.ConfigurationManager.AppSettings["SearchSegments"].Split(',').ToList(), Model);
+}
+@Html.DropDownListFor(model => model, Items)

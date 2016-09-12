@@ -1,0 +1,1134 @@
+﻿@model object
+@using System.Reflection
+@using System.Collections.Generic
+@using System.Linq
+@using System.ComponentModel.DataAnnotations
+@using Uco.Models
+@using Uco.Models.Shopping
+@{
+    ViewBag.Title = RP.T("Admin.Views.Product.Index.Title");
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutNoTree.cshtml";
+    string Lang = ViewBag.Lang;
+}
+@*@Html.Partial("~/Views/Generic/_Grid.cshtml", Model)*@
+
+
+<br />
+<a href="javascript:void(0);" onclick="$('#Productgridfilterbox').toggle();" class="k-button">@RP.T("Views.Common.Search") <span class="k-icon k-i-search"></span></a>
+<br />
+
+
+<div id="Productgridfilterbox" style="display:none;" class="gridfilterbox">
+    <br />
+    <div class="editor-label">
+        <label for="SKU">מקט</label>
+    </div>
+    <div class="editor-field">
+        <input class="k-textbox" data-val="true" data-val-length="The field מקט must be a string with a maximum length of 400." data-val-length-max="400" id="SKU" name="SKU" type="text" value="" />
+    </div>
+    <div class="editor-label">
+        <label for="Name">שם מוצר</label>
+    </div>
+    <div class="editor-field">
+        <input class="k-textbox" id="Name" name="Name" type="text" value="" />
+    </div>
+    <div class="editor-label">
+        <label for="Manufacturer">יצרן</label>
+    </div>
+    <div class="editor-field">
+        <input id="Manufacturer101359903" data-zero="false" name="ProductManufacturerID" value="0" />
+
+        <script>
+            $('#Manufacturer101359903')
+                                    .kendoComboBox(
+            {
+                placeholder: "Select ",
+                dataTextField: "Name",
+                dataValueField: "ID",
+
+                filter: "contains",
+                minLength: 1,
+                "autoBind": true,
+                dataSource: {
+                    schema: {
+                        data: "Data",
+                        total: "Total",
+                        errors: "Errors",
+                    },
+                    type: "json",
+                    serverFiltering: true,
+                    filter: [],
+                    transport: {
+                        "prefix": "",
+                        read: {
+                            url: "/Admin/Manage/Manufacturer/_AjaxAutoComplete"
+        ,
+                            type: "POST",
+                            data: function () {
+                                var data = kendo.ui.ComboBox.requestData('#Manufacturer101359903');
+
+                                /** data["filter"] = "SpecificationAttributeID~eq~1";
+                                console.log(data);
+                                **/
+                                return data;
+                            },
+                        }
+                    }
+                }
+            });
+
+        </script>
+    </div>
+    <div class="editor-label">
+        <label for="Category">קטגוריה</label>
+    </div>
+    <div class="editor-field">
+
+
+
+        <input id="CategoryID101359903" data-zero="false" name="CategoryID" value="0" />
+
+        <script>
+            $('#CategoryID101359903')
+                                    .kendoComboBox(
+            {
+                placeholder: "Select ",
+                dataTextField: "Name",
+                dataValueField: "ID",
+
+                filter: "contains",
+                minLength: 1,
+                "autoBind": true,
+                dataSource: {
+                    schema: {
+                        data: "Data",
+                        total: "Total",
+                        errors: "Errors",
+                    },
+                    type: "json",
+                    serverFiltering: true,
+                    filter: [],
+                    transport: {
+                        "prefix": "",
+                        read: {
+                            url: "/Admin/Manage/Category/_AjaxAutoComplete"
+        ,
+                            type: "POST",
+                            data: function () {
+                                var data = kendo.ui.ComboBox.requestData('#CategoryID101359903');
+
+                                /** data["filter"] = "SpecificationAttributeID~eq~1";
+                                console.log(data);
+                                **/
+                                return data;
+                            },
+                        }
+                    }
+                }
+            });
+
+        </script>
+
+    </div>
+
+    <div class="button-wrap">
+        <a href="javascript:void(0);" class="k-button" onclick="ProductgridFiltering.filter('Productgridfilterbox');">חיפוש</a>
+        <a href="javascript:void(0);" class="k-button" onclick="ProductgridFiltering.clear();">נקה</a>
+    </div>
+
+</div>
+<br />
+<div id="Productgrid"></div>
+
+
+<script>
+
+    var ProductgridFiltering = {
+        filter: function (id) {
+            var data = { logic: "and", filters: [] };
+            //{ field: "name", operator: "startswith", value: "Jane" }
+            var grid = $("#Productgrid").data('kendoGrid');
+            //  console.log(grid.dataSource.options.schema.model);
+            $('#' + id + ' input').each(function (i, e) {
+                if ($(e).attr('name') && $(e).val()) {
+                    var inpname = $(e).attr('name');
+                    var objname = inpname.split(".")[0];
+                    if (objname in grid.dataSource.options.schema.model.fields) {
+
+                        var model = grid.dataSource.options.schema.model.fields[objname];
+                        if (model.type == 'number' || model.type == 'object') {
+                            if ($(e).attr('data-zero') && $(e).val() < 1) {
+                                return;
+                            }
+                        }
+                        var operator = 'eq';
+                        if (model.type == 'date') {
+                            operator = 'gt'; // >
+                            var todate = $('#' + id + ' input[name="' + inpname + '_dateto"]');
+                            if (todate.length > 0) {
+                                data.filters.push({ field: $(e).attr('name'), operator: 'lte', value: model.parse(todate.val()) });
+                            }
+                        }
+                        if (model.type == 'string') {
+                            operator = 'contains'; // .startswith
+                        }
+                        //lte <=
+                        //  console.log(model);
+                        var parseVal = $(e).val();
+                        if (model.type != 'object') {
+                            parseVal = model.parse(parseVal);
+                        }
+                        data.filters.push({ field: $(e).attr('name'), operator: operator, value: parseVal });
+                    }
+
+                }
+            });
+
+            grid.dataSource.filter(data);
+
+        },
+        clear: function () {
+            var grid = $("#Productgrid").data('kendoGrid');
+            grid.dataSource.filter({});
+        },
+        setFilter: function (name, value) {
+            var grid = $("#Productgrid").data('kendoGrid');
+            grid.dataSource.filter({ field: name, operator: "eq", value: value });
+            //grid.dataSource.page(1);
+            // alert(name + value);
+        },
+    };
+
+    function IntToTime(i) {
+        var hr = Math.floor(i / 60);
+        var mn = i % 60; if (mn < 10) { mn = '0' + mn; }
+        //  var part ="AM";
+        // if(hr>12)
+        //  {
+        //    hr-=12;
+        //     part="PM";
+        // }
+        // if(hr == 0){hr = 12;}
+        var time = hr + ":" + mn;// + " " + part;
+        return time;
+    }
+    $(document).ready(function () {
+        /*
+        Docs
+        http://docs.telerik.com/kendo-ui/api/javascript/ui/grid
+        */
+        var gridLocal = function () {
+            if ('messages' in kendo.ui.Grid.prototype.options) {
+                return kendo.ui.Grid.prototype.options.messages.commands.create;
+            } else {
+                return "Add new";
+            }
+        }
+        $("#Productgrid").kendoGrid({
+            
+
+            "toolbar": '<a class="k-button" href="/Admin/Product/CopyUnusedImages">Copy Unused Images</a>'
+            + '<a class="k-button" href="\\#" id="Export">@RP.S("Admin.Views.Product.Index.Export")</a>'
+            + '<a class="k-button" href="\\#" id="ImageImport">@RP.S("Admin.Views.ProductImage.Index.Import")</a>'
+            // + '<a class="k-button" href="\\#" id="ProductImport">@RP.S("Admin.Views.Product.Index.Import")</a>'
+              + '<a class="k-button" href="\\#" id="ProductSpecificationImport">@RP.S("Admin.Views.ProductSpecification.Index.Import")</a>'
+             + '<a class="k-button" href="\\#" id="ProductFlagImport">@RP.S("Admin.Views.Product.Index.ImportWithFlags")</a>'
+            ,
+            dataSource: {
+
+                type: "json",
+                transport: {
+                    "prefix": "",
+                    read: {
+                        url: "/Admin/Manage/Product/_AjaxRead",
+                        type: "POST",
+                        dataType: "json",
+                        // data: { filter:'ID~eq~3'  }
+                    },
+
+                    "destroy": {
+                        "url": "/Admin/Manage/Product/_AjaxDelete"
+                    },
+                },
+
+                schema: {
+                    data: "Data",
+                    total: "Total",
+                    errors: "Errors",
+                    model: {
+                        "id": "ID",
+                        fields: {
+                            "ID": { "type": "number", defaultValue: 0, editable: false, },
+                            "SKU": { "type": "string" },
+                            "Name": { "type": "string" },
+                            "IsKosher": { "type": "boolean" },
+                            "KosherType": { "type": "string" },
+                            "Capacity": { "type": "string" },
+                            "SoldByWeight": { "type": "boolean" },
+                            "IgnoreOnImport": { "type": "boolean" },
+                            "MeasureUnit": { "type": "string" },
+                            "MeasureUnitStep": { "type": "number", defaultValue: 0, nullable: true, },
+                            "UnitsPerPackage": { "type": "number", defaultValue: 0, nullable: true, },
+                            "RecomendedPrice": { "type": "number", defaultValue: 0 },
+                            "ShortDescription": { "type": "string" },
+                            "ProductShopOptions": { "type": "string" },
+                            "Components": { "type": "string" },
+                            "Image": { "type": "string" },
+                            "HasImage": { "type": "boolean" },
+                            "CategoryID": { "type": "number", defaultValue: 0 },
+                            "ProductManufacturerID": { "type": "number", defaultValue: 0 },
+                            "NoTax": { "type": "boolean" },
+                            "IsFeaturedTop": { "type": "boolean" },
+                            "IsFeaturedLeft": { "type": "boolean" },
+                            "Manufacturer": { "type": "string" },
+                            "Category": { "type": "object", editable: false, nullable: true, },
+                            "ProductManufacturer": { "type": "object", editable: false, nullable: true, },
+                            "Rate": { "type": "number", defaultValue: 0 },
+                            "RateCount": { "type": "number", defaultValue: 0 },
+                            "FullDescription": { "type": "string" },
+                            // "ID": {"type":"number" ,editable: false}
+                        }
+
+                    }
+                },
+                requestEnd: function (e) {
+                    if ($('#Productgride-checkall').length > 0) {
+                        $('#Productgride-checkall')[0].checked = false;
+                    }
+                },
+                pageSize: 20,
+                "error": error_handler,
+                "sync": function (e) { this.read(); },
+                "serverPaging": true,
+                "serverSorting": true,
+                "serverFiltering": true,
+                "serverGrouping": true,
+                "serverAggregates": true,
+                "filter": [],
+                "type": "aspnetmvc-ajax",
+
+                sort: [],
+            },
+            refresh: true,
+            //  detailTemplate: kendo.template($("#template").html()),
+            // detailInit: detailInit,
+            // dataBound: function () {
+            //this.expandRow(this.tbody.find("tr.k-master-row").first());
+            //   },
+            pageable: {
+                refresh: true,
+                pageSize: 10
+            },
+
+            columns: [
+{ field: "ID", title: "ID", sortable: false, filterable: false, editor: '<input data-val="true" data-val-number="The field ID must be a number." data-val-required="The ID field is required." id="ID" name="ID" type="hidden" value="0" /><span class="field-validation-valid" data-valmsg-for="ID" data-valmsg-replace="true"></span>', },
+{ field: "SKU", title: "מקט", sortable: false, filterable: false, editor: '<input class="k-textbox" data-val="true" data-val-length="The field מקט must be a string with a maximum length of 400." data-val-length-max="400" id="SKU" name="SKU" type="text" value="" /><span class="field-validation-valid" data-valmsg-for="SKU" data-valmsg-replace="true"></span>', },
+{ field: "Name", title: "שם מוצר", sortable: false, filterable: false, editor: '<input class="k-textbox" id="Name" name="Name" type="text" value="" /><span class="field-validation-valid" data-valmsg-for="Name" data-valmsg-replace="true"></span>', },
+{ field: "IsKosher", title: "IsKosher", sortable: false, filterable: false, hidden: true, editor: '<input class="check-box" data-val="true" data-val-required="The כשר? field is required." id="IsKosher" name="IsKosher" type="checkbox" value="true" /><input name="IsKosher" type="hidden" value="false" /><span class="field-validation-valid" data-valmsg-for="IsKosher" data-valmsg-replace="true"></span>', },
+{ field: "KosherType", title: "KosherType", sortable: false, filterable: false, hidden: true, editor: '<input class="k-textbox" id="KosherType" name="KosherType" type="text" value="" /><span class="field-validation-valid" data-valmsg-for="KosherType" data-valmsg-replace="true"></span>', },
+{ field: "Capacity", title: "Capacity", sortable: false, filterable: false, hidden: true, editor: '<input class="k-textbox" id="Capacity" name="Capacity" type="text" value="" /><span class="field-validation-valid" data-valmsg-for="Capacity" data-valmsg-replace="true"></span>', },
+{ field: "SoldByWeight", title: "SoldByWeight", sortable: false, filterable: false, hidden: true, editor: '<input class="check-box" data-val="true" data-val-required="The נמכר לפי משקל field is required." id="SoldByWeight" name="SoldByWeight" type="checkbox" value="true" /><input name="SoldByWeight" type="hidden" value="false" /><span class="field-validation-valid" data-valmsg-for="SoldByWeight" data-valmsg-replace="true"></span>', },
+{ field: "IgnoreOnImport", title: "IgnoreOnImport", sortable: false, filterable: false, hidden: true, editor: '<input class="check-box" data-val="true" data-val-required="The התעלם ביבוא field is required." id="IgnoreOnImport" name="IgnoreOnImport" type="checkbox" value="true" /><input name="IgnoreOnImport" type="hidden" value="false" /><span class="field-validation-valid" data-valmsg-for="IgnoreOnImport" data-valmsg-replace="true"></span>', },
+{ field: "MeasureUnit", title: "MeasureUnit", sortable: false, filterable: false, hidden: true, editor: '<input class="k-textbox" id="MeasureUnit" name="MeasureUnit" type="text" value="" /><span class="field-validation-valid" data-valmsg-for="MeasureUnit" data-valmsg-replace="true"></span>', },
+{
+    field: "MeasureUnitStep", title: "MeasureUnitStep", sortable: false, filterable: false, hidden: true, editor: '<input data-val="true" data-val-number="The field כמות יחידות בלחיצה must be a number." id="MeasureUnitStep" name="MeasureUnitStep" type="number" /><script> \
+	jQuery(function(){jQuery("#MeasureUnitStep").kendoNumericTextBox({"format":"n0","decimals":0});}); \
+</sc'+ 'ript> \
+<span class="field-validation-valid" data-valmsg-for="MeasureUnitStep" data-valmsg-replace="true"></span>',
+},
+{
+    field: "UnitsPerPackage", title: "UnitsPerPackage", sortable: false, filterable: false, hidden: true, editor: '<input data-val="true" data-val-number="The field יחידות באריזה must be a number." id="UnitsPerPackage" name="UnitsPerPackage" type="number" /><script> \
+	jQuery(function(){jQuery("#UnitsPerPackage").kendoNumericTextBox({"format":"n0","decimals":0});}); \
+</sc'+ 'ript> \
+<span class="field-validation-valid" data-valmsg-for="UnitsPerPackage" data-valmsg-replace="true"></span>',
+},
+{
+    field: "RecomendedPrice", title: "מחיר מומלץ", sortable: false, filterable: false, editor: '<input id="RecomendedPrice" name="RecomendedPrice" type="number" value="0" /><script> \
+	jQuery(function(){jQuery("#RecomendedPrice").kendoNumericTextBox({"decimals":4});}); \
+</sc'+ 'ript> \
+ \
+<span class="field-validation-valid" data-valmsg-for="RecomendedPrice" data-valmsg-replace="true"></span>',
+},
+{
+    field: "ShortDescription", title: "ShortDescription", sortable: false, filterable: false, hidden: true, editor: '<textarea class="text-box multi-line k-textbox" id="ShortDescription" name="ShortDescription"> \
+</textarea> \
+<span class="field-validation-valid" data-valmsg-for="ShortDescription" data-valmsg-replace="true"></span>',
+},
+{
+    field: "ProductShopOptions", title: "ProductShopOptions", sortable: false, filterable: false, hidden: true, editor: '<textarea class="text-box multi-line k-textbox" id="ProductShopOptions" name="ProductShopOptions"> \
+</textarea> \
+<span class="field-validation-valid" data-valmsg-for="ProductShopOptions" data-valmsg-replace="true"></span>',
+},
+{
+    field: "Components", title: "Components", sortable: false, filterable: false, hidden: true, editor: '<textarea class="text-box multi-line k-textbox" id="Components" name="Components"> \
+</textarea> \
+<span class="field-validation-valid" data-valmsg-for="Components" data-valmsg-replace="true"></span>',
+},
+{
+    field: "SmallGridImage", title: "תמונה", sortable: false, filterable: false, template: "<img  height=\"30\"  src=\"#: SmallGridImage #\" alt=\"alt\" />", editor: '<img id="img_Image" src="" alt="Image" style=" max-width:280px; max-height:40px;" /> \
+ \
+<input id="value_Image" name="SmallGridImage" type="hidden" value="" /> \
+ \
+<input class="file-upload-box" id="attachments_Image" name="attachments_Image" type="file" /><script> \
+	jQuery(function(){jQuery("#attachments_Image").kendoUpload({"success":OnSuccess_Image,"multiple":false,"async":{"saveUrl":"/Admin/Upload/Save","autoUpload":true,"removeUrl":"/Admin/Upload/Remove"}});}); \
+</sc'+ 'ript> \
+ \
+<script type="text/javascript"> \
+ \
+    $(document).ready(function () { \
+ \
+         \
+ \
+        var PARAM_NAME = "attachments"; \
+        var uploadElement = $("#attachments_Image"); \
+        uploadElement.data("kendoUpload").name = PARAM_NAME; \
+ \
+             \
+        $(\'#img_Image\').addClass("dn"); \
+         \
+    }); \
+ \
+    var OnSuccess_Image=function(e) { \
+        if (e.operation == "upload") { \
+            $("#value_Image").attr("value", "/Content/UserFiles/Admin/Upload/" + e.files[0].name); \
+            $(\'#img_Image\').attr("src", "/Content/UserFiles/Admin/Upload/" + e.files[0].name); \
+            $(\'#img_Image\').removeClass("dn"); \
+        } \
+        else if (e.operation == "remove") { \
+            $("#value_Image").attr("value", ""); \
+            $(\'#img_Image\').attr("src", ""); \
+            $(\'#img_Image\').addClass("dn"); \
+        } \
+    } \
+</sc'+ 'ript> \
+ \
+<span class="field-validation-valid" data-valmsg-for="Image" data-valmsg-replace="true"></span>',
+},
+{ field: "HasImage", title: "HasImage", sortable: false, filterable: false, hidden: true, editor: '<input class="check-box" data-val="true" data-val-required="The Models.Product.HasImage field is required." id="HasImage" name="HasImage" type="checkbox" value="true" /><input name="HasImage" type="hidden" value="false" /><span class="field-validation-valid" data-valmsg-for="HasImage" data-valmsg-replace="true"></span>', },
+{ field: "NoTax", title: "NoTax", sortable: false, filterable: false, hidden: true, editor: '<input class="check-box" data-val="true" data-val-required="The ללא מעמ field is required." id="NoTax" name="NoTax" type="checkbox" value="true" /><input name="NoTax" type="hidden" value="false" /><span class="field-validation-valid" data-valmsg-for="NoTax" data-valmsg-replace="true"></span>', },
+{ field: "IsFeaturedTop", title: "IsFeaturedTop", sortable: false, filterable: false, hidden: true, editor: '<input class="check-box" data-val="true" data-val-required="The מומלץ בעמוד הבית field is required." id="IsFeaturedTop" name="IsFeaturedTop" type="checkbox" value="true" /><input name="IsFeaturedTop" type="hidden" value="false" /><span class="field-validation-valid" data-valmsg-for="IsFeaturedTop" data-valmsg-replace="true"></span>', },
+{ field: "IsFeaturedLeft", title: "IsFeaturedLeft", sortable: false, filterable: false, hidden: true, editor: '<input class="check-box" data-val="true" data-val-required="The מומלץ בקופה field is required." id="IsFeaturedLeft" name="IsFeaturedLeft" type="checkbox" value="true" /><input name="IsFeaturedLeft" type="hidden" value="false" /><span class="field-validation-valid" data-valmsg-for="IsFeaturedLeft" data-valmsg-replace="true"></span>', },
+{
+    field: "ProductManufacturerID", title: "יצרן", sortable: false, filterable: false,
+    template: "# if (ProductManufacturer) { #  #: ProductManufacturer.Name # # } #",
+    editor: '<input class="k-textbox" id="Manufacturer" name="Manufacturer" type="text" value="" /><span class="field-validation-valid" data-valmsg-for="Manufacturer" data-valmsg-replace="true"></span>',
+},
+{
+    field: "CategoryID", title: "קטגוריה", filterable: false, editor: '     \
+    <div class="k-widget k-tabstrip k-header" id="TabStrip"><ul class="k-reset k-tabstrip-items"><li class="k-item k-state-default k-state-active"><a class="k-link" href="#TabStrip-1">ראשי</a></li><li class="k-item k-state-default"><a class="k-link" href="#TabStrip-2">תת קטגוריות</a></li></ul><div class="k-content k-state-active" id="TabStrip-1" style="display:block"> \
+<input data-val="true" data-val-number="The field ID must be a number." data-val-required="The ID field is required." id="Category_ID" name="Category.ID" type="hidden" value="" />                                <div class="editor-label"><label for="Category_Name">שם</label> </div> \
+                            <div class="editor-field"><input class="k-textbox" id="Category_Name" name="Category.Name" type="text" value="" /> <span class="field-validation-valid" data-valmsg-for="Category.Name" data-valmsg-replace="true"></span></div> \
+                                <div class="editor-label"><label for="Category_Image">תמונה</label> </div> \
+                            <div class="editor-field"><img id="img_Category.Image" src="" alt="Category.Image" style=" max-width:280px; max-height:40px;" /> \
+ \
+<input id="value_Category.Image" name="Category.Image" type="hidden" value="" /> \
+ \
+<input class="file-upload-box" id="attachments_Category.Image" name="attachments_Category.Image" type="file" /><script> \
+	jQuery(function(){jQuery("#attachments_Category_Image").kendoUpload({"success":OnSuccess_Category.Image,"multiple":false,"async":{"saveUrl":"/Admin/Upload/Save","autoUpload":true,"removeUrl":"/Admin/Upload/Remove"}});}); \
+</sc'+ 'ript> \
+ \
+<script type="text/javascript"> \
+ \
+    $(document).ready(function () { \
+ \
+         \
+ \
+        var PARAM_NAME = "attachments"; \
+        var uploadElement = $("#attachments_Category.Image"); \
+        uploadElement.data("kendoUpload").name = PARAM_NAME; \
+ \
+             \
+        $(\'#img_Category.Image\').addClass("dn"); \
+         \
+    }); \
+ \
+    var OnSuccess_Category.Image=function(e) { \
+        if (e.operation == "upload") { \
+            $("#value_Category.Image").attr("value", "/Content/UserFiles/Admin/Upload/" + e.files[0].name); \
+            $(\'#img_Category.Image\').attr("src", "/Content/UserFiles/Admin/Upload/" + e.files[0].name); \
+            $(\'#img_Category.Image\').removeClass("dn"); \
+        } \
+        else if (e.operation == "remove") { \
+            $("#value_Category.Image").attr("value", ""); \
+            $(\'#img_Category.Image\').attr("src", ""); \
+            $(\'#img_Category.Image\').addClass("dn"); \
+        } \
+    } \
+</sc'+ 'ript> \
+ \
+ <span class="field-validation-valid" data-valmsg-for="Category.Image" data-valmsg-replace="true"></span></div> \
+            </div><div class="k-content" id="TabStrip-2"> \
+            </div></div><script> \
+	jQuery(function(){jQuery("#TabStrip").kendoTabStrip({"animation":false});}); \
+</sc'+ 'ript> \
+     \
+                <div class="editor-label"><label for="Category_ParentCategoryID">ParentCategoryID</label> *</div> \
+            <div class="editor-field"><input data-val="true" data-val-number="The field ParentCategoryID must be a number." data-val-required="The ParentCategoryID field is required." id="Category_ParentCategoryID" name="Category.ParentCategoryID" type="number" /><script> \
+	jQuery(function(){jQuery("#Category_ParentCategoryID").kendoNumericTextBox({"format":"n0","decimals":0});}); \
+</sc'+ 'ript> \
+ <span class="field-validation-valid" data-valmsg-for="Category.ParentCategoryID" data-valmsg-replace="true"></span></div> \
+                <div class="editor-label"><label for="Category_DisplayOrder">סדר תצוגה</label> *</div> \
+            <div class="editor-field"><input data-val="true" data-val-number="The field סדר תצוגה must be a number." data-val-required="The סדר תצוגה field is required." id="Category_DisplayOrder" name="Category.DisplayOrder" type="number" /><script> \
+	jQuery(function(){jQuery("#Category_DisplayOrder").kendoNumericTextBox({"format":"n0","decimals":0});}); \
+</sc'+ 'ript> \
+ <span class="field-validation-valid" data-valmsg-for="Category.DisplayOrder" data-valmsg-replace="true"></span></div> \
+                <div class="editor-label"><label for="Category_Published">פורסם</label> *</div> \
+            <div class="editor-field"><input class="check-box" data-val="true" data-val-required="The פורסם field is required." id="Category_Published" name="Category.Published" type="checkbox" value="true" /><input name="Category.Published" type="hidden" value="false" /> <span class="field-validation-valid" data-valmsg-for="Category.Published" data-valmsg-replace="true"></span></div> \
+<span class="field-validation-valid" data-valmsg-for="Category" data-valmsg-replace="true"></span>', template: "# if (Category) { #  #: Category.Name # # } #", editor: ' \
+ \
+ \
+<input id="CategoryID102150783" data-zero="false" name="CategoryID" value="0" /> \
+ \
+<script> \
+    $(\'#CategoryID102150783\') \
+                            .kendoComboBox( \
+    { \
+        placeholder: "Select ", \
+        dataTextField: "Name", \
+        dataValueField: "ID", \
+ \
+        filter: "contains", \
+        minLength: 1, \
+        "autoBind": true, \
+        dataSource: { \
+            schema: { \
+                data: "Data", \
+                total: "Total", \
+                errors: "Errors", \
+            }, \
+            type: "json", \
+            serverFiltering: true, \
+            filter: [], \
+            transport: { \
+                "prefix": "", \
+                read: { \
+                    url: "/Admin/Manage/Category/_AjaxAutoComplete" \
+, \
+                    type: "POST", \
+                    data: function () { \
+                        var data = kendo.ui.ComboBox.requestData(\'#CategoryID102150783\'); \
+ \
+                        /** data["filter"] = "SpecificationAttributeID~eq~1"; \
+                        console.log(data); \
+                        **/ \
+                        return data; \
+                    }, \
+                } \
+            } \
+        } \
+    }); \
+ \
+</sc'+ 'ript> \
+ \
+',
+},
+{
+    field: "Rate", title: "Rate", sortable: false, filterable: false, hidden: true, editor: '<input id="Rate" name="Rate" type="number" value="0" /><script> \
+	jQuery(function(){jQuery("#Rate").kendoNumericTextBox({"decimals":4});}); \
+</sc'+ 'ript> \
+ \
+<span class="field-validation-valid" data-valmsg-for="Rate" data-valmsg-replace="true"></span>',
+},
+{
+    field: "RateCount", title: "RateCount", sortable: false, filterable: false, hidden: true, editor: '<input data-val="true" data-val-number="The field כמות מדרגים must be a number." data-val-required="The כמות מדרגים field is required." id="RateCount" name="RateCount" type="number" value="0" /><script> \
+	jQuery(function(){jQuery("#RateCount").kendoNumericTextBox({"format":"n0","decimals":0});}); \
+</sc'+ 'ript> \
+<span class="field-validation-valid" data-valmsg-for="RateCount" data-valmsg-replace="true"></span>',
+},
+{
+    field: "FullDescription", title: "FullDescription", sortable: false, filterable: false, hidden: true, editor: '<textarea cols="20" id="FullDescription" name="FullDescription" rows="5"></textarea><script> \
+	jQuery(function(){jQuery("#FullDescription").kendoEditor({"tools":[{"name":"bold"},{"name":"italic"},{"name":"underline"},{"name":"strikethrough"},{"name":"justifyLeft"},{"name":"justifyCenter"},{"name":"justifyRight"},{"name":"justifyFull"},{"name":"insertUnorderedList"},{"name":"insertOrderedList"},{"name":"outdent"},{"name":"indent"},{"name":"createLink"},{"name":"unlink"},{"name":"insertImage"},{"name":"subscript"},{"name":"superscript"},{"name":"createTable"},{"name":"addColumnLeft"},{"name":"addColumnRight"},{"name":"addRowAbove"},{"name":"addRowBelow"},{"name":"deleteRow"},{"name":"deleteColumn"},{"name":"formatting"},{"name":"fontName"},{"name":"fontSize"},{"name":"foreColor"},{"name":"backColor"},{"name":"viewHtml"}],"encoded":false,"imageBrowser":{"transport":{"read":{"url":"/Admin/ImageBrowser/Read"},"type":"imagebrowser-aspnetmvc","thumbnailUrl":"/Admin/ImageBrowser/Thumbnail","uploadUrl":"/Admin/ImageBrowser/Upload","destroy":{"url":"/Admin/ImageBrowser/Destroy"},"create":{"url":"/Admin/ImageBrowser/Create"},"imageUrl":"/Content/UserFiles/Admin/{0}"}}});}); \
+</sc'+ 'ript><span class="field-validation-valid" data-valmsg-for="FullDescription" data-valmsg-replace="true"></span>',
+},
+
+
+
+
+{
+    "width": "100px",
+    "template": "<a class=\"k-button\" href=\"/Admin/Manage/Product/Edit/#= ID #\">עריכה</a>"
+},
+
+
+{
+    "width": "100px",
+    "buttonType": "Image",
+    "command": [
+
+{
+    "name": "destroy",
+    "buttonType": "Image",
+    "text": "מחיקה"
+},
+
+    ]
+},
+
+            ],
+            //   height: 600,
+            "scrollable": false,
+            filterable: true,
+            sortable: true,
+            "editable": {
+                "confirmation": "האם אתה בטוח?",
+                "confirmDelete": "מחיקה",
+                "cancelDelete": "בטל",
+                "mode": "inline",
+                "create": true,
+                "update": true,
+                "destroy": true
+            }
+
+        });
+        var Productgrid = $("#Productgrid").data('kendoGrid');
+        Productgrid.dataSource.transport.parameterMap = function (data, type) {
+
+            // console.log(type);
+            if (type != "read") {
+                for (var i in data) {
+                    //console.log(Object.prototype.toString.call( data[i] ));
+                    if (Object.prototype.toString.call(data[i]) === '[object Object]') {
+                        delete data[i];
+                    }
+                    if (Object.prototype.toString.call(data[i]) === '[object Array]') {
+                        delete data[i];
+                    }
+                    if (Object.prototype.toString.call(data[i]) === '[object Date]') {
+                        data[i] = kendo.toString(kendo.parseDate(data[i]), "G");// Date.parse(data[i]);
+                    }
+                    //if(i == 'UserID' && !data[i]){
+                    //    data[i]=
+                    // }
+                    //@ViewBag.AdditionalFilterField", operator: "eq", value: ''
+                }
+            }
+
+            kendo.data.transports["aspnetmvc-ajax"](data);
+            data = new kendo.data.transports["aspnetmvc-ajax"]({ prefix: "" }).parameterMap(data, type);
+            //  console.log(data);
+            return data;
+        }
+
+        function error_handler(e) {
+
+            if (e.errors) {
+                e.preventDefault();   // cancel grid rebind if error occurs
+                var message = "Errors:\n";
+                $.each(e.errors, function (key, value) {
+                    if ('errors' in value) {
+                        $.each(value.errors, function () {
+                            message += this + "\n";
+                        });
+                    }
+                });
+                alert(message);
+            }
+        }
+        function detailInit(e) {
+            var detailRow = e.detailRow;
+            console.log(e);
+
+
+        }
+
+    });
+
+</script>
+
+
+<script>
+    $(document).ready(function () {
+        $(".wPictures").click(function () {
+            if (this.checked)
+            {
+                var id = this.id;
+                if (id == "WithPictures") {
+                    $("#WithoutPictures").prop('checked', false);
+                }
+                else {
+                    $("#WithPictures").prop('checked', false);
+                }
+
+            }
+        });
+        $(".wCategory").click(function () {
+            if (this.checked) {
+                var id = this.id;
+                if (id == "WithCategory") {
+                    $("#WithoutCategory").prop('checked', false);
+                }
+                else {
+                    $("#WithCategory").prop('checked', false);
+                }
+
+            }
+        });
+    });
+</script>
+
+
+<br />
+<br />
+<a class="k-button" href="/Admin/Manage/Product/Create">הוספה</a>
+
+
+
+
+
+</br></br>
+
+
+@(Html.Kendo().Window()
+        .Name("ExportWindow")
+            .Title(RP.S("Admin.Views.Product.Index.Export"))
+    .Content(@<text>
+       @* Product export *@
+@{
+    
+    var shops = LS.Get<Shop>()
+        .Select(x => new SelectListItem() { Text = x.Name, Value = x.ID.ToString(), Selected = x.ID == LS.CurrentShopID })
+        .ToList();
+    shops.Insert(0, new SelectListItem() { Value="0",Text = RP.S("Admin.View.Product.AllShops") });
+}
+
+    <form action="/Admin/Product/Export" method="post" >
+    <div class="k-notification-wrap k-header">
+        <table cellpadding="0" cellspacing="0">
+            <tr>
+                <td><span>@RP.T("Admin.Views.ProductImage.Index.With/WithoutPictures")</span></td>
+                <td>
+                <select id="WithPictures" name="WithPictures">
+                    <option value="">@RP.T("Admin.View.Product.ExportAny")</option>
+                    <option value="true">@RP.T("Admin.View.Product.WithPicture")</option>
+                    <option value="false">@RP.T("Admin.View.Product.WithoutPicture")</option>
+                </select>
+                    <br/>
+                </td>
+             
+            </tr>
+            <tr>
+                <td><span>@RP.T("Admin.Views.ProductImage.Index.With/WithoutCategory")</span></td>
+                <td>
+                 <select id="WithCategory" name="WithCategory">
+                    <option value="">@RP.T("Admin.View.Product.ExportAny")</option>
+                    <option value="true">@RP.T("Admin.View.Product.WithCategory")</option>
+                    <option value="false">@RP.T("Admin.View.Product.WithoutCategory")</option>
+                </select>
+                    <br/>
+               </td>
+               
+            </tr>
+            <tr>
+                <td><span>@RP.T("Admin.Views.ProductImage.Index.ActiveShop")</span></td>
+                <td>
+                 <select id="ActiveShop" name="ActiveShop">
+                    <option value="">@RP.T("Admin.View.Product.ExportAny")</option>
+                    <option value="true">@RP.T("Admin.View.Product.Active")</option>
+                    <option value="false">@RP.T("Admin.View.Product.NotActive")</option>
+                </select>
+                    <br/>
+               </td>
+               
+            </tr>
+
+
+        </table>
+         <script>
+             $("#WithCategory").kendoDropDownList({
+                 animation: false
+             });
+             $("#WithPictures").kendoDropDownList({
+                 animation: false
+             });
+             $("#ActiveShop").kendoDropDownList({
+                 animation: false
+             });
+             
+         </script>
+        <br/>
+        <div>
+            <span>@RP.T("Admin.Views.ProductImage.Index.ShopName")</span>
+           @(Html.Kendo().DropDownList()
+         .Name("ShopName")
+            //.Events(e => e.Change("ShopSelectListonSelectedIndexChanged"))
+            .BindTo(shops)
+           // .DataTextField("Text")
+           // .DataValueField("Value")
+           // .Value("0")
+        )
+        </div>
+        <div class="k-notification-wrap">
+            @RP.T("Admin.Views.Product.Index.Export")
+
+        </div>
+        <input class="k-button" type="submit" name="export" value="@RP.T("Admin.Views.Product.Index.DoExport")" />
+
+    </div>
+</form>
+    </text>)
+    .Draggable()
+    .Resizable()
+    .Width(500)
+    .Actions(actions => actions.Close())
+    .Visible(false)
+) 
+
+
+@* ImageImport*@
+@(Html.Kendo().Window()
+            .Name("ImageImportWindow")
+                .Title(RP.S("Admin.Views.ProductImage.Index.Import"))
+    .Content(@<text>
+       @* ImageImport *@
+<div class="import">
+    <div class="k-notification-wrap demo-section k-header">
+        @T("Admin.Views.ProductImage.Index.Import")
+
+
+        <div><button class="k-button" id="imageimport">@RP.T("Admin.Views.ProductImage.Index.DoImport")</button></div>
+        <div id="imageimportstatus"></div>
+    </div>
+</div>
+    </text>)
+    .Draggable()
+    .Resizable()
+    .Width(500)
+    .Actions(actions => actions.Close())
+    .Visible(false)
+) 
+
+
+@* ProductImport*@
+@(Html.Kendo().Window()
+                .Name("ProductImportWindow")
+                    .Title(RP.S("Admin.Views.Product.Index.Import"))
+    .Content(@<text>
+@* Product import *@
+<div class="import">
+    <div class="k-notification-wrap demo-section k-header">
+        @T("Admin.Views.Product.Index.Import")
+    </div>
+    <div class="demo-section k-header" id="loadzone2">
+        <input name="attachment" id="files2" type="file" />
+    </div>
+    <div><a href="/Content/ImportExamples/Products.xlsx">@RP.T("Admin.Common.ExampleImportFile")</a></div>
+    <div id="importerrors"></div>
+</div>
+    </text>)
+    .Draggable()
+    .Resizable()
+    .Width(500)
+    .Actions(actions => actions.Close())
+    .Visible(false)
+) 
+
+
+@* ProductSpecificationImport*@
+@(Html.Kendo().Window()
+                    .Name("ProductSpecificationImportWindow")
+                        .Title(RP.S("Admin.Views.ProductSpecification.Index.Import"))
+    .Content(@<text>
+
+@* Product attributes import *@
+<div class="import">
+    <div class="k-notification-wrap demo-section k-header">
+        @T("Admin.Views.ProductSpecification.Index.Import")
+    </div>
+    <div class="demo-section k-header" id="loadzone3">
+        <input name="attachment" id="files3" type="file" />
+    </div>
+    <div><a href="/Content/ImportExamples/ProductSpecificationss.xlsx">@RP.T("Admin.Common.ExampleImportFile")</a></div>
+</div>
+
+    </text>)
+    .Draggable()
+    .Resizable()
+    .Width(500)
+    .Actions(actions => actions.Close())
+    .Visible(false)
+) 
+
+@(Html.Kendo().Window()
+                        .Name("ProductFlagImportWindow")
+                            .Title(RP.S("Admin.Views.Product.Index.ImportWithFlags"))
+    .Content(@<text>
+@* New flag Product import *@
+<div class="import">
+    <div class="k-notification-wrap demo-section k-header">
+        @T("Admin.Views.Product.Index.ImportWithFlags")
+    </div>
+    <div class="demo-section k-header" id="loadzone4">
+        <input name="attachment" id="files4" type="file" />
+    </div>
+    <div><a href="/Content/ImportExamples/Products.xlsx">@RP.T("Admin.Common.ExampleImportFile")</a></div>
+    <div id="importerrors4"></div>
+</div>
+    </text>)
+    .Draggable()
+    .Resizable()
+    .Width(500)
+    .Actions(actions => actions.Close())
+    .Visible(false)
+) 
+<br />
+<script>
+    $(document).ready(function () {
+        $("#Export").click(function () {
+            var window = $("#ExportWindow");
+            window.data("kendoWindow").refresh();
+            window.data("kendoWindow").center();
+            window.data("kendoWindow").open();
+        });
+        
+            $("#ImageImport").click(function () {
+                var window = $("#ImageImportWindow");
+                window.data("kendoWindow").refresh();
+                window.data("kendoWindow").center();
+                window.data("kendoWindow").open();
+            });
+
+            
+            $("#ProductImport").click(function () {
+                var window = $("#ProductImportWindow");
+                window.data("kendoWindow").refresh();
+                window.data("kendoWindow").center();
+                window.data("kendoWindow").open();
+            });
+
+            
+
+            $("#ProductSpecificationImport").click(function () {
+                var window = $("#ProductSpecificationImportWindow");
+                window.data("kendoWindow").refresh();
+                window.data("kendoWindow").center();
+                window.data("kendoWindow").open();
+            });
+            
+            $("#ProductFlagImport").click(function () {
+                var window = $("#ProductFlagImportWindow");
+                window.data("kendoWindow").refresh();
+                window.data("kendoWindow").center();
+                window.data("kendoWindow").open();
+            });
+        $('#imageimport').click(function () {
+            $('#imageimportstatus').html('@RP.T("Admin.Common.ImportStarted")');
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: "/Admin/Product/ImageImport",
+                data: { import: true },
+                cache: false,
+                error: function () { alert('Server error'); }
+            }).done(function (data) {
+                $('#imageimportstatus').html(data.message);
+
+            });
+        });
+    });
+</script>
+
+
+<script>
+    $(document).ready(function () {
+        function onError2(e) {
+            $('#loadzone2 .k-upload-status-total').html("@RP.T("Admin.Product.Import.500Error")");
+            // console.log("Error (" + e + ") :: " + getFileInfo(e));
+        }
+        function onSuccess2(e) {
+            $('#importerrors').html('');
+            if (e.response["success"] == "ok") {
+                //success
+                $('#loadzone2 .k-upload-status-total').html(e.response["message"] + '<span class="k-icon k-i-tick"></span>');
+                if (e.response.errors) {
+                    $('#importerrors').html(e.response.errors.replace(/(?:\r\n|\r|\n)/g, '<br />'));
+                }
+            } else {
+                //error
+                $('#loadzone2 .k-upload-status-total').html(e.response["message"]);
+            }
+        }
+        function getFileInfo2(e) {
+            return $.map(e.files, function (file) {
+                var info = file.name;
+
+                // File size is not available in all browsers
+                if (file.size > 0) {
+                    info += " (" + Math.ceil(file.size / 1024) + " KB)";
+                }
+                return info;
+            }).join(", ");
+        }
+        $("#files2").kendoUpload({
+            async: {
+                saveUrl: "/Admin/Product/ProductImport",
+                //  removeUrl: "remove",
+                autoUpload: false
+            }
+,
+            error: onError2,
+            success: onSuccess2,
+            upload: function (e) {
+                console.log(e);
+                e.data = {
+                    EventID: 1,
+                    import: 'Import',
+
+
+                };
+            }
+, multiple: false
+        });
+    });
+</script>
+
+
+<script>
+    $(document).ready(function () {
+        function onError3(e) {
+            $('#loadzone3 .k-upload-status-total').html("Upload error (Server error: 500)");
+            // console.log("Error (" + e + ") :: " + getFileInfo(e));
+        }
+        function onSuccess3(e) {
+            if (e.response["success"] == "ok") {
+                //success
+                $('#loadzone3 .k-upload-status-total').html(e.response["message"] + '<span class="k-icon k-i-tick"></span>');
+            } else {
+                //error
+                $('#loadzone3 .k-upload-status-total').html(e.response["message"]);
+            }
+        }
+        function getFileInfo3(e) {
+            return $.map(e.files, function (file) {
+                var info = file.name;
+
+                // File size is not available in all browsers
+                if (file.size > 0) {
+                    info += " (" + Math.ceil(file.size / 1024) + " KB)";
+                }
+                return info;
+            }).join(", ");
+        }
+        $("#files3").kendoUpload({
+            async: {
+                saveUrl: "/Admin/Product/ProductSpecificationImport",
+                //  removeUrl: "remove",
+                autoUpload: false
+            }
+,
+            error: onError3,
+            success: onSuccess3,
+            upload: function (e) {
+                console.log(e);
+                e.data = {
+                    EventID: 1,
+                    import: 'Import',
+
+
+                };
+            }
+, multiple: false
+        });
+    });
+</script>
+
+
+
+
+
+<script>
+
+    var StatusChecker = {
+        interval: 2, // sec
+        timerId: {},
+        check: function (type) {
+            //clear timer
+            if (StatusChecker.timerId[type]) {
+                clearTimeout(StatusChecker.timerId[type]);
+                StatusChecker.timerId[type] = 0;
+            }
+            //do stuff
+            $.ajax({
+                type: "GET",
+                url: '/admin/Product/Status?type=' + type,
+                //data: { json: JSON.stringify(json) },
+                dataType: "json",
+
+                success: function (data) {
+                    if (data.message) {
+                        $('#loadzone4 .k-upload-status-total').html(data.message);
+                    }
+                    if (data.progress) {
+                        $('#loadzone4 .k-upload-status-total').append(' ' + data.progress + ' %');
+                    }
+                    if (data.next) {
+                        //check next
+                        StatusChecker.timerId[type] = setTimeout(function () { StatusChecker.check(type); }, StatusChecker.interval * 1000);
+
+                    } else {
+                        $('#loadzone4 .k-upload-status-total').append(' 100 %');
+                    }
+                    //END AJAX GET
+                },
+                error: function (data) {
+                    console.log(data);
+                },
+                complete: function (XMLHttpRequest, textStatus) {
+
+                }
+            });
+
+        },
+    };
+
+    $(document).ready(function () {
+        function onError4(e) {
+            $('#loadzone3 .k-upload-status-total').html("@RP.T("Admin.Product.Import.500Error")");
+            // console.log("Error (" + e + ") :: " + getFileInfo(e));
+        }
+        function onSuccess4(e) {
+            $('#importerrors4').html('');
+            if (e.response["success"] == "ok") {
+                //success
+                $('#loadzone4 .k-upload-status-total').html(e.response["message"] + '<span class="k-icon k-i-tick"></span>');
+                StatusChecker.check('ProductAdminImport');
+                if (e.response.errors) {
+                    $('#importerrors3').html(e.response.errors.replace(/(?:\r\n|\r|\n)/g, '<br />'));
+                }
+            } else {
+                //error
+                $('#loadzone4 .k-upload-status-total').html(e.response["message"]);
+            }
+        }
+        function getFileInfo4(e) {
+            return $.map(e.files, function (file) {
+                var info = file.name;
+
+                // File size is not available in all browsers
+                if (file.size > 0) {
+                    info += " (" + Math.ceil(file.size / 1024) + " KB)";
+                }
+                return info;
+            }).join(", ");
+        }
+        $("#files4").kendoUpload({
+            async: {
+                saveUrl: "/Admin/Product/ProductImportWithFlag",
+                //  removeUrl: "remove",
+                autoUpload: false
+            }
+,
+            error: onError4,
+            success: onSuccess4,
+            upload: function (e) {
+                console.log(e);
+                e.data = {
+                    EventID: 1,
+                    import: 'Import',
+
+
+                };
+            }
+, multiple: false
+        });
+    });
+</script>

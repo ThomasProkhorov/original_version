@@ -1,0 +1,17 @@
+﻿@model int
+@using System.Reflection
+@using System.Collections.Generic
+@using System.Linq
+@using System.ComponentModel.DataAnnotations
+@{
+    ViewBag.Title = RP.T("Admin.Views.Product.SkuReport.Title");
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutNoTree.cshtml";
+    string Lang = ViewBag.Lang;
+    int parntN = 1;
+}
+@for(var i=0;i<Model;i+=5000)
+{
+    <a class="k-button" href="@Url.Action("GetSkuReport", new { pos =i,limit=5000})">@RP.T("Admin.View.Product.SkuReport.DownloadPart") @parntN</a> <br/>
+parntN++;
+}
+

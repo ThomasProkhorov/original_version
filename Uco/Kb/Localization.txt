@@ -1,0 +1,15 @@
+ In View:
+
+@Html.R("Title")
+
+or for PartialView?
+
+@Html.R(VirtualPath, "Welcome")
+
+In Controler:
+
+LocalizationHelpers.GetLocalResource("~/Views/Account/LogOn.cshtml", "UsernameIncorrect")
+
+or
+
+LocalizationHelpers.GetGlobalResource("~/Views/Account/LogOn.cshtml", "UsernameIncorrect")

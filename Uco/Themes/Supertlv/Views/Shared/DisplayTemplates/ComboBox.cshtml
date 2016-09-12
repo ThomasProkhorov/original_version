@@ -1,0 +1,52 @@
+﻿@model string
+@using Kendo.Mvc.UI
+@using Kendo.Mvc.UI.Fluent
+
+@{
+    string segment = ViewData["segment00"] as string;
+   segment = "Category";
+    int ComboBoxNumber = 2;
+}
+
+
+@for (int i = 1; i <= ComboBoxNumber; i++)
+{
+    if (i == 1 && ComboBoxNumber == 1)
+    {
+        @(Html.Kendo().DropDownList()
+            .Name("ComboBox_" + i)
+            .Placeholder("הכל")
+            .SelectedIndex(0)
+                .DataBinding(binding => binding.Ajax().Select("_GetComboBox", "PagePart", new { segment = segment, level = i, ComboBox_0 = 0 }))
+        )
+    }
+    else if (i == 1)
+    {
+        @(Html.Kendo().DropDownList()
+            .Name("ComboBox_" + i)
+            .Placeholder("הכל")
+            .SelectedIndex(0)
+            .CascadeTo("ComboBox_" + (i + 1))
+                    .DataBinding(binding => binding.Ajax().Select("_GetComboBox", "PagePart", new { segment = segment, level = i, ComboBox_0 = 0 }))
+        )
+    }
+    else if (i == ComboBoxNumber)
+    {
+        @(Html.Kendo().DropDownList()
+            .Name("ComboBox_" + i)
+            .Placeholder("הכל")
+            .SelectedIndex(0)
+                    .DataBinding(binding => binding.Ajax().Select("_GetComboBox", "PagePart", new { segment = segment, level = i }))
+        )
+    }
+    else
+    {
+        @(Html.Kendo().DropDownList()
+            .Name("ComboBox_" + i)
+            .Placeholder("הכל")
+            .SelectedIndex(0)
+            .CascadeTo("ComboBox_" + (i + 1))
+                    .DataBinding(binding => binding.Ajax().Select("_GetComboBox", "PagePart", new { segment = segment, level = i }))
+        )
+    }
+}

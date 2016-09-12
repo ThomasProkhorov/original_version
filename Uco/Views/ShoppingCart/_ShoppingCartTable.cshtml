@@ -1,0 +1,95 @@
+﻿@model Uco.Models.Overview.ShoppingCartOverviewModel
+
+@if (Model.Items.Count() > 0)
+{
+    @* Do NOT Delete this !!!*@
+     <span class="dn sh_carttotalwithoutship" style="display:none; font-size:0px;" id="sh_carttotalmain">@Model.TotalStr</span>
+    @* Do NOT Delete this !!!*@
+    
+    
+    <table  class="shpng_cart2_tab shoppingCartProducts" width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+            <th align="center" valign="middle" class="tab_width1">&nbsp;</th>
+            <th align="right" valign="middle" class="tab_width2">@RP.T("Views.ShoppingCart.Index.ProductName")</th>
+            <th align="right" valign="middle" class="tab_width3">@RP.T("Views.ShoppingCart.Index.Manufacturer")</th>
+            <th align="center" valign="middle" class="tab_width4">@RP.T("Views.ShoppingCart.Index.PriceForEach")</th>
+            <th align="center" valign="middle" class="tab_width5">@RP.T("Views.ShoppingCart.Index.NumberOfUnits")</th>
+            <th align="center" valign="middle" class="tab_width6">@RP.T("Views.ShoppingCart.Index.ProductOption")</th>
+            <th align="center" valign="middle" class="tab_width7">@RP.T("Views.ShoppingCart.Index.Price")</th>
+            <th align="right" valign="middle" class="tab_width8">@RP.T("Views.ShoppingCart.Index.RowHeadNote")</th>
+            <th align="center" valign="middle" class="tab_width9">@RP.T("Views.ShoppingCart.Index.RowHeadDelete")</th>
+        </tr>
+        @for (var i = 0; i < Model.Items.Count(); i++)
+        {
+            var item = Model.Items[i];
+            bool shoDecimals = false;
+            if (!string.IsNullOrEmpty(item.MeasureUnit) && item.QuantityPriceType == Uco.Models.QuantityType.Default)
+            {
+                shoDecimals = true;
+            }
+    <tr id="productSKU_@item.SKU" data-productshopid="@item.ProductShopID" data-productid="@item.ID" data-productsku="@item.SKU" 
+           data-productname="@item.Name" class="shoping_cart2_tab_listing sh_cartitem" >
+        <td align="center" valign="middle" class="tab_width1"><a href="#!/@item.SKU/@item.ProductShopID">
+            <img src="@SF.GetImage(item.Image, 40, 50, true, true)" alt="" /></a></td>
+        <td align="right" valign="middle" class="tab_width2">
+        <a   href="#!/@item.SKU/@item.ProductShopID">
+            @item.Name</a>
+        </td>
+        <td align="right" valign="middle" class="tab_width3 shsku">@item.Manufacturer</td>
+        <td align="center" valign="middle" class="tab_width4 shPrice">@item.PriceStr</td>
+        <td align="center" valign="middle" class="tab_width5">
+            <table width="65" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td align="center" valign="middle" class="shoping_cart_minus">
+                        <a href="#" onclick="Shop.CartDecrease(this,event,@item.ID, 1);"></a>
+                    </td>
+                    <td align="center" valign="middle" class="shpng_qty_show">
+                        <input type="text" class="single-line"
+                               onblur="Shop.CartQuantKeyPress(this,{which : 13},@item.ID);"
+                               onkeypress="Shop.CartQuantKeyPress(this,event,@item.ID);"
+                               value="@(shoDecimals ? item.Quantity.ToString("0.00") : item.Quantity.ToString("0"))" id="textfield" name="Quantity">
+                    </td>
+                    <td align="center" valign="middle" class="shoping_cart_plus">
+                        <a href="#" onclick="Shop.CartIncreas(this,event,@item.ID, 1 );"></a>
+                    </td>
+                </tr>
+            </table>
+        </td>
+        <td align="center" valign="middle" class="tab_width6">
+            @if (item.Attributes.Count > 0)
+            {
+                <select name="ProductAttributeOptionID" class="drop_down" onchange="Shop.CartChangeAttribute(this,event,@item.ID);">
+                    @*<option value="0">@RP.T("Views.ShoppingCart.Index.Choose")</option>*@
+                    @foreach (var atr in item.Attributes)
+                    {
+                        string selected = "";
+                        if (atr.ID == item.ProductAttributeOptionID) { selected = "selected=\"selected\""; }
+                        <option value="@atr.ID" @selected>@atr.Name</option>
+                    }
+                </select>}
+        </td>
+        <td align="center" valign="middle" class="tab_width7">
+            <span class="price shUnitPrice">
+                @item.UnitPriceStr
+
+        </span>
+        <span style="cursor: pointer; @(string.IsNullOrEmpty(item.DiscountDescription) ? "display:none;" : "") " class="cartitemdiscount" title="@item.DiscountDescription"><img src="~/Content/DesignFiles/prdct_open_qstn_mark.png" alt="" /></span>
+    </td>
+    <td align="right" valign="middle" class="tab_width8 shAttributeDescription" data-productid="@item.ProductID">@item.Comments</td>
+    <td align="center" valign="middle" class="tab_width9"><a href="#" onclick="Shop.CartDelete(this,event,@item.ID);"><img src="/Content/DesignFiles/remove_icon1.png" alt=""></a></td>
+</tr>
+}
+    </table>
+}
+else
+{
+    @RP.T("ShoppingCart._CartTable.NoItems")
+}
+<div id="noteWindow" class="dn left_sec_in_form1">
+    <div>
+        <textarea class="multi-line" name="productNoteText" id="productNoteText" required data-required-msg="@RP.T("Views.Shop.Index.NoteTextRequired")"></textarea>
+        <div id="addProductNote" class="product_green_btn3" data-productid="">
+            <a href="javascript:void(0)">@RP.T("Views.Shop.Index.Save")</a>
+        </div>
+    </div>
+</div>

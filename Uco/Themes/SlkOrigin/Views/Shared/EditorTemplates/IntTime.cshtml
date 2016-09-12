@@ -1,0 +1,72 @@
+@model int  
+@{
+int hr = Model / 60;
+int mn = Model % 60;
+//string part ="AM";
+//if(hr>12)
+//{
+//hr-=12;
+//part="PM";
+//}
+//if(hr == 0){hr = 12;}
+var time = hr + ":" + mn;// +" " + part;
+}  
+<input type="hidden" id="@ViewData.TemplateInfo.HtmlFieldPrefix" name="@ViewData.TemplateInfo.HtmlFieldPrefix" value="@Model" />    
+<input id="@(ViewData.TemplateInfo.HtmlFieldPrefix)_str" name="@(ViewData.TemplateInfo.HtmlFieldPrefix)_str" value="@time" />
+<script>
+               
+    $("#@(ViewData.TemplateInfo.HtmlFieldPrefix)_str").kendoTimePicker({ format: "HH:mm" });
+    $("#@(ViewData.TemplateInfo.HtmlFieldPrefix)_str").change(
+function () {
+    
+   
+    var intTime = TimeToInt( $(this).val());;
+    $("#@(ViewData.TemplateInfo.HtmlFieldPrefix)").val(intTime);
+    $("#@(ViewData.TemplateInfo.HtmlFieldPrefix)").trigger("change");
+}
+);
+
+    $("#@(ViewData.TemplateInfo.HtmlFieldPrefix)").change(function () {
+        
+        var strtime = IntToTime( $(this).val());
+       $("#@(ViewData.TemplateInfo.HtmlFieldPrefix)_str").val(strtime);
+    });
+    function TimeToInt(strtime)
+    {
+      
+        var arr = strtime.split(":");
+        var intTime = parseInt(arr[0]) * 60;
+        var mnp = arr[1].split(" ");
+        var mn = parseInt(mnp[0]);
+        if (mnp[1] && mnp[1] == "AM") {
+            if (intTime >= 720) { intTime -= 720; }
+        }
+        if (mnp[1] && mnp[1] == "PM" && intTime < 720) {
+
+            intTime += 12 * 60;
+        }
+        intTime += mn;
+        return intTime;
+    }
+    function IntToTime(i) {
+        var hr = Math.floor(i / 60);
+        var mn = i % 60 ; if(mn<10){mn='0'+mn;}
+        var part ="AM";
+        if(hr>12)
+        {
+            hr-=12;
+            part="PM";
+        }
+        if(hr == 0){hr = 12;}
+        var time = hr + ":" + mn + " " + part;
+        return time;
+    }
+    setTimeout(function () {
+        if ($("#@(ViewData.TemplateInfo.HtmlFieldPrefix)").val() > 0) {
+
+            var strtime = IntToTime($("#@(ViewData.TemplateInfo.HtmlFieldPrefix)").val());
+            $("#@(ViewData.TemplateInfo.HtmlFieldPrefix)_str").val(strtime);
+        }
+    }, 200);
+   
+</script>

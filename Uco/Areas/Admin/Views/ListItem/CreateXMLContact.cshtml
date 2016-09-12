@@ -1,0 +1,14 @@
+﻿@model Uco.Models.XmlContact
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_ActionLayout.cshtml";
+}
+<h2>יצירת איש קשר</h2>
+@using (Html.BeginForm()) {
+    @Html.ValidationSummary(true)
+    @Html.EditorForModel()
+    @Html.Hidden("ParentID", (int)ViewBag.ParentID)
+    @Html.Hidden("ReturnUrl", ViewBag.ReturnUrl as string)
+    <p class="clear">
+        <input type="submit" class="k-button" value="שמור" /> @Html.ActionLink("חזרה לרשימה", "XmlCatalogs", new { ID = (int)ViewBag.ParentID, ReturnUrl = Url.Content("/Admin/Main/Edit/" + ViewBag.ParentID) })
+    </p>
+}

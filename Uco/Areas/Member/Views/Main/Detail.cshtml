@@ -1,0 +1,1000 @@
+﻿@using Uco.Models
+@model Order
+@{
+    ViewBag.Title = RP.T("Admin.Views.Order.Detail.Title");
+    Layout = "~/Areas/Member/Views/Shared/_LayoutNoTree.cshtml";
+    bool changedGlobal = LS.CurrentEntityContext.OrderNotes.Any(x => x.OrderID == Model.ID);
+}
+@helper EditorBox(string field)
+{
+    if (Model.OrderStatus == OrderStatus.New || Model.OrderStatus == OrderStatus.Paid)
+    {
+        <a href="javascript:void(0);" onclick="$('#editor@(field)').toggle();">@T("Admin.Order.Edit" + field)</a>
+        <div id="editor@(field)" class="dn cellwrap">
+            @Html.Editor(field)
+
+            <div style="margin-left:149px; margin-right:149px;">
+                <label for="OrderNote">@M("Order", "OrderNote"):</label> <br />
+                @Html.TextArea("OrderNote", new { @class = "k-textbox", onkeyup = "this.style.borderColor=null;" })
+                <br />
+                <a href="javascript:void(0);" class="k-button" onclick="OrderCellEditor.update(event,this,'@(field)',@Model.ID);">@T("Admin.Edit.Save")</a>
+            </div>
+
+        </div>
+    }
+}
+<script>
+    
+    var OrderCellEditor={
+        refreshInfo: function(){
+            // AjaxDetail
+            $.ajax({
+                type: "GET",
+                dataType: "html",
+                url: '@Url.Action("AjaxDetail", "Main", new { ID = Model.ID })',
+               // data: data,
+                cache: false,
+                error: function () { alert('Server error'); }
+            }).done(function (data) {
+                $('#detailcontent').html(data);
+            });
+        },
+        update:function(event,button,field,id)
+        {
+            var wrap = $(button).parents('.cellwrap:eq(0)');
+            var note = $.trim($('[name="OrderNote"]',wrap).val());
+            //if(!note)
+            //{
+            //    $('[name="OrderNote"]',wrap).css('border-color','#FF0000');
+            //    return;
+            //}
+            //  console.log(arguments);
+            //  console.log( $('[name="'+field+'"]',wrap).val() );
+            data = {ID:id ,Field: field, Value : $('[name="'+field+'"]',wrap).val()
+            ,OrderNote: note };
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: '@Url.Action("SaveCell","Main")',
+                data: data,
+                cache: false,
+                error: function () { alert('Server error'); }
+            }).done(function (data) {
+                if(data.result == 'ok')
+                {
+                    wrap.hide();
+                    OrderCellEditor.ShowLoading($('.editor-field'));
+                    setTimeout(function(){ OrderCellEditor.refreshInfo(); },100);
+                }else
+                {
+                    alert(data.message);
+                }
+            });
+
+        }
+        ,ShowLoading: function (container) {
+            if ($('.indicatorload', container).length == 0) {
+                if ($('td', container).length > 9) {
+                    $('td:eq(9)', container).css('position','relative').append('<div class="k-loading-mask indicatorload" style="width:100%;height:100%;top:0;"><span class="k-loading-text">Loading...</span><div class="k-loading-image"><div class="k-loading-color"></div></div></div>'
+
+                   );
+                } else {
+                    var checkpos = container.css('position');
+                    if (!checkpos || checkpos == 'static')
+                    {
+                        container.css('position','relative');
+                    }
+                    container.append('<div class="k-loading-mask indicatorload" style="width:100%;height:100%;top:0;"><span class="k-loading-text">Loading...</span><div class="k-loading-image"><div class="k-loading-color"></div></div></div>'
+
+                    );
+                }
+            }
+
+            $('.indicatorload', container).show();
+        },
+        HideLoading: function (container) {
+
+            $('.indicatorload', container).hide();
+        }
+    };
+</script>
+<h2>@RP.T("Admin.Views.Order.Detail.Number")@Model.ID</h2>
+ @(Html.Kendo().TabStrip()
+    .Name("TabStrip")
+    .Animation(false)
+    .Items(tabstrip =>
+    {
+
+        tabstrip.Add().Text(RP.S("Member.Order.MainTab")).Content(@<text>
+ <div id="detailcontent">
+<div id="errorwrap" class="message_green" style="display:none;"></div>
+
+
+
+<div class="editor-label"><label for="TotalCard">@M("Order", "FullName"):</label></div>
+<div class="editor-field">@Model.FullName </div>
+
+<div class="editor-label"><label for="TotalCard">@M("Order", "ShipAddress"):</label></div>
+<div class="editor-field">@Model.ShipAddress </div>
+
+<div class="editor-label"><label for="TotalCard">@M("Order", "Phone"):</label></div>
+<div class="editor-field">@Model.Phone </div>
+
+<div class="editor-label">
+    <label for="ShippingMethod">@M("Order", "ShippingMethod"):</label>
+</div>
+<div class="editor-field">
+    @Model.ShippingMethodHebrew
+
+</div>
+
+<div class="editor-label"><label for="TotalCard">@M("Order", "OrderStatus"):</label></div>
+<div class="editor-field">@RP.T("Enums." + Model.OrderStatus.ToString()) </div>
+
+<div class="editor-label"><label for="discount">@M("Order", "TotalDiscountAmount"):</label></div>
+<div class="editor-field" id="discount">
+    @ShoppingService.FormatPrice(Model.TotalDiscountAmount)
+    @EditorBox("TotalDiscountAmount")
+    @if (!string.IsNullOrEmpty(Model.TotalDiscountDescription))
+    {
+        <span>( @Html.Raw(Model.TotalDiscountDescription) )</span>
+    }
+</div>
+
+
+
+
+<div class="editor-label"><label for="TotalCard">@M("Order", "PaymentMethod"):</label></div>
+<div class="editor-field">@RP.T("Enums." + Model.PaymentMethod.ToString()) </div>
+
+@if (Model.PaymentMethod == PaymentMethod.Cash && Model.User != null)
+{
+    <div class="editor-label"><label for="TotalCard">@M("User", "ApprovedBySms"):</label></div>
+    <div class="editor-field">@RP.T("Model.User.ApprovedBySms." + Model.User.ApprovedBySms.ToString())</div>
+
+}
+
+
+
+<div class="editor-label"><label for="TotalCard">@M("Order", "TotalCard"):</label></div>
+<div class="editor-field" id="totalcard">
+    @ShoppingService.FormatPrice(Model.Total)
+@EditorBox("Total")
+</div>
+
+<div class="editor-label"><label for="shippingPrice">@M("Order", "ShippingPriceText"):</label></div>
+<div class="editor-field" id="shippingPrice">
+    @(Model.ShippingMethod == ShippingMethod.Courier ? ShoppingService.FormatPrice(Model.ShipCost) : ShoppingService.FormatPrice(0))
+@if (Model.ShippingMethod == ShippingMethod.Courier)
+{ 
+@EditorBox("ShipCost")
+}
+</div>
+
+
+    <div class="editor-label"><label for="shippingPrice">@M("Order", "ShipTime"):</label></div>
+    <div class="editor-field" id="shippingPrice">
+        @if (Model.ShippingMethod == ShippingMethod.Courier && Model.ShippOn)
+{
+       @Model.ShipTimeStr
+}
+        else if (Model.ShippingMethod == ShippingMethod.Manual)
+        {
+            @RP.T("Enums.Manual")
+        }
+        else
+        {
+            @RP.T("Admin.Views.Order.ShipImediatly")
+        }
+    </div>
+
+
+
+@if (Model.RefundAmount > 0)
+{
+    <div class="editor-label"><label for="TotalCard">@M("Order", "RefundAmount"):</label></div>
+    <div class="editor-field">@ShoppingService.FormatPrice(Model.RefundAmount) @EditorBox("RefundAmount")</div>
+}
+
+     </div>
+ </text>);
+
+     tabstrip.Add().Text(RP.S("Member.Order.ItemsTab")).Content(@<text>
+      
+<div id="OrderItemgrid"></div>
+ </text>);
+
+        tabstrip.Add().Text(RP.S("Admin.View.OrderNote.Title")).Content(@<text>
+ @*<h2>@RP.T("Admin.View.OrderNote.Title")</h2>*@
+<style>
+    #OrderNotegrid .k-grid-add {
+        display: none !important;
+    }
+</style>
+@Html.Action("Grid", "Generic", new { Filed = "OrderID", ID = Model.ID, model = "OrderNote" })
+
+  </text>);
+    }).SelectedIndex(0))
+<script>
+
+
+    var OrderItemStatusEnums  = {
+        @foreach( var en in Enum.GetValues(typeof(OrderItemStatus) ))
+        {
+            <text>@((int)en):'@RP.T("Enums."+en.ToString())', </text>
+
+        }
+
+    };
+
+    $(document).ready(function () {
+        /*
+        Docs
+        http://docs.telerik.com/kendo-ui/api/javascript/ui/grid
+        */
+
+
+        var gridLocal = function(){
+            if('messages' in kendo.ui.Grid.prototype.options){
+                return  kendo.ui.Grid.prototype.options.messages.commands.create;
+            }else{
+                return "Add new";
+            }
+        }
+
+
+        $("#OrderItemgrid").kendoGrid({
+            "toolbar": [   {name: "create"    ,text:gridLocal() }         ],
+            dataSource: {
+
+                type: "json",
+                transport: {
+                    "prefix": "",
+                    read: {
+                        url: "/Member/Main/_OrderItemAjaxRead",
+                        type: "POST",
+                        dataType: "json",
+                        // data: { filter:'ID~eq~3'  }
+                    },
+
+                    "update": {
+                        "url": "/Member/Manage/OrderItem/_AjaxUpdate"
+                    },
+
+                    "create": {
+                        "url": "/Member/Manage/OrderItem/_AjaxInsert"
+                    },
+                    "destroy": {
+                        "url": "/Member/Manage/OrderItem/_AjaxDelete"
+                    },
+                },
+
+                schema: {
+                    data: "Data",
+                    total: "Total",
+                    errors: "Errors",
+                    model: {
+                        "id": "ID",
+                        fields: {
+                            "ID": { "type": "number",defaultValue: 0  ,editable: false,},
+                            "OrderID": { "type": "number",defaultValue: 0 ,editable: false, },
+                            "ProductShopID": { "type": "number" ,defaultValue: 0 },
+                            "ProductShop": { "type": "object" ,editable: false,nullable: false,defaultValue:{Product:{Category:{Name:""}}} },
+                            "ProductAttributeOptionID": { "type": "number",defaultValue: 0  },
+                            "ProductAttributeOption": { "type": "object" ,editable: false,nullable: true, },
+                            "Price": { "type": "number" ,defaultValue: 0 ,editable: true },
+                            "Quantity": { "type": "number"  },
+                            "DiscountDescription":{"type":"string",editable: false},
+                            "UnitPrice": { "type": "number" ,defaultValue: 0 ,editable: true },
+                            "OrderItemStatus": { "type": "number",defaultValue: 0  },
+
+                            // "ID": {"type":"number" ,editable: false}
+                        }
+
+                    }
+                },
+                requestEnd: function(e) {
+
+                    var order = e.response.Additional;
+                    if(order)
+                    {
+                        $('#totalcash').html(order.Total.toFixed(2)+'₪');
+                        $('#totalcard').html(order.Total.toFixed(2)+'₪');
+                        console.log(order);
+                    }
+                    if (e.type == 'read')
+                    {
+                        if (e.response && e.response.Data) {
+                            for (var i in e.response.Data) {
+
+                                if (!e.response.Data[i].ProductShop) {
+                                    e.response.Data[i].ProductShop = {};
+                                }
+                                if (!e.response.Data[i].ProductShop.Product) {
+                                    e.response.Data[i].ProductShop.Product = {Name:"", SKU:""};
+                                }
+                                if (!e.response.Data[i].ProductShop.Product.Category) {
+                                    e.response.Data[i].ProductShop.Product.Category = { Name: "" };
+                                }
+                                console.log(e.response.Data[i]);
+                            }
+                        }
+                    }
+                },
+                pageSize: 50,
+                "error": error_handler,
+                "sync":function(e){ this.read(); },
+                "serverPaging": true,
+                "serverSorting": true,
+                "serverFiltering": true,
+                "serverGrouping": false,
+                "serverAggregates": true,
+
+                filter: { field: "OrderID", operator: "eq", value: @Model.ID }  ,
+                sort: [{ field: "ProductShop.OrderPosition", dir: "asc" }, ],
+                group: { field: "ProductShop.Product.Category.Name" },
+                "type": "aspnetmvc-ajax",
+            },
+            refresh: true,
+            //  detailTemplate: kendo.template($("#template").html()),
+            // detailInit: detailInit,
+            // dataBound: function () {
+            //this.expandRow(this.tbody.find("tr.k-master-row").first());
+            //   },
+            pageable: {
+                refresh: true,
+                // pageSizes: [10, 20, 50],
+                pageSize: 50
+            },
+
+            columns: [
+{ field: "ID",title: "@M("OrderItem", "ID")", sortable: false, filterable: false , hidden: true},
+{ field: "OrderID",title: "@M("OrderItem", "OrderID")", sortable: false,filterable: false,hidden: true,  },
+{ field: "ProductShop.Product.Image",title: "@M("Product", "Image")", sortable: false,filterable: false,
+    template:"# if (ProductShop && ProductShop.Product) { #  <img height=\"30px\" src=\"#: ProductShop.Product.Image #\" alt=\"alt\" /> # } #",
+    editor: function(tr,d){ $(tr).html(''); }},
+
+{ field: "ProductShop.Product.SKU",title: "@M("Product", "SKU")", sortable: false,filterable: false,template:"# if (ProductShop && ProductShop.Product) { #  #: ProductShop.Product.SKU # # } #", editor: function(tr,d){ $(tr).html(''); }},
+{ field: "ProductShopID",title: "@M("OrderItem", "ProductShop")", sortable: false,filterable: false,template:"# if (ProductShop && ProductShop.Product) { #  #: ProductShop.Product.Name # # } #",  editor: ' \
+ \
+ \
+<input id="ProductShopID"  name="ProductShopID" value="0"/> \
+ \
+<script> \
+    $(\'#ProductShopID\') \
+                            .kendoComboBox( \
+    { \
+        placeholder: "Select ", \
+        dataTextField: "Name", \
+        dataValueField: "ID", \
+ \
+        filter: "contains", \
+        minLength: 1, \
+        "autoBind": true, \
+        dataSource: { \
+            schema: { \
+                data: "Data", \
+                total: "Total", \
+                errors: "Errors",}, \
+            type: "json", \
+            serverFiltering: true, \
+            filter: [], \
+    change: function () { \
+                        }, \
+    transport: { \
+                "prefix": "", \
+                read: { \
+                    url: "/Member/Manage/ProductShop/_AjaxAutoComplete" \
+, \
+                    type: "POST", \
+                    data: function () { \
+                        var data = kendo.ui.ComboBox.requestData(\'#ProductShopID\'); \
+                         \
+                        /** data["filter"] = "SpecificationAttributeID~eq~1";  \
+                        console.log(data); \
+                        **/ \
+                        return data; \
+                    }, \
+                } \
+            } \
+        } \
+    }); \
+$(\'#ProductShopID\').change(function(){ \
+                            var combobox = $("#ProductAttributeOptionID").data("kendoComboBox"); \
+ \
+                            combobox.filter = "ProductShopID~eq~" + $(\'#ProductShopID\').val(); \
+                            combobox.text(""); \
+                            combobox.value(""); \
+ \
+                            combobox.one("dataBound", function () { \
+                                this.select(0); \
+                                $(\'#ProductAttributeOptionID\').val(this.value()); \
+                                this.trigger("change"); \
+                            }); \
+ \
+ \
+                            combobox.dataSource.read(); \
+ \
+ \
+ }); \
+</sc'+'ript> \
+ \
+', },
+{ field: "ProductAttributeOptionID",title: "@M("OrderItem", "ProductAttributeOption")", sortable: false,filterable: false,template:"# if (ProductAttributeOption && ProductAttributeOption.ProductAttribute) { #  #: ProductAttributeOption.ProductAttribute.Name # # } # # if (ProductAttributeOption && ProductAttributeOption.Name) { #  #: ProductAttributeOption.Name # # } #",  editor: ' \
+ \
+ \
+<input id="ProductAttributeOptionID"  name="ProductAttributeOptionID" value="0"/> \
+ \
+<script> \
+    $(\'#ProductAttributeOptionID\') \
+                            .kendoComboBox( \
+    { \
+        placeholder: "Select ", \
+        dataTextField: "Name", \
+        dataValueField: "ID", \
+ \
+        filter: "contains", \
+        minLength: 1, \
+        "autoBind": true, \
+        dataSource: { \
+            schema: { \
+                data: "Data", \
+                total: "Total", \
+                errors: "Errors",}, \
+            type: "json", \
+            serverFiltering: true, \
+            filter: [], \
+            transport: { \
+                "prefix": "", \
+                read: { \
+                    url: "/Member/Manage/ProductAttributeOption/_AjaxAutoComplete" \
+, \
+                    type: "POST", \
+                    data: function () { \
+                        var data = kendo.ui.ComboBox.requestData(\'#ProductAttributeOptionID\'); \
+                         \
+                         data["filter"] = "ProductShopID~eq~"+$(\'#ProductShopID\').val();  \
+                        \
+                         \
+                        return data; \
+                    }, \
+                } \
+            } \
+        } \
+    }); \
+ \
+</sc'+'ript> \
+ \
+', },
+
+//{ field: "ProductAttributeOption.Name",title: "Attribute",  sortable: false, filterable: false,
+//template:"# if (ProductAttributeOption && ProductAttributeOption.Name) { #  #: ProductAttributeOption.Name # # } #", editor: function(e,b){ $(e).html( b.model.ProductAttributeOption.Name);} },
+
+{ field: "Price",title: "@M("OrderItem", "Price")", sortable: false, filterable: false , },
+
+{ field: "Quantity",title: "@M("OrderItem", "Quantity")", sortable: false,filterable: false,editor:'<input data-val="true" data-val-number="The field Quantity must be a number." data-val-required="The Quantity field is required." id="Quantity" name="Quantity" type="number" value="0" /><script> \
+	jQuery(function(){jQuery("#Quantity").kendoNumericTextBox({"decimals":4});}); \
+</sc'+'ript> \
+<span class="field-validation-valid" data-valmsg-for="Quantity" data-valmsg-replace="true"></span>', },
+{ field: "UnitPrice",title: "@M("OrderItem", "UnitPrice")", sortable: false, filterable: false ,editor: ' ', },
+{ field: "DiscountDescription",title: "@M("OrderItem", "DiscountDescription")", sortable: false, filterable: false , },
+
+{ field: "OrderItemStatus",title: "@M("OrderItem", "OrderItemStatus")", sortable: false,filterable: false,
+    template:"# if (OrderItemStatusEnums[OrderItemStatus]) { # #: OrderItemStatusEnums[OrderItemStatus] # # } #",    editor: ' ', },
+        {field:"ProductShop.Product.Category.Name",title: "@M("Category", "Name")", sortable: false, filterable: false , hidden: true},
+@if(Model.OrderStatus == OrderStatus.New || (Model.OrderStatus == OrderStatus.Paid && (Model.PaymentMethod == PaymentMethod.Credit
+    || Model.PaymentMethod == PaymentMethod.CreditShopOwner
+    )))
+{
+    <text>
+   { "width": "340px",
+       "template":" "
+           +"# if (OrderItemStatus  == 1) { #"
+      +" <a onclick=\"gridAPI.accept(this,#= ID #);\" class=\"k-button gahide\">@RP.T("Member.Main.OrderDetail.Item.Accept")</a> "
+   +" <a onclick=\"gridAPI.outofstock(this,#= ID #);\" class=\"k-button gahide\">@RP.T("Member.Main.OrderDetail.Item.OutOfStock")</a> "
+   +"<a style=\"display:none;\" onclick=\"gridAPI.cancelRow(this,#= ID #);\" class=\"k-button gahide2cancel cancelrowa\">@RP.T("Member.Main.OrderDetail.Item.Cancel")</a>"
+   //+" <a onclick=\"gridAPI.edit(this,#= ID #);\" class=\"k-button \">@RP.T("Member.Main.OrderDetail.Item.ChangeProduct")</a> "
+        + " # } else if(ID > 0) { # "
+
+             +"# if (OrderItemStatus  == 2) { #"
+
+          +" <a onclick=\"gridAPI.changeDecision(this,#= ID #);\" class=\"k-button gahide gdecision\">@RP.T("Member.Main.OrderDetail.Item.ChangeDecision")</a> "
+    //   +" <a onclick=\"gridAPI.accept(this,#= ID #);\" class=\"k-button gahide ghidenow\">@RP.T("Member.Main.OrderDetail.Item.Accept")</a> "
+   +" <a onclick=\"gridAPI.outofstock(this,#= ID #);\" class=\"k-button gahide ghidenow\">@RP.T("Member.Main.OrderDetail.Item.OutOfStock")</a> "
+   +"<a style=\"display:none;\" onclick=\"gridAPI.cancelRow(this,#= ID #);\" class=\"k-button gahide2cancel cancelrowa\">@RP.T("Member.Main.OrderDetail.Item.Cancel")</a>"
+   //+" <a onclick=\"gridAPI.edit(this,#= ID #);\" class=\"k-button ghidenow\">@RP.T("Member.Main.OrderDetail.Item.ChangeProduct")</a>  "
+   +" <a onclick=\"gridAPI.cancelDecision(this,#= ID #);\" class=\"k-button gahide2cancel ghidenow\">@RP.T("Member.Main.OrderDetail.Item.Cancel")</a>"
+
+             +"# } else if (OrderItemStatus  == 3) { #"
+
+          +" <a onclick=\"gridAPI.changeDecision(this,#= ID #);\" class=\"k-button gahide gdecision\">@RP.T("Member.Main.OrderDetail.Item.ChangeDecision")</a> "
+    //   +" <a onclick=\"gridAPI.accept(this,#= ID #);\" class=\"k-button gahide ghidenow\">@RP.T("Member.Main.OrderDetail.Item.Accept")</a> "
+   +" <a onclick=\"gridAPI.accept(this,#= ID #);\" class=\"k-button gahide ghidenow\">@RP.T("Member.Main.OrderDetail.Item.Accept")</a> "
+   +"<a style=\"display:none;\" onclick=\"gridAPI.cancelRow(this,#= ID #);\" class=\"k-button gahide2cancel cancelrowa\">@RP.T("Member.Main.OrderDetail.Item.Cancel")</a>"
+   //+" <a onclick=\"gridAPI.edit(this,#= ID #);\" class=\"k-button ghidenow\">@RP.T("Member.Main.OrderDetail.Item.ChangeProduct")</a>  "
+   +" <a onclick=\"gridAPI.cancelDecision(this,#= ID #);\" class=\"k-button gahide2cancel ghidenow\">@RP.T("Member.Main.OrderDetail.Item.Cancel")</a>"
+
+
+             + "# } #"
+
+   + " # } else { # "
+
+   +"<a onclick=\"gridAPI.saveRow(this,#= ID #);\" class=\"k-button\" >@RP.T("Member.Main.OrderDetail.Item.Save")</a> "
+   +"<a onclick=\"gridAPI.cancelRow(this,#= ID #);\" class=\"k-button\" >@RP.T("Member.Main.OrderDetail.Item.Cancel")</a>"
+   +"  # } # "
+   +" <a onclick=\"gridAPI.edit(this,#= ID #);\" class=\"k-button\">@RP.T("Member.Main.OrderDetail.Item.ChangeProduct")</a>  "
+       +" <a onclick=\"gridAPI.remove(this,#= ID #);\" class=\"k-button\">@RP.T("Member.Main.OrderDetail.Item.Remove")</a> "
+   },
+    </text>
+}
+
+//{
+//    "width": "190px",
+//    "buttonType": "Image",
+//    "command": [
+//      {  "name": "edit",
+//          "buttonType": "Icon",
+//          "text": "Edit"
+//      },
+
+
+//{
+//    "name": "destroy",
+//    "buttonType": "Image",
+//    "text": "Delete"
+//},
+
+//    ]
+//},
+
+    ],
+            //   height: 600,
+            "scrollable": false,
+    filterable: true,
+    sortable: true,
+    "editable": {
+        "confirmation": "Are you sure you want to delete this record?",
+        "confirmDelete": "Delete",
+        "cancelDelete": "Cancel",
+        "mode": "inline",
+        "create": true,
+        "update": true,
+        "destroy": true
+    },
+
+
+
+    });
+
+
+    var OrderItemgrid = $("#OrderItemgrid").data('kendoGrid');
+    OrderItemgrid.dataSource.transport.parameterMap = function(data,type){
+
+
+        if(type != "read")
+        {
+            for(var i in data)
+            {
+                //console.log(Object.prototype.toString.call( data[i] ));
+                if( Object.prototype.toString.call( data[i] ) === '[object Object]' ) {
+                    delete data[i];
+                }
+                if( Object.prototype.toString.call( data[i] ) === '[object Array]' ) {
+                    delete data[i];
+                }
+                if( Object.prototype.toString.call( data[i] ) === '[object Date]' ) {
+                    data[i] = kendo.toString(kendo.parseDate(data[i]), "G");// Date.parse(data[i]);
+                }
+                //if(i == 'UserID' && !data[i]){
+                //    data[i]=
+                // }
+                //@ViewBag.AdditionalFilterField", operator: "eq", value: 2
+
+                if(i == 'OrderID')
+                {
+                    data[i] = @Model.ID ;
+                }
+
+                if(i in OrderItemgrid.dataSource.options.schema.model.fields)
+                {
+                    var model = OrderItemgrid.dataSource.options.schema.model.fields[i];
+                    if(!data[i] && 'defaultValue' in model)
+                    {
+
+                        data[i] = model.defaultValue;
+                    }
+                }
+            }
+        }
+
+        kendo.data.transports["aspnetmvc-ajax"](data);
+        data = new kendo.data.transports["aspnetmvc-ajax"]({ prefix: "" }).parameterMap(data, type);
+        //  console.log(data);
+        return data;
+    }
+
+    function error_handler(e) {
+
+        if (e.errors) {
+            e.preventDefault();   // cancel grid rebind if error occurs
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            alert(message);
+        }
+    }
+    function detailInit(e) {
+        var detailRow = e.detailRow;
+        console.log(e);
+
+
+    }
+
+    });
+    var gridAPI = {
+        changeDecision:function(e,id){
+            var wrap = $(e).parents('tr:eq(0)');
+            $('.ghidenow',wrap).show();
+            $('.gdecision',wrap).hide();
+        },
+        cancelDecision:function(e,id){
+            var wrap = $(e).parents('tr:eq(0)');
+            $('.ghidenow',wrap).hide();
+            $('.gdecision',wrap).show();
+        },
+        edit:function(e,id){
+            var grid = $("#OrderItemgrid").data('kendoGrid');
+            $('.cancelrowa').hide();
+            $('.gahide').hide();
+
+            grid.editRow($(e).parents('tr:eq(0)'));
+            $(e).attr('onclick','gridAPI.saveRow(this,'+id+');').text('@RP.T("Member.Main.OrderDetail.Item.Save")');
+            $('.gahide2cancel').hide();
+            $('.cancelrowa', $(e).parents('tr:eq(0)')).show();
+        },
+        cancelRow:function(e,id){
+            var grid = $("#OrderItemgrid").data('kendoGrid');
+            grid.cancelChanges();
+            $('.gahide').show();
+            $('.ghidenow').hide();
+        },
+        saveRow:function(e,id){
+            var note = $.trim(prompt('Please write note'));
+            // if(note)
+            //{
+            var grid = $("#OrderItemgrid").data('kendoGrid');
+            var data = grid.dataSource.get(id);
+            data.set('OrderItemStatus', 4);
+            grid.saveRow();
+            $('.gahide').show();
+            $('.ghidenow').hide();
+
+            //adding note
+            // if(note)
+            // {
+            if(!note)
+            {
+                note = '@RP.S("Member.OrderNote.DefaultMessage").Replace("'","`")';
+            }
+            var grid = $("#OrderNotegrid").data('kendoGrid');
+            var productName = data.ProductShopID;
+            var status = '@RP.S("Admin.Common.Added")';
+            if(data.ProductShop && data.ProductShop.Product)
+            {
+                productName = data.ProductShop.Product.Name;
+                status = '@RP.S("Admin.Common.Changed")';
+            }else if( $('#OrderItemgrid [name=ProductShopID_input]').length > 0)
+            {
+                productName = $('#OrderItemgrid [name=ProductShopID_input]').val();
+            }
+            grid.dataSource.add({Note:note, CreateDate: new Date()
+                ,Field: productName + ' @RP.M("OrderItem", "Price"): '
+                            +data.Price+', @RP.M("OrderItem", "Quantity"): '
+                            +data.Quantity+', @RP.M("OrderItem", "UnitPrice"): '+data.UnitPrice
+                        , OrderID : @Model.ID,NewValue: status, OldValue: '' });
+            grid.saveChanges();
+            // }
+            // }else{
+            //     alert('Note required');
+            // }
+            OrderCellEditor.ShowLoading($('.editor-field'));
+            setTimeout(function(){ OrderCellEditor.refreshInfo(); },100);
+        },
+        remove:function(e,id){
+            if(confirm('Are you sure ?'))
+            {
+                var note = $.trim(prompt('Please write note'));
+                //if(note)
+                //{
+                var grid = $("#OrderItemgrid").data('kendoGrid');
+                var data = grid.dataSource.get(id);
+                grid.dataSource.remove(data);
+                // data.set('OrderItemStatus', 2);
+                grid.saveChanges();
+
+                //adding note
+                var grid = $("#OrderNotegrid").data('kendoGrid');
+                grid.dataSource.add({Note:note, CreateDate: new Date(),Field: data.ProductShop.Product.Name
+                    , OrderID : @Model.ID,NewValue: '@RP.S("Admin.Common.Deleted")', OldValue: data.ProductShop.Product.Name });
+                grid.saveChanges();
+                // }else{
+                //    alert('Note required');
+                // }
+                OrderCellEditor.ShowLoading($('.editor-field'));
+                setTimeout(function(){ OrderCellEditor.refreshInfo(); },100);
+            }
+        },
+        accept:function(e,id){
+            var grid = $("#OrderItemgrid").data('kendoGrid');
+            var data = grid.dataSource.get(id);
+            data.set('OrderItemStatus', 2);
+            grid.saveChanges();
+            OrderCellEditor.ShowLoading($('.editor-field'));
+            setTimeout(function(){ OrderCellEditor.refreshInfo(); },100);
+        },
+        outofstock:function(e,id){
+            var grid = $("#OrderItemgrid").data('kendoGrid');
+            var data = grid.dataSource.get(id);
+            data.set('OrderItemStatus', 3);
+            grid.saveChanges();
+            OrderCellEditor.ShowLoading($('.editor-field'));
+            setTimeout(function(){ OrderCellEditor.refreshInfo(); },100);
+        },
+        Reject:function(orderID){
+            if(confirm("@RP.T("Member.Order.Reject.AreYouSure")"))
+            {
+                var order = {ID : orderID };
+                gridAPI.SendInfo(order,"/Member/Main/OrderReject");
+            }
+        },
+        Missing:function(orderID){
+            if(confirm("@RP.T("Member.Order.Missing.AreYouSure")"))
+            {
+                var order = {ID : orderID };
+                gridAPI.SendInfo(order,"/Member/Main/OrderMissing");
+            }
+        },
+        Confirm:function(orderID){
+            if(confirm("@RP.T("Member.Order.Confirm.AreYouSure")"))
+            {
+                var order = {ID : orderID };
+                gridAPI.SendInfo(order,"/Member/Main/OrderConfirm");
+            }
+        },
+        ConfirmAndCharge:function(orderID){
+            if(confirm("@RP.T("Member.Order.ConfirmAndCharge.AreYouSure")"))
+            {
+                var order = {ID : orderID };
+                gridAPI.SendInfo(order,"/Member/Main/OrderConfirmAndCharge");
+            }
+        },
+
+        OrderSent:function(orderID){
+            if(confirm("@RP.T("Member.Order.Sent.AreYouSure")"))
+            {
+                var order = {ID : orderID };
+                gridAPI.SendInfo(order,"/Member/Main/OrderSent");
+            }
+        },
+        PayByPhone:function(orderID){
+            $('#payguardwindow').html('<iframe src="@Url.Action("_PayCreditStandart", "Checkout", new { area = string.Empty, ID = Model.ID })" width="100%" height="500" align="left">\
+             @RP.T("Common.Error.YouBrowserDontSupportIframes") \
+         </iframe>');
+            $('#payguardwindow').data("kendoWindow").center().open();
+        },
+        OrderPartialRefund:function(orderID){
+
+            $('#refundwindow').data("kendoWindow").center().open();
+
+        },
+        OrderPartialRefundAction:function(orderID)
+        {
+            var amount = $('#refundamount').val();
+            if(!amount || amount <= 0) {
+                alert('Please enter amount');
+                return;
+            }
+            var order = {ID : orderID,
+                Amount: amount};
+            $('#refundwindow').data("kendoWindow").close();
+            gridAPI.SendInfo(order,"/Member/Main/OrderPartialRefund");
+        },
+        OrderRefund:function(orderID){
+            $('#refundwindowconfirm').data("kendoWindow").center().open();
+        },
+        OrderRefundCancel:function(orderID){
+            $('#refundwindowconfirm').data("kendoWindow").close();
+        },
+        OrderRefundAction:function(orderID){
+            var order = {ID : orderID };
+            gridAPI.SendInfo(order,"/Member/Main/OrderRefund");
+            $('#refundwindowconfirm').data("kendoWindow").close();
+        },
+        OrderDelivered:function(orderID){
+            if(confirm("@RP.T("Member.Order.Delivered.AreYouSure")"))
+            {
+                var order = {ID : orderID };
+                gridAPI.SendInfo(order,"/Member/Main/OrderDelivered");
+            }
+        },
+        SendInfo:function(data,url)
+        { $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: url,
+            data: data,
+            cache: false,
+            error: function () { alert('Server error'); }
+        }).done(function (data) {
+            if (data.result == "ok") {
+                $('#errorwrap').show().html(data.message);
+                setTimeout(function(){ OrderCellEditor.refreshInfo(); },700);
+            } else {
+                $('#errorwrap').show().html(data.message);
+            }
+        });
+        },
+    };
+
+</script>
+<style>
+    .ghidenow {
+        display: none;
+    }
+</style>
+<p class="clear">
+    @if (Model.OrderStatus == OrderStatus.New || Model.OrderStatus == OrderStatus.Paid)
+    {
+        <button class="k-button pstooltip" title="@RP.T("Member.Main.OrderDetail.Button.RejectTooltip")" onclick="gridAPI.Reject(@Model.ID);">@RP.T("Member.Main.OrderDetail.Button.Reject")</button>
+
+        @*<button class="k-button pstooltip" title="@RP.T("Member.Main.OrderDetail.Button.SendMissingTooltip")" onclick="gridAPI.Missing(@Model.ID);">@RP.T("Member.Main.OrderDetail.Button.SendMissing")</button>*@
+        if ((Model.PaymentMethod == PaymentMethod.Credit || Model.PaymentMethod == PaymentMethod.CreditShopOwner)
+             && Model.OrderStatus == OrderStatus.Paid
+            )
+        {
+            <button class="k-button pstooltip" title="@RP.T("Member.Main.OrderDetail.Button.AcceptAndChargeCreditTooltip")"
+                    onclick="gridAPI.ConfirmAndCharge(@Model.ID);">
+                @RP.T("Member.Main.OrderDetail.Button.AcceptAndChargeCredit")
+                </button>
+        }
+        else if (Model.OrderStatus != OrderStatus.Paid && (Model.PaymentMethod == PaymentMethod.ByPhone 
+        || Model.PaymentMethod == PaymentMethod.Cash))
+        {
+            <button class="k-button pstooltip" title="@RP.T("Member.Main.OrderDetail.Button.AcceptTooltip")"
+                    onclick="gridAPI.Confirm(@Model.ID);">
+                @RP.T("Member.Main.OrderDetail.Button.Accept")
+                </button>
+        }
+    }
+    @if (Model.OrderStatus == OrderStatus.Accepted)
+    {
+        <button class="k-button pstooltip" title="@RP.T("Member.Main.OrderDetail.Button.SentTooltip")" onclick="gridAPI.OrderSent(@Model.ID);">@RP.T("Member.Main.OrderDetail.Button.Sent")</button>
+
+    }
+    @if (Model.OrderStatus == OrderStatus.Sent)
+    {
+        <button class="k-button pstooltip" title="@RP.T("Member.Main.OrderDetail.Button.DeliveredTooltip")" onclick="gridAPI.OrderDelivered(@Model.ID);">@RP.T("Member.Main.OrderDetail.Button.Delivered")</button>
+
+    }
+    @if (Model.OrderStatus == OrderStatus.Delivered && Model.RefundAmount < Model.Total)
+    {
+        <div id="refundwindow" style="display:none;">
+            <div class="center_div">
+                @{
+        ViewData.TemplateInfo.HtmlFieldPrefix = "refundamount";
+                }
+                @(Html.Kendo().CurrencyTextBox()
+      .HtmlAttributes(new { id = "refundamount" })
+      .Min(0)
+                )
+                @{
+        ViewData.TemplateInfo.HtmlFieldPrefix = "";
+                }
+
+
+            </div>
+            <br />
+            <div class="center">
+
+
+                <button class="k-button pstooltip" title="@RP.T("Member.Main.OrderDetail.Button.PartialRefundTooltip")" onclick="gridAPI.OrderPartialRefundAction(@Model.ID);">@RP.T("Member.Main.OrderDetail.Popup.Button.Refund")</button>
+            </div>
+        </div>
+        <div id="refundwindowconfirm" style="display:none;">
+            <div>@RP.T("Member.Main.OrderDetail.RefundConfirm.AreYouSure")</div>
+            <div class="center">
+
+
+                <button class="k-button pstooltip" title="@RP.T("Member.Main.OrderDetail.Button.RefundTooltip")" onclick="gridAPI.OrderRefundAction(@Model.ID);">@RP.T("Member.Main.OrderDetail.Popup.Button.Refund")</button>
+                <button class="k-button" onclick="gridAPI.OrderRefundCancel(@Model.ID);">@RP.T("Member.Main.OrderDetail.Button.Cancel")</button>
+            </div>
+        </div>
+
+
+
+
+
+        <script>
+            $('#refundwindow').kendoWindow({
+                width: "360px",
+                title: "@RP.T("Member.Main.OrderDetail.Refund.Title")",
+                actions: [
+                   "Close"
+                ],
+                draggable: false,
+                modal: true,
+
+            });
+            $('#refundwindowconfirm').kendoWindow({
+                width: "420px",
+                title: "@RP.T("Member.Main.OrderDetail.Refund.Title")",
+                actions: [
+                   "Close"
+                ],
+                draggable: false,
+                modal: true,
+
+            });
+
+        </script>
+        <button class="k-button pstooltip" title="@RP.T("Member.Main.OrderDetail.Button.RefundTooltip")" onclick="gridAPI.OrderRefund(@Model.ID);">@RP.T("Member.Main.OrderDetail.Button.Refund")</button>
+        <button class="k-button pstooltip" title="@RP.T("Member.Main.OrderDetail.Button.PartialRefundTooltip")" onclick="gridAPI.OrderPartialRefund(@Model.ID);">@RP.T("Member.Main.OrderDetail.Button.PartialRefund")</button>
+    }
+
+    @if (Model.OrderStatus == OrderStatus.New || (Model.OrderStatus == OrderStatus.Paid && changedGlobal))
+    {
+        <button class="k-button pstooltip" title="@RP.T("Member.Main.OrderDetail.Button.PayByCreditTooltip")"
+                onclick="gridAPI.PayByPhone(@Model.ID);">
+            @RP.T("Member.Main.OrderDetail.Button.PayByCredit")
+            </button>
+        if (Model.OrderStatus == OrderStatus.Paid && changedGlobal)
+        {
+            <span>@RP.T("Member.Main.OrderDetail.Button.PayByCreditWarning")*</span>
+        }
+        <div id="payguardwindow" style="display:none;">
+
+        </div>
+        <script>
+            $('#payguardwindow').kendoWindow({
+                width: "710px",
+                title: "@RP.T("Member.Main.OrderDetail.PayGuard.Title")",
+                actions: [
+                   "Close"
+                ],
+                draggable: false,
+                modal: true,
+
+            });
+
+
+        </script>
+    }
+</p>
+<script>
+
+    $('.pstooltip').poshytip({
+        className: 'tip-twitter',
+        showTimeout: 1,
+        alignTo: 'target',
+        alignX: 'center',
+        offsetY: 5,
+        allowTipHover: false,
+        fade: false,
+        slide: false
+    });
+
+</script>
+
+
+@*@Html.Partial("~/Views/Generic/_Grid.cshtml", new OrderNote())*@
+
+<p class="clear">
+
+    @Html.ActionLink(@RP.T("Admin.Views.Command.BackToList").ToString(), "Index")
+</p>
+

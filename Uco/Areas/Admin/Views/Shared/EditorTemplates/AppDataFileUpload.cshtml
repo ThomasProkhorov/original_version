@@ -1,0 +1,46 @@
+@model System.String
+@Html.TextBox("", ViewData.TemplateInfo.FormattedModelValue.ToString(), new { @class = "text-box single-line ltr al file-upload attachments_" + ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty) })
+@(Html.Kendo().Upload()
+    .Name("attachments_" + ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))
+    .Multiple(false)
+    .Async(async => async
+        .Save("SaveApp_Data", "Upload")
+        .Remove("RemoveApp_Data", "Upload")
+        .AutoUpload(true)
+    )
+    .Events(events => events.Success("OnSuccess_" + ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty)))
+    .HtmlAttributes(new { @class = "file-upload-box" })
+)
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        OnLoad_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))();
+    });
+
+    function OnSuccess_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))(e) {
+        if (e.operation == "upload") {
+            $(".attachments_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))").attr("value", getFileInfo(e));
+        }
+        else if (e.operation == "remove") {
+            $(".attachments_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))").attr("value", "");
+        }
+
+    }
+
+    var PARAM_NAME = "attachments";
+    function OnLoad_@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))() {
+        var uploadElement = $("input", this).attr("name", PARAM_NAME);
+        setTimeout(function () {
+            uploadElement.data("tUpload").name = PARAM_NAME;
+        }, 0);
+    }
+
+    function getFileInfo(e) {
+        return $.map(e.files, function (file) {
+            var info = file.name;
+            return info;
+        }).join(", ");
+    }
+</script>
+

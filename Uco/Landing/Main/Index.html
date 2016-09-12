@@ -1,0 +1,687 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta property="og:title" content="׳סל קניות׳- משלוחים בקטנה, מהחנויות בשכונה">
+    <meta property="og:image" content="http://www.slk.co.il/landing/main/Content/DesignFiles/share.jpg">
+    <meta property="og:url" content="http://www.slk.co.il/landing/main/index.html">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width">
+
+    <meta property="og:description" content="להזמין מבתי העסק המועדפים עליך, בשכונה שלך. ">
+    <meta name="description"
+          content="ב'סל קניות' מזמינים משלוחים עד הבית מהמינימרקט השכונתי, מהמכבסה בשכונה, מהירקנייה שליד הבית, מהקצביה שברחוב ממול, מחנות בע״ח שהכלב אוהב, מחנות אלכוהול ומשקאות האהובה ועוד אין מינימום הזמנה ויש משלוחים בחינם" />
+    <meta name="keywords" content="קניות ומשלוחים אונליין, מכולת באינטרנט, הזמנת מצרכים תוך שעתיים, מכבסות, חנות דגים, קצבייה, אלכהל ומשקאות" />
+
+
+    <title>׳סל קניות׳- משלוחים בקטנה, מהחנויות בשכונה</title>
+
+    <link href="Content/site.css?v=4" rel="stylesheet" type="text/css">
+    <link href="Scripts/pstooltip/pstooltip.css" rel="stylesheet" type="text/css">
+    <link href="Scripts/jQuery.mmenu-master/dist/css/jquery.mmenu.all.css" rel="stylesheet" />
+    <script src="Scripts/jquery-1.10.2.js"></script>
+    <script src="Scripts/pstooltip/pstooltip.js"></script>
+    <script type="text/javascript" src="Scripts/css_browser_selector.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true&libraries=places&language=iw"></script>
+    <script src="Scripts/jQuery.mmenu-master/dist/js/jquery.mmenu.min.all.js"></script>
+    <script src="/Scripts/Custum/shopapi.js"></script>
+    <link rel="stylesheet" href="/Content/bootstrap.min.css" media="screen">
+    <link rel="stylesheet" href="/Content/stylemodal.css" media="screen">
+    <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/1.5.2/css/ionicons.min.css" media="screen">
+    <script src="/Scripts/bootstrap.min.js"></script>
+    <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 7]> <html class="ie6"> <![endif]-->
+    <!--[if IE 7]>    <html class="ie7"> <![endif]-->
+    <!--[if IE 8]>    <html class="ie8"> <![endif]-->
+    <!--[if IE 9]>    <html class="ie9"> <![endif]-->
+
+    <script type="text/javascript">
+        var geocoder = new google.maps.Geocoder();
+        var Latitude, Longitude;
+        var CookiesDataObject = {};
+
+        $(document).ready(function () {
+            GetCookies();
+            Init();
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: "/Account/IsLogined",
+                cache: false,
+                error: function () { }
+            }).done(function (data) {
+                if (data) {
+                    Shop.isLogined = true;
+                    $('#loginlink').attr('href', '/Profile/Index')
+                    .attr('onclick', '');
+                    $('#loginlinkmobile').attr('href', '/Profile/Settings')
+                   .attr('onclick', '');
+                }
+            });
+
+
+            $("#my-menu").mmenu({
+                extensions: ["theme-dark"],
+                offCanvas: {
+                    position: "right",
+                    zposition: "front",
+                    pageNodetype: "section"
+                },
+                navbar: {
+                    title: "תפריט"
+                }
+            });
+            ////////    search close button
+            $(".close_btn").on("click", function () {
+                $("#AddressMap").val("");
+            });
+            /////
+            $(".headr_midd_nav ul li").on("click", function (event) {
+                event.preventDefault();
+                $(".headr_midd_nav ul li").each(function () {
+                    $(this).removeClass("current");
+                });
+                $("#shopType").val($(this).attr("data-id"));
+                $(this).addClass("current");
+            });
+            window.addressTyped = '';
+            $("#AddressMap").keyup(function () {
+                window.addressTyped = $("#AddressMap").val();
+
+            });
+            $("#AddressMap").keypress(function (event) {
+                if (event.keyCode == 13) {
+                    $("#submit_btn").focus();
+                    setTimeout(function () { $("#submit_btn").click(); }, 50)
+                    return false;
+                }
+            });
+            $("#submit_btn").on("click", function () {
+                var addressValue = $("#AddressMap").val();
+                //if (!addressValue.match(/^(?=.*\d).*$/)) {
+                //     alert("אנא הכנס מספר בית");
+                //     return false;
+                //  }
+                if (addressValue == "") {
+                    alert("הכנס כתובת");
+                    return false;
+                }
+                ga('send', 'event', 'Landing', 'shopButton', addressValue);
+                getAddr(addressValue, function (status, results) {
+                    if (status == 'ok') {
+                        Latitude = results[0].geometry.location.lat();
+                        Longitude = results[0].geometry.location.lng();
+                        if (Latitude != null && Longitude != null) {
+                            RedirectToUrl();
+                        }
+                    } else {
+                        alert("לא מצליח למצוא את הכתובת: " + results);
+                    }
+                });
+            });
+
+            $(".nav_slider_right_f_m").on("click", function () {
+                $(".headr_midd_nav ul li").eq(0).appendTo($(".headr_midd_nav ul").last());
+                $(".headr_midd_nav ul li").removeClass("current");
+                $(".headr_midd_nav ul li").eq(0).addClass("current");
+                $("#shopType").val($(".headr_midd_nav ul li").attr("data-id"));
+            });
+
+            $(".nav_slider_left_f_m").on("click", function () {
+                $(".headr_midd_nav ul li").last().prependTo($(".headr_midd_nav ul").first());
+                $(".headr_midd_nav ul li").removeClass("current");
+                $(".headr_midd_nav ul li").eq(0).addClass("current");
+                $("#shopType").val($(".headr_midd_nav ul li").attr("data-id"));
+            });
+
+
+            var data = $(".scooter_part").css('background-position').split(",");
+            var first = data[0].split(' ');
+            var firstX = first[0].split("px");
+
+            var second = data[1].split(' ');
+            var secondX = second[1].split("px");
+
+            var _x = firstX[0];
+            var _x2 = secondX[0]
+            var x1 = parseInt(_x)
+            var x2 = parseInt(_x2)
+            $(window).scroll(function () {
+                if ($(this).scrollTop() >= 0) {
+                    var x = $(this).scrollTop();
+                    var pr = (x / 10) + 33;
+                    if (pr <= 100) {
+                        $(".scooter_part").css('background-position', pr + '%' + ' ' + first[1] + ',' + ((-x / 8) + x2) + 'px' + ' ' + second[2]);
+                    }
+                } else {
+
+                }
+            });
+            $(document).ready(function () {
+                if ($(this).scrollTop() >= 0) {
+                    var x = $(this).scrollTop();
+                    var pr = (x / 10) + 33;
+                    if (pr <= 100) {
+                        $(".scooter_part").css('background-position', pr + '%' + ' ' + first[1] + ',' + ((-x / 8) + x2) + 'px' + ' ' + second[2]);
+                    }
+                } else {
+
+                }
+            });
+
+            $('.tooltip').poshytip({
+                className: 'tip-green',
+                showTimeout: 1,
+                alignTo: 'target',
+                alignX: 'inner-left',
+                offsetY: 5,
+                offsetX: 50,
+                allowTipHover: true,
+                fade: false,
+                slide: false
+            });
+
+        });
+
+
+
+        function RedirectToUrl() {
+            var address = $("#AddressMap").val();
+            createCookie("Address", address, 30);
+            createCookie("Latitude", Latitude, 30);
+            createCookie("Longitude", Longitude, 30);
+
+            $.ajax({
+                type: "Post",
+                crossDomain: true,
+                url: "/Shop/LandingSelectShop",
+                data: { shopType: $("#shopType").val(), address: address, addressTyped: window.addressTyped, Latitude: Latitude, Longitude: Longitude },
+                async: false,
+                success: function (data) {
+                    if (data == "noshop" || data == "/c/noshop") {
+                        var _atpopq = window._atpopq || (window._atpopq = []);
+                        window._atpopobj = {};
+                        if (!_atpopq.loaded) {
+                            var atpopjs = document.createElement('script');
+                            atpopjs.type = 'text/javascript';
+                            atpopjs.async = true;
+                            atpopjs.src = '//cdn-media.web-view.net/popups/lib/v1/loader.min.js';
+                            var s = document.getElementsByTagName('script')[0];
+                            s.parentNode.insertBefore(atpopjs, s);
+                            _atpopq.loaded = true;
+                        }
+                        _atpopq.push(['UserId', 'xfzts2dh']);
+                        _atpopq.push(['PopupId', 'x3fsa2']);
+                        _atpopq.push(['Address', address]);
+                        _atpopq.push(['Latitude', Latitude]);
+                        _atpopq.push(['Longitude', Longitude]);
+                        $('.bl-content-item-unremovable:eq(0)')
+                            .append('<input data-field-type="text" data-field-source="Address" value="' + address + '" type="hidden">');
+                        console.log(_atpopq);
+                        _atpopq.push(['OnEventCallback', 'handleATPopupEvent']);
+                    }
+                    else {
+                        $(location).attr('href',
+                            //'http://www.slk.co.il' +
+                            data);
+                    }
+                }
+
+            });
+        }
+
+        //Sample event handler function
+        function handleATPopupEvent(ev, args) {
+            switch (ev) {
+                case 'display':
+                    //Do this when the popup is displayed
+                    break;
+                case 'close':
+                    //Do this when the popup gets closed by the user
+                    break;
+                case 'submit':
+                    //Do this when popup gets submitted and the user doesn't get redirected to a URL
+                    break;
+            }
+        }
+
+        function GetCookies() {
+            CookiesDataObject.address = getCookie("Address");
+            CookiesDataObject.latitude = getCookie("Latitude");
+            CookiesDataObject.longitude = getCookie("Longitude");
+            $("#AddressMap").val(CookiesDataObject.address);
+        }
+
+        var createCookie = function (name, value, days) {
+            var expires;
+            if (days) {
+                var date = new Date();
+                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                expires = "; expires=" + date.toGMTString();
+            }
+            else {
+                expires = "";
+            }
+            document.cookie = name + "=" + value + expires + "; path=/";
+        }
+
+        function getCookie(c_name) {
+            if (document.cookie.length > 0) {
+                c_start = document.cookie.indexOf(c_name + "=");
+                if (c_start != -1) {
+                    c_start = c_start + c_name.length + 1;
+                    c_end = document.cookie.indexOf(";", c_start);
+                    if (c_end == -1) {
+                        c_end = document.cookie.length;
+                    }
+                    return unescape(document.cookie.substring(c_start, c_end));
+                }
+            }
+            return "";
+        }
+
+        getAddr = function GetGeocode(v, fun) {
+
+            var cur_val = v;
+
+            geocoder.geocode({ 'address': cur_val }, function (results, status) {
+                if (status == google.maps.GeocoderStatus.OK) {
+                    fun('ok', results);
+                }
+                else {
+                    fun('error', status);
+                }
+            });
+
+        }
+
+
+        function Init() {
+            if (CookiesDataObject && CookiesDataObject.latitude && CookiesDataObject.longitude) {
+                Latitude = CookiesDataObject.latitude;
+                Longitude = CookiesDataObject.longitude;
+
+            } else {
+                Latitude = 31.046051;
+                Longitude = 34.85161199999993;
+            }
+            var input = (document.getElementById('AddressMap'));
+            var options = {
+                types: ['address']
+
+            };
+            var autocomplete = new google.maps.places.Autocomplete(input, options);
+        }
+
+        if (navigator && navigator.geolocation && navigator.geolocation.getCurrentPosition) {
+            navigator.geolocation.getCurrentPosition(function (a) {
+                if (a && a.coords && a.coords.latitude && a.coords.longitude) {
+                    var geourl = 'http://maps.googleapis.com/maps/api/geocode/json?latlng=' + a.coords.latitude + ',' + a.coords.longitude + '&sensor=false';
+                    $.get(geourl, function (data) {
+                        if (data.status == "OK") {
+                            if (data.results[0]) {
+                                $('#AddressMap').val(data.results[0].formatted_address.replace(/,\s+\w+$/, ''));
+                                //console.log(data.results[0].formatted_address.replace(/,\s+\w+$/, ''));
+                            }
+                        }
+                        // console.log(data);
+
+                    });
+                }
+            });
+        }
+    </script>
+
+    <script>
+
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new
+            Date(); a = s.createElement(o),
+
+            m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+        ga('create', 'UA-61822723-1', 'auto');
+        ga('send', 'pageview');
+
+    </script>
+
+</head>
+<body>
+    <div class="k-rtl" id="fb-root"></div>
+    <script>
+        (function (d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s); js.id = id;
+            js.src = "//connect.facebook.net/he_IL/sdk.js#xfbml=1&version=v2.3&appId=1626666457575757";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    </script>
+    <!-- Google Tag Manager -->
+    <noscript>
+        <iframe src="//www.googletagmanager.com/ns.html?id=GTM-T23MZ5"
+                height="0" width="0" style="display:none;visibility:hidden"></iframe>
+    </noscript>
+    <script>
+(function (w, d, s, l, i) {
+w[l] = w[l] || []; w[l].push({
+'gtm.start':
+new Date().getTime(), event: 'gtm.js'
+}); var f = d.getElementsByTagName(s)[0],
+j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+'//www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+})(window, document, 'script', 'dataLayer', 'GTM-T23MZ5');</script>
+    <!-- End Google Tag Manager -->
+    <div class="header_part k-rtl">
+        <div class="center_div">
+            <div class="header_top1">
+                <div class="logo"><img src="Content/DesignFiles/logo.png" alt=""></div>
+                <div class="logo2"><img src="Content/DesignFiles/logo2_head.png" alt=""></div>
+                <div class="header_nav1">
+                    <a style="height: 15px;width: 20px;display: block;" href="#my-menu">&nbsp;</a>
+                    <ul>
+                        <li><a class="tooltip" title="בוחרים סוג חנות, מכניסים כתובת למשלוח ולוחצים ״לרכישה״ מכניסים מוצרים לסל, בוחרים צורת תשלום ומבצעים הזמנה ההזמנה מועברת לחנות המבוקשת אשר מלקטת, אורזת ושולחת אליכם" href="#">איך זה עובד?</a></li>
+                        <li><a class="tooltip" title='חוסכים כסף - המחירים באתר נמוכים או זהים למחירים בחנויות משלוחים מיידיים ובחינם מעל סכום סמלי! חוסכים זמן - מזמינים לחיצת כפתור במקום לנסוע לחנות, ללקט מוצרים, לשלם ולסחוב שומרים על טריות - ניתן להזמין משלוחים קטנים ולעתים תכופות תומכים בבעלי העסקים הנחמדים שבשכונה וגם נהנים משירות אישי ואיכותי  נהנים מאיכות - אנחנו פה לודא שתהיו מרוצים מהשירות ואיכות המוצרים' href="#">למה זה כדאי לי?</a></li>
+                        <li><a class="tooltip" target="_blank" href="http://www.slk.co.il/f/JoinUs">בעלי חנויות</a></li>
+                    </ul>
+                    <div class="clear"></div>
+                </div>
+                <div class="header_left1"><a href="tel:0747026970">שירות לקוחות<span>074-702-6970</span></a></div>
+                <div class="header_phne_icon"><a href="tel:0747026970"><img src="Content/DesignFiles/header_phne_icon.png" alt=""></a></div>
+                <div class="header_login"><a id="loginlink" onclick="Shop.ShowLoginReg();" href="javascript:void(0)"><img src="Content/DesignFiles/header_login.png" alt=""></a></div>
+                <div class="facebook_like_part">
+                    <div class="fb-like" data-href="https://www.facebook.com/SLK.co.il" data-layout="button" data-action="like" data-show-faces="false" data-share="false"></div>
+                </div>
+                <div class="clear"></div>
+            </div>
+            <div class="header_top2">
+
+                <div class="banner_text1">משלוח מיידי מהחנויות בשכונה</div>
+                <div class="banner_text2">ללא מינימום הזמנה</div>
+            </div>
+            <!--<div class="nav_slider_right_f_m"></div>
+            <div class="nav_slider_left_f_m"></div>-->
+            <div class="headr_midd_nav">
+
+                <div class="clear"></div>
+            </div>
+            <div class="midd_nav_search">
+                <div class="nav_srch_txt">הזן כתובת ומצא את החנות הקרובה אליך</div>
+                <div class="nav_form1">
+                    <div class="input_ty">
+                        <input type="text" name="AddressMap" id="AddressMap" placeholder="כתובת לדוגמא: מזא״ה 9, תל אביב" value="" class="single-line">
+                        <span class="close_btn">x</span>
+                    </div>
+                    <div class="input_img1">
+                        <input type="hidden" id="shopType" value="1" />
+                        <input id="submit_btn" type="image" src="/Content/DesignFiles/input_img2.png" width="88" height="88" alt="Submit">
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="scooter_part k-rtl">ביותר מ - 140 בתי עסק ברחבי הארץ</div>
+    <div class="text_part1 k-rtl">
+        <div class="center_div">
+            <div class="heading1">מה זה פה? שכונה?!</div>
+            <div class="text1">
+                אנו ב"סל קניות" מאמינים בקנייה חברתית ומציגים פלטפורמה ראשונה בתחומה המקשרת בין אנשים לבתי עסק שכונתיים. בואו להיות חלק ממהפכת קניות קהילתית. סל קניות מאפשר אלטרנטיבה לקנייה ברשתות הגדולות. אנחנו מאמינים שתמיכה בבתי עסק שכונתיים חיונית לכלכלה, לתחרות החופשית בשוק ומחזקת קשרים בתוך הקהילה. יחד, ניצור סביבה של שותפות וערבות הדדית.
+                בתי העסק איתם אנו עובדים נבחרו בקפידה, תוך מתן דגש על איכות המוצר והשירות. אנו מתחייבים להיות כתובת זמינה ולתת מענה לאורך כל התהליך.
+                אנחנו בתחילת הדרך ונשמח אם תכתבו לנו איך נוכל להשתפר...
+            </div>
+        </div>
+    </div>
+    <div class="footer k-rtl" style="display:none">
+
+        <div class="footer_top1">
+            <div class="center_div">
+                <div>
+                    <br />
+                </div><ul>
+                    <li><a href="#"><img alt="" src="/Content/DesignFiles/logo6.png" /></a></li>
+                    <li>
+                        <a href="#"></a><br />
+                    </li>
+                    <li><a href="#"><img alt="" src="/Content/DesignFiles/logo5.png" /></a></li>
+                    <li></li>
+                    <li><a href="#"><img alt="" src="/Content/DesignFiles/logo3.png" /></a></li>
+                    <li><a href="#"></a></li>
+                    <li>
+                        <a href="#">
+                            <img alt="" src="/Content/DesignFiles/logo2.png" /><br />
+                        </a>
+                    </li>
+                </ul>
+                <div class="clear"></div>
+            </div>
+        </div>
+        <div class="footer_top2">
+            <div class="center_div">
+                <div class="footer_clm1">
+                    <h6></h6>
+                    <p></p>
+                </div>
+                <div class="footer_clm1">
+                    <h6>תשמרו על קשר:</h6>
+                    <ul>
+                        <li><strong><a href="http://www.slk.co.il/f/contact" target="_blank" title="כתבו ותתפלאו כמה מהר אנחנו מגיבים...">צרו קשר</a></strong></li>
+                        <li>
+                            <strong><a href="http://www.slk.co.il/f/Join" target="_blank" title="הצטרף לסל קניות עוד היום">צרפי את חנותך</a></strong><br />
+                        </li>
+                        <li><strong><a href="http://www.slk.co.il/f/recommend" target="_blank" title="ותזכי בקארמה טובה">המליצי על עסקים בשכונתך</a></strong></li>
+                        <li>
+                            <strong><a href="/c/איך-קונים-באתר" target="_blank" title="דרושים ודרושות, רצויים ורצויות"></a><a href="http://www.slk.co.il/c/hr" target="_blank" title="אתם מוזמנים להצטרף אלינו!">דרושים, דרושות רצויים ורצויות</a></strong><br />
+                        </li>
+                    </ul>
+                </div>
+                <div class="footer_clm1">
+                    <h6></h6>
+                    <div>
+                        <br>
+                    </div>
+                </div>
+                <div class="footer_clm1">
+                    <h6>אם אנחנו מסקרנים אתכם:</h6>
+                    <ul>
+                        <li>
+                            <a href="http://www.slk.co.il/c/whoarewe" target="_blank" title="ומה אנחנו רוצים מכם?">מי אנחנו</a><br />
+                        </li>
+                    </ul>
+                </div>
+                <div class="footer_clm1">
+                    <h6></h6>
+                    <div>
+                        <br>
+                    </div>
+                </div>
+                <div class="footer_clm1">
+                    <h6>כדאי שתדעו:</h6>
+                    <ul>
+                        <li><a href="http://www.slk.co.il/c/Terms" target="_blank">תקנון שימוש באתר</a></li>
+                    </ul>
+                </div>
+                <div class="clear"></div>
+            </div>
+        </div>
+    </div>
+    <nav id="my-menu" class="k-rtl">
+        <ul>
+            <li><a id="loginlinkmobile" onclick="$('#my-menu').removeClass('mm-current').removeClass('mm-oppened'); $('#mm-0').css({ position: 'inherit' }); Shop.isHomeMobile = true; Shop.ShowLoginReg();" href="javascript:void(0)">חשבון שלי</a></li>
+            <li><a href="tel:0747026970">שירות לקוחות</a></li>
+            <li><a class="tooltip" title='בוחרים סוג חנות, מכניסים כתובת למשלוח ולוחצים ״לרכישה״ מכניסים מוצרים לסל, בוחרים צורת תשלום ומבצעים הזמנה ההזמנה מועברת לחנות המבוקשת אשר מלקטת, אורזת ושולחת אליכם' href="#">איך זה עובד?</a></li>
+            <li><a class="tooltip" title='חוסכים כסף - המחירים באתר נמוכים או זהים למחירים בחנויות משלוחים מיידיים ובחינם מעל סכום סמלי! חוסכים זמן - מזמינים לחיצת כפתור במקום לנסוע לחנות, ללקט מוצרים, לשלם ולסחוב שומרים על טריות - ניתן להזמין משלוחים קטנים ולעתים תכופות תומכים בבעלי העסקים הנחמדים שבשכונה וגם נהנים משירות אישי ואיכותי נהנים מאיכות - אנחנו פה לודא שתהיו מרוצים מהשירות ואיכות המוצרים' href="#">למה זה כדאי לי?</a></li>
+            <li><a class="tooltip" href="http://www.slk.co.il/f/JoinUs">בעלי חנויות</a></li>
+        </ul>
+    </nav>
+
+
+
+    <!-- Modal -->
+    <div class="specialcss specialbootstrap">
+        <div class="modal fade myModal login-window" id="myModal" role="dialog" style="display:none;">
+            <div class="modal-dialog">
+
+                <div class="col-lg-9 col-md-9  col-sm-9  col-xs-12 col-lg-offset-2  col-sm-offset-2  modal-content">
+                    <div class="logologin">
+                        <img src="/Content/img/logo.gif" class="center-block img-responsive" />
+                    </div>
+                    <div class="col-lg-12">
+                        <form class="col-lg-12  center-block">
+                            <div class="clear20"></div>
+                            <div class="col-lg-12 no_padding">
+                                <input name="UserName" type="text" id="loginFormUserName" autofocus="autofocus" class="form-control input_blok " placeholder="אימייל">
+                            </div>
+                            <div class="clear20"></div>
+                            <div class="col-lg-12 no_padding">
+                                <input name="Password" type="password" class="form-control input_blok " placeholder="סיסמה">
+                            </div>
+                            <div class="clear20"></div>
+                            <button onclick="Shop.DoLogin(this,event);" type="button" class=" col-lg-12 col-md-12  col-sm-12  col-xs-12  btn  org_btn">
+                                התחבר
+                            </button>
+                            <div class="clear10"></div>
+                            <table class=" col-lg-12 col-md-12  col-sm-12  col-xs-12">
+                                <tr>
+                                    <td style="width:47%"><hr /></td>
+                                    <td style="vertical-align:middle; text-align: center">or</td>
+                                    <td style="width:47%"><hr /></td>
+                                </tr>
+                            </table>
+                            <div class="clear10"></div>
+                            <div id="socialfacebook"></div>
+
+                            <div class="clear10"></div>
+                            <!--<button type="button" class=" col-lg-12 col-md-12  col-sm-12  col-xs-12  btn  googl_btn  no_padding" data-dismiss="modal">-->
+                            <!--הלחא אלםושמושמ הניחט-->
+                            <!--<i class="ion-social-google step size-32  pull-left"></i>-->
+                            <!--</button>-->
+
+                            <div class="col=lg-12 pull-right no_padding">
+                                <p class="underline">
+                                    <a href="#" onclick="Shop.ShowRegModal(this, event);" data-dismiss="modal">צריך לפתוח חשבון חדש? לחץ כאן</a>
+                                    <br /><a href="#" onclick="Shop.ShowForgotPass(this, event);" data-dismiss="modal">שכחת סיסמה? לחץ כאן</a>
+                                </p>
+                            </div>
+                            <div class="clear10"></div>
+                        </form>
+
+                    </div>
+
+                </div>
+                <div class="clear10"></div>
+            </div>
+
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade modalReg" id="myModalreg" role="dialog" style="display:none;">
+            <div class="modal-dialog">
+
+                <div class="col-lg-9 col-md-9  col-sm-9  col-xs-12 col-lg-offset-2  col-sm-offset-2  modal-content">
+                    <div class="logologin">
+                        <img src="/Content/img/logo.gif" class="center-block img-responsive" />
+                    </div>
+                    <div class="col-lg-12">
+                        <form class="col-lg-12  center-block">
+                            <div class="clear20"></div>
+                            <div class=" col-lg-5 col-md-5  col-sm-5  col-xs-5  no_padding pull-left">
+                                <input type="text" name="FirstName" class="form-control input_blok " placeholder="שם פרטי">
+                            </div>
+                            <div class=" col-lg-5 col-md-5 col-sm-5 col-xs-5  no_padding pull-right">
+                                <input type="text" class="form-control input_blok " placeholder="שם משפחה" name="LastName">
+                            </div>
+                            <div class="clear20"></div>
+                            <div class="col-lg-12 no_padding">
+                                <input id="confemail" type="hidden" value="" name="ConfirmEmail" />
+                                <input onkeyup="$('#confemail').val(this.value);" type="email" class="form-control input_blok " placeholder="אימייל" name="Email">
+                            </div>
+                            <div class="clear20"></div>
+                            <div class="col-lg-12 no_padding">
+                                <input type="password" class="form-control input_blok " placeholder="סיסמה" name="Password">
+                            </div>
+                            <div class="clear20"></div>
+                            <div class="col=lg-12 no_padding">
+                                <p>
+                                    <input type="checkbox" value="true" checked="checked" name="NewsLetter" class="pull-right">
+                                    <input name="NewsLetter" type="hidden" value="false">
+                                    מאשר קבלת עדכונים ומבצעים למייל
+
+
+                                </p>
+                                <p> בלחיצה על הרשמה אני מסכימ/ה<a>לתקנון </a></p>
+                            </div>
+                            <div class="clear10"></div>
+                            <button onclick="Shop.DoReg(this,event);" type="button" class=" col-lg-12 col-md-12  col-sm-12  col-xs-12  btn  org_btn ">
+                                הרשם
+                            </button>
+                            <div class="clear10"></div>
+                            <table class=" col-lg-12 col-md-12  col-sm-12  col-xs-12">
+                                <tr>
+                                    <td style="width:47%"><hr /></td>
+                                    <td style="vertical-align:middle; text-align: center">or</td>
+                                    <td style="width:47%"><hr /></td>
+                                </tr>
+                            </table>
+                            <div class="clear10"></div>
+                            <div id="socialfacebookreg"></div>
+                            <div class="clear10"></div>
+                            <div class="col=lg-12 pull-right no_padding">
+                                <p> אם כבר יש לך חשבון<a href="#" onclick="Shop.ShowLoginReg(this, event);" data-dismiss="modal">לחץ כאן</a> </p>
+                            </div>
+                        </form>
+                        <div class="clear10"></div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+    <div class="showfarfaraway">
+        <div id="facebookbutton">
+            <fb:login-button id="fb-login-button-idnew" scope="public_profile,email" onlogin="afterFacebookConnect();" autologoutlink="false" size="xlarge"></fb:login-button>
+        </div>
+    </div>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script language="javascript" type="text/javascript">
+        function onSignIn(googleUser) {
+
+            var profile = googleUser.getBasicProfile();
+            var data = {
+                ID: profile.getId(),
+                Name: profile.getName(),
+                Image: profile.getImageUrl(),
+                Email: profile.getEmail(),
+            };
+            Shop.DoGoogle(data);
+
+        }
+
+        function afterFacebookConnect() {
+            FB.getLoginStatus(function (response) {
+                if (response.authResponse) {
+
+                    // console.log(response);
+                    Shop.DoFacebook(response.authResponse.accessToken);
+                    //  window.location = "../Account/FacebookLogin?token=" + response.authResponse.accessToken;
+                } else {
+                    // user clicked Cancel
+                }
+
+            });
+        };
+        $(function () {
+
+
+        });
+
+    </script>
+</body>
+</html>

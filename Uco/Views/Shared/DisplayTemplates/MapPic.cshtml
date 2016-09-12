@@ -1,0 +1,2 @@
+﻿@model string
+<img alt="map" src="http://maps.googleapis.com/maps/api/staticmap?language=@(System.Threading.Thread.CurrentThread.CurrentCulture)&center=Israel @(Model)&zoom=15&size=640x222&maptype=roadmap&visible=Israel @(Model)&markers=size:mid%7Ccolor:0xFFFF00%7Clabel:C%7CIsrael @(Model)&sensor=false" />

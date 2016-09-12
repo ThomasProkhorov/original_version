@@ -1,0 +1,343 @@
+﻿@using Uco.Models
+@using Uco.Models.Overview
+@using Uco.Infrastructure
+@{
+     ViewBag.Title = RP.T("Admin.Views.Order.Index.Title");
+    Layout = "~/Areas/Member/Views/Shared/_LayoutNoTree.cshtml";
+
+}
+@model OrderListModel
+@if (!string.IsNullOrEmpty(ViewBag.Mesage))
+{
+    <div class="notification information">
+        <div>
+            @ViewBag.Mesage
+        </div>
+    </div>
+}
+<h2>@ViewBag.Title</h2>
+<div>
+
+    <button class="k-button" onclick="gridFiltering.setFilter('OrderStatus', [ @((int)OrderStatus.New) , @((int)OrderStatus.Paid) ]);">
+        @RP.T("Member.Main.FilterButton.NewAndPaid")
+        <span class="role_num">@Model.NewAndPyedCount</span>
+    </button>
+
+    @*<button class="k-button" onclick="gridFiltering.setFilter('OrderStatus', @((int)OrderStatus.Paid));">
+        @RP.T("Member.Main.FilterButton.Payed")
+        <span class="role_num">@Model.PayedCount</span>
+    </button>*@
+
+    <button class="k-button" onclick="gridFiltering.setFilter('OrderStatus', @((int)OrderStatus.Accepted));">
+        @RP.T("Member.Main.FilterButton.Accepted")
+        <span class="role_num">@Model.AcceptedCount</span>
+    </button>
+
+    <button class="k-button" onclick="gridFiltering.setFilter('OrderStatus', @((int)OrderStatus.Sent));">
+        @RP.T("Member.Main.FilterButton.Sent")
+        <span class="role_num">@Model.SentCount</span>
+    </button>
+
+
+<button class="k-button" onclick="gridFiltering.setFilter('OrderStatus', @((int)OrderStatus.Delivered));">
+    @RP.T("Member.Main.FilterButton.Delivered")
+    <span class="role_num">@Model.DelivereCount</span></button>
+   
+     <button class="k-button" onclick="gridFiltering.setFilter('OrderStatus', @((int)OrderStatus.Canceled));">
+    @RP.T("Member.Main.FilterButton.Canceled")
+    <span class="role_num">@Model.CanceledCount</span></button>
+
+</div>
+<br/>
+ <a href="javascript:void(0);" onclick="$('#Ordergridfilterbox').toggle();" class="k-button">@RP.T("Views.Common.Search") <span class="k-icon k-i-search"></span></a>
+<br/>
+<div id="Ordergridfilterbox" class="gridfilterbox" style="display:none;">
+  <br/>
+            
+
+    <div class="editor-label">
+<label for="Name">@RP.T("Models.Order.ID")</label></div>
+            <div class="editor-field">
+<input class="k-textbox" id="ID" name="ID" type="text" value="" />            </div>
+
+
+     <div class="editor-label">
+<label for="Name">@RP.T("Models.Order.FullName")</label></div>
+            <div class="editor-field">
+<input class="k-textbox" id="FullName" name="FullName" type="text" value="" />            </div>
+
+
+        <div class="editor-label">
+<label for="Name">@RP.T("Models.Order.Phone")</label></div>
+            <div class="editor-field">
+<input class="k-textbox" id="Phone" name="Phone" type="text" value="" />            </div>
+
+      <div class="editor-label">
+<label for="Name">@RP.T("Models.Order.Email")</label></div>
+            <div class="editor-field">
+<input class="k-textbox" id="Email" name="Email" type="text" value="" />            </div>
+
+
+
+    <div class="button-wrap">
+        <a href="javascript:void(0);" class="k-button" onclick="OrdergridFiltering.filter('Ordergridfilterbox');">חיפוש</a>
+        <a href="javascript:void(0);" class="k-button" onclick="OrdergridFiltering.clear();">נקה</a>
+    </div>
+
+</div>
+
+<br />
+<div id="Ordergrid"></div>
+<script>
+
+    var OrdergridFiltering = {
+        filter: function (id) {
+            var data = { logic: "and", filters: [] };
+            //{ field: "name", operator: "startswith", value: "Jane" }
+            var grid = $("#Ordergrid").data('kendoGrid');
+            //  console.log(grid.dataSource.options.schema.model);
+            $('#' + id + ' input').each(function (i, e) {
+                if ($(e).attr('name') && $(e).val())
+                {
+                    var inpname = $(e).attr('name');
+                    var objname = inpname.split(".")[0];
+                    if(objname in grid.dataSource.options.schema.model.fields)
+                    {
+
+                        var model = grid.dataSource.options.schema.model.fields[objname];
+                        if(model.type == 'number' || model.type == 'object'){
+                            if($(e).attr('data-zero') && $(e).val() < 1)
+                            {
+                                return;
+                            }
+                        }
+                        var operator = 'eq';
+                        if(model.type == 'date'){
+                            operator = 'gt'; // >
+                            var todate = $('#' + id + ' input[name="'+inpname+'_dateto"]');
+                            if(todate.length >0)
+                            {
+                                data.filters.push({ field: $(e).attr('name'), operator: 'lte', value: model.parse(todate.val()) });
+                            }
+                        }
+                        if(model.type == 'string'){
+                            operator = 'startswith'; // .startswith
+                        }
+                        //lte <=
+                        //  console.log(model);
+                        var parseVal = $(e).val();
+                        if(model.type != 'object')
+                        {
+                            parseVal =model.parse(parseVal);
+                        }
+                        data.filters.push({ field: $(e).attr('name'), operator: operator, value: parseVal });
+                    }
+
+                }
+            });
+
+            grid.dataSource.filter(data);
+
+        },
+        clear: function () {
+            var grid = $("#Ordergrid").data('kendoGrid');
+            grid.dataSource.filter({});
+        },
+        setFilter: function (name, value) {
+            var grid = $("#Ordergrid").data('kendoGrid');
+            grid.dataSource.filter({ field: name, operator: "eq", value: value });
+            //grid.dataSource.page(1);
+            // alert(name + value);
+        },
+    };
+
+    var gridFiltering = {
+        setFilter: function (name, value) {
+            var grid = $("#Ordergrid").data('kendoGrid');
+           
+            if( Object.prototype.toString.call( value ) === '[object Array]' ) {
+                var filters = [];
+                for(var i in value)
+                {
+                    filters.push({ field: name, operator: "eq", value: value[i] });
+                }
+                grid.dataSource.filter({filters:filters , logic:'or'});
+            }else{
+                grid.dataSource.filter({ field: name, operator: "eq", value: value });
+            }
+            //grid.dataSource.page(1);
+           // alert(name + value);
+        },
+    };
+
+    var OrderStatusEnums = {
+              @foreach( var en in Enum.GetValues(typeof(OrderStatus)) )
+    {
+       <text>@((int)en):'@RP.T("Enums."+en.ToString())', </text>
+   
+    }   
+            
+    };
+
+    $(document).ready(function () {
+      
+        /*
+        Docs
+        http://docs.telerik.com/kendo-ui/api/javascript/ui/grid
+        */
+
+        $("#Ordergrid").kendoGrid({
+          //  "toolbar": [              ],
+            dataSource: {
+
+                type: "json",
+                transport: {
+                    "prefix": "",
+                    read: {
+                        url: "/Member/Manage/Order/_AjaxRead",
+                        type: "POST",
+                        dataType: "json",
+                        // data: { filter:'ID~eq~3'  }
+                    },
+                                                        },
+
+                schema: {
+                    data: "Data",
+                    total: "Total",
+                    errors: "Errors",
+                    model: {
+                        "id": "ID",
+                        fields: {
+  "ID": { "type": "number" ,editable: false,}, 
+  "User": { "type": "object" ,editable: false,nullable: true, }, 
+  "TotalCard": { "type": "number"  }, 
+  "TotalCash": { "type": "number"  }, 
+  "ShipAddress": { "type": "string"  }, 
+  "FullName": { "type": "string"  }, 
+  "Email": { "type": "string"  }, 
+  "CreateOn": { "type": "date"  }, 
+  "OrderStatus": { "type": "number" }, 
+  //"OrderStatus": { "type": "object" ,editable: false,nullable: true, }, 
+                            // "ID": {"type":"number" ,editable: false}
+                        }
+
+                    }
+                },
+               
+                pageSize: 20,
+                "error": error_handler,
+                "sync":function(e){ this.read(); },
+                "serverPaging": true,
+                "serverSorting": true,
+                "serverFiltering": true,
+                "serverGrouping": true,
+                "serverAggregates": true,
+                filter: {filters:[{ field: 'OrderStatus', operator: "eq", value: @((int)OrderStatus.New) },
+                { field: 'OrderStatus', operator: "eq", value: @((int)OrderStatus.Paid) }
+                ] , logic:'or'}  ,
+                "type": "aspnetmvc-ajax",
+                sort:{ field: "ID", dir: "desc"}
+            },
+            refresh: true,
+            //  detailTemplate: kendo.template($("#template").html()),
+            // detailInit: detailInit,
+            // dataBound: function () {
+            //this.expandRow(this.tbody.find("tr.k-master-row").first());
+            //   },
+            pageable: {
+                refresh: true,
+                // pageSizes: [10, 20, 50],
+                pageSize: 10
+            },
+           
+            columns: [
+{ field: "ID",title: "@M("Order", "ID")", sortable: false, filterable: false ,hidden:true },
+{ field: "FullName",title: "@M("Order", "FullName")",  sortable: false,hidden: false, filterable: true,
+    template: "<a href=\"/Member/Main/Detail/#= ID #\">#= FullName #</a>"
+},
+{ field: "Email",title: "@M("Order", "Email")",  sortable: false, filterable: true,hidden:true },
+{ field: "TotalCard",title: "@M("Order", "TotalCard")", sortable: false,hidden:true, filterable: false ,template:"#:TotalCard+TotalCash # " },
+//{ field: "TotalCash",title: "", sortable: false, filterable: false , },
+{ field: "ShipAddress",title: "@M("Order", "ShipAddress")",hidden: true, sortable: false, filterable: false , },
+{ field: "CreateOn",title: "@M("Order", "CreateOn")",hidden: true ,format: "{0: dd/MM/yyyy HH:mm}", sortable: false, filterable: false ,},
+{ field: "OrderStatus",title: "@M("Order", "OrderStatus")",hidden:true, sortable: false,filterable: false,template:"# if(OrderStatusEnums[OrderStatus]) { # #: OrderStatusEnums[OrderStatus] # # } #", },
+
+
+
+
+            ],
+            //   height: 600,
+            "scrollable": false,
+            filterable: true,
+            sortable: true,
+            "editable": {
+                "confirmation": "Are you sure you want to delete this record?",
+                "confirmDelete": "Delete",
+                "cancelDelete": "Cancel",
+                "mode": "inline",
+                "create": true,
+                "update": true,
+                "destroy": true
+            },
+
+
+
+        });
+        var Ordergrid = $("#Ordergrid").data('kendoGrid');
+        Ordergrid.dataSource.transport.parameterMap = function(data,type){
+
+           // console.log(type);
+            if(type != "read")
+            {
+                for(var i in data)
+                {
+                    //console.log(Object.prototype.toString.call( data[i] ));
+                    if( Object.prototype.toString.call( data[i] ) === '[object Object]' ) {
+                        delete data[i];
+                    }
+                    if( Object.prototype.toString.call( data[i] ) === '[object Array]' ) {
+                        delete data[i];
+                    }
+                    if( Object.prototype.toString.call( data[i] ) === '[object Date]' ) {
+                        data[i] = kendo.toString(kendo.parseDate(data[i]), "G");// Date.parse(data[i]);
+                    }
+                    //if(i == 'UserID' && !data[i]){
+                    //    data[i]=
+                   // }
+                    //@ViewBag.AdditionalFilterField", operator: "eq", value: 
+                }
+            }
+
+            kendo.data.transports["aspnetmvc-ajax"](data);
+            data = new kendo.data.transports["aspnetmvc-ajax"]({ prefix: "" }).parameterMap(data, type);
+          //  console.log(data);
+            return data;
+        }
+
+        function error_handler(e) {
+
+            if (e.errors) {
+                e.preventDefault();   // cancel grid rebind if error occurs
+                var message = "Errors:\n";
+                $.each(e.errors, function (key, value) {
+                    if ('errors' in value) {
+                        $.each(value.errors, function () {
+                            message += this + "\n";
+                        });
+                    }
+                });
+                alert(message);
+            }
+        }
+        function detailInit(e) {
+            var detailRow = e.detailRow;
+            console.log(e);
+
+
+        }
+
+    });
+
+</script>
+
+@*@Html.Partial("../Generic/_Grid", new Order())*@

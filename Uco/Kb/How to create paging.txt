@@ -1,0 +1,110 @@
+How to create paging?
+Add model to file DataModels?.cs:
+
+[NotMapped]
+public class Pagination
+{
+	public int PageTotal { get; set; }
+	public int PageNumber { get; set; }
+	public int PageItems { get; set; }
+	public string Url { get; set; }
+
+	public Pagination()
+	{
+		this.PageTotal = 20;
+		this.PageNumber = 1;
+		this.PageItems = 20;
+		this.Url = "/";
+	}
+
+	public Pagination(int _PageTotal, int _PageNumber, int _PageItems, string _Url)
+	{
+		this.PageTotal = _PageTotal;
+		this.PageNumber = _PageNumber;
+		this.PageItems = _PageItems;
+		this.Url = _Url;
+	}
+}
+
+Add view to shared folder: (this is the paging link menu,for example: 1, 2, 3 ,4) as _Pagination.cshtml
+
+@model Uco.Models.Pagination
+@if(Model.PageTotal > Model.PageItems)
+{
+    int PageTotal = Convert.ToInt32(Math.Ceiling(((decimal)Model.PageTotal / (decimal)Model.PageItems)));
+    int PageFrom = 1;
+    int PageTo = PageTotal;
+
+
+    if (PageTo > 10)
+    {
+        if (Model.PageNumber > 6)
+        {
+            PageFrom = Model.PageNumber - 5;
+            PageTo = Model.PageNumber + 5;
+        }
+        else
+        {
+            PageFrom = 1;
+            PageTo = 11;
+        }
+        if (PageTotal < PageTo)
+        {
+            PageTo = PageTotal;
+        }
+    }
+    <div class="pagination">
+        <ul>
+            @if(Model.PageNumber != PageFrom) { <li><a href="@(Model.Url)?page=@(Model.PageNumber - 10 > 0 ? (Model.PageNumber - 10) : 1)"><img alt="" src="/Content/DesignFiles/pagination_next.png"></a></li> }
+            @for (int i = PageFrom; i <= PageTo; ++i)
+            {
+            <li><a class="@(Model.PageNumber == i ? "current" : "")" href="@(Model.Url)?page=@(i)">@(i)</a></li>
+            }
+            @if(Model.PageNumber != PageTo) { <li><a href="@(Model.Url)?page=@(Model.PageNumber + 10 < PageTotal ? (Model.PageNumber + 10) : PageTotal)"><img alt="" src="/Content/DesignFiles/pagination_prev.png"></a></li> }
+        </ul>
+    </div>
+}
+
+In controler
+
+public ActionResult CompanyAll(int? page)
+{
+	Pagination paging = new Uco.Models.Pagination();
+	var l = _db.AbstractPage.Where(r => r.Visible).OrderBy(r => r.Order);
+
+	paging.PageTotal = l.Count();
+	paging.PageItems = 10;
+	paging.Url = Url.Content(CurrentPage.Url);
+
+	if (page == null || page == 0)
+	{
+		paging.PageNumber = 1;
+		ViewBag.Items = l.Take(paging.PageItems).ToList();
+	}
+	else
+	{
+		paging.PageNumber = (int)page;
+		ViewBag.Items = l.Skip((paging.PageNumber - 1) * paging.PageItems).Take(paging.PageItems).ToList();
+	}
+
+	ViewBag.Pagination = paging;
+
+	return View(CurrentPage);
+}
+
+And page view:
+
+@model Uco.Models.AbstractPage
+@{
+    Layout = Model.Layout;
+    Uco.Models.Pagination paging = ViewBag.Pagination;
+}
+			<ul>
+                @foreach (Uco.Models.AbstractPage item in ViewBag.Items)
+                {
+                    <li>@item.Title</li>
+                }
+            </ul>
+        }
+
+@Html.Partial("_Pagination", paging)

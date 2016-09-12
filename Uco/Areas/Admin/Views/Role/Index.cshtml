@@ -1,0 +1,44 @@
+﻿@{
+    ViewBag.Title =  RP.T("Admin.Views.Role.Index.Title");
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutNoTree.cshtml";
+}
+
+<h2>@RP.T("Admin.Views.Role.Index.Title")</h2>
+
+@(Html.Kendo().Grid<Uco.Models.Role>()
+        .Name("Grid")
+        .DataSource(dataSource => dataSource.Ajax()
+            .Model(model => { model.Id(item => item.ID); })
+            .Read(r => r.Action("_AjaxIndex", "Role"))
+            .Destroy(r => r.Action("_AjaxDelete", "Role"))
+            .Events(events => events.Error("onError"))
+        )
+        .Columns(columns =>
+        {
+            columns.Bound(r => r.ID).Width(200);
+            columns.Bound(r => r.Title);
+            columns.Bound(r => r.IsSystem);
+            columns.Template(r => r.ID).ClientTemplate(
+                "<a class='k-button' href='" + Url.Action("Edit", "Role") + "?ID=#= ID #'" + ">" + RP.T("Admin.Views.Command.Edit").ToString() + "</a>"
+            ).Width(100);
+            columns.Command(commands =>
+            {
+                commands.Destroy();
+            })
+            .Width(100);
+        })
+        .Pageable()
+        .Sortable()
+        .Filterable()
+)
+<br />
+@Html.ActionLink(@RP.T("Admin.Views.Command.Create").ToString(), "Create", null, new { @class = "k-button k-state-default" })
+
+<script>
+    function onError(e, status) {
+        alert("A server error has occurred!");
+        var grid = $("#Grid").data("kendoGrid");
+        grid.dataSource.page(1);
+        grid.dataSource.read();
+    }
+</script>

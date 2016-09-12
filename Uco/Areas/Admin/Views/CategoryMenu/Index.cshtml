@@ -1,0 +1,338 @@
+﻿
+@using System.Web.Script.Serialization;
+@{
+    Script.AddFooter("~/Scripts/jquery-ui-1.11.4/jquery-ui.min.js?v=2");
+    Style.AddFooter("~/Content/jquery-ui/jquery-ui.min.css?v=1");
+    Style.AddFooter("~/Content/categorymenu.css?v=1");
+    ViewBag.Title = RP.T("Admin.Views.CategoryMenu.Index.Title");
+    Layout = "~/Areas/Member/Views/Shared/_LayoutNoTree.cshtml";
+   
+}
+<h2>@ViewBag.Title</h2>
+ 
+<script>
+    var MenuBuilder = {
+        Categories: {},
+        ItemData: {}
+        , ShowLoading: function (container) {
+            if ($('.indicatorload', container).length == 0) {
+                if ($('td', container).length > 9) {
+                    $('td:eq(9)', container).css('position', 'relative').append('<div class="k-loading-mask indicatorload" style="width:100%;height:100%;top:0;"><span class="k-loading-text">Loading...</span><div class="k-loading-image"><div class="k-loading-color"></div></div></div>'
+
+                   );
+                } else {
+                    var checkpos = container.css('position');
+                    if (!checkpos || checkpos == 'static') {
+                        container.css('position', 'relative');
+                    }
+                    container.append('<div class="k-loading-mask indicatorload" style="width:100%;height:100%;top:0;"><span class="k-loading-text">Loading...</span><div class="k-loading-image"><div class="k-loading-color"></div></div></div>'
+
+                    );
+                }
+            }
+
+            $('.indicatorload', container).show();
+        },
+        HideLoading: function (container) {
+
+            $('.indicatorload', container).hide();
+        },
+        onStart: function () {
+            $(".connectedSortable").sortable({
+                connectWith: ".connectedSortable"
+            });//.disableSelection();
+
+            $("#sortable").html('').sortable();
+            // $("#sortable").disableSelection();
+
+            //load list of categories
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: "@Url.Action("_GetCategoriesAjax", "CategoryMenu")",
+                cache: false,
+                data: { ShopID: $('[name="ShopID"]').val() }
+            }).done(function (data) {
+                MenuBuilder.Categories = data.menu;
+                MenuBuilder.AllCategories = data.categoryTree;
+                MenuBuilder.CategoryTable = {};
+                for (var o in MenuBuilder.AllCategories) {
+
+                    $('#selecttemplate [name="CategoryID"]').append('<option value="' +
+                        MenuBuilder.AllCategories[o].ID
+                        + '" data-name="' + MenuBuilder.AllCategories[o].Name + '">' + MenuBuilder.AllCategories[o].Name + '</option>');
+                    MenuBuilder.CategoryTable[MenuBuilder.AllCategories[o].ID] = MenuBuilder.AllCategories[o].Name;
+
+                    for (var cat in MenuBuilder.AllCategories[o].Childrens) {
+                        var child = MenuBuilder.AllCategories[o].Childrens[cat];
+                        $('#selecttemplate [name="CategoryID"]').append('<option value="' +
+                       child.ID
+                       + '" data-name="' + child.Name + '">' + child.Path + child.Name + '</option>');
+                        MenuBuilder.CategoryTable[child.ID] = child.Name;
+                    }
+
+                }
+                MenuBuilder.fillShopCategories();
+
+            });
+        },
+        fillShopCategories: function () {
+            //we got response:
+            //Category: null
+            //CategoryID: 6450
+            //DisplayOrder: 1
+            //GroupNumber: 0
+            //ID: 2
+            //Level: 1
+            //Published: true
+            //Shop: null
+            //ShopID: 46
+            var group = {};
+            for (var o in MenuBuilder.Categories) {
+                var item = MenuBuilder.Categories[o];
+
+                if (item.Level == 0) {
+                    group = MenuBuilder.addNewGroup(MenuBuilder.CategoryTable[item.CategoryID], item.CategoryID, item.Published);
+                } else {
+                    MenuBuilder.addNewSubMenu(group, MenuBuilder.CategoryTable[item.CategoryID], item.CategoryID, item.Published);
+                }
+
+
+            }
+        },
+        fillAllCategories: function () {
+            if (confirm("@RP.S("Member.Views.CategoryMenu.AreYouSureToAddAllCategories")")) {
+                for (var o in MenuBuilder.AllCategories) {
+                    var group = MenuBuilder.addNewGroup(MenuBuilder.AllCategories[o].Name, MenuBuilder.AllCategories[o].ID, true);
+                    for (var cat in MenuBuilder.AllCategories[o].Childrens) {
+                        var child = MenuBuilder.AllCategories[o].Childrens[cat];
+                        MenuBuilder.addNewSubMenu(group, child.Name, child.ID, true);
+
+                    }
+
+                }
+            }
+        },
+        nextIdNum: 0,
+        addNewGroup: function (name, id, published) {
+            $("#sortable").append('<li class="ui-state-default"><li>');
+            $("#sortable > li.ui-state-default:last").append($('#edittemplateroot').html());
+            $("#sortable > li.ui-state-default:last .groupname").text(name);
+            $('#sortable > li.ui-state-default:last .editwrap').attr('data-categoryid', id);
+            if (published) {
+                $('#sortable > li.ui-state-default:last .editwrap').attr('data-published', 'True');
+
+            } else {
+                $('#sortable > li.ui-state-default:last .editwrap').attr('data-published', 'False');
+                $('#sortable > li.ui-state-default:last').addClass('notactive');
+            }
+            $("#sortable > li.ui-state-default:last").append('<ul class="connectedSortable"></ul>');
+            $("#sortable > li.ui-state-default:last ul").sortable({
+                connectWith: ".connectedSortable"
+            });//.disableSelection();
+            $("#sortable > li").not('.ui-state-default').remove();
+
+            var wall = $("#sortable").width();
+            $('.emptycontent').width(wall);
+
+            return $("#sortable > li.ui-state-default:last ul");
+        },
+        addNewSubMenu: function (group, name, id, published) {
+            var template = $('#edittemplate').html();
+            //.replace(/[\t\n]+/g, ' ');
+            MenuBuilder.nextIdNum++;
+            $(group).append('<li class="ui-state-highlight" id="subitem' + MenuBuilder.nextIdNum + '">' + template + '</li>');
+            $('.groupname', $('#subitem' + MenuBuilder.nextIdNum)).text(name);
+            $('.editwrap', $('#subitem' + MenuBuilder.nextIdNum)).attr('data-categoryid', id);
+            if (published) {
+                $('.editwrap', $('#subitem' + MenuBuilder.nextIdNum)).attr('data-published', 'True');
+
+            } else {
+                $('.editwrap', $('#subitem' + MenuBuilder.nextIdNum)).attr('data-published', 'False');
+                $('#subitem' + MenuBuilder.nextIdNum).addClass('notactive');
+            }
+        },
+        EditMenuItem: function (e, event) {
+            $('.groupeditor').html('').hide();
+            var wrap = $(e).parents('.editwrap:eq(0)');
+            $('.nameeditbuttonwrap:hidden').show();
+            $('.nameeditbuttonwrap', wrap).hide();
+            $('.groupeditor', wrap).html($('#selecttemplate').html()).show();
+            var cid = wrap.attr('data-categoryid');
+            $('[name="CategoryID"]', wrap).val(cid);
+
+            var k = $('[name="Published"]', wrap);
+            var pub = wrap.attr('data-published');
+            if (pub == 'True') {
+                k[0].checked = true;
+            } else {
+                k[0].checked = false;
+            }
+        },
+        SaveMenuItem: function (e, event) {
+            var wrap = $(e).parents('.editwrap:eq(0)');
+            var selectedCid = $('[name="CategoryID"]', wrap).val();
+            var name = $('[name="CategoryID"] option:selected', wrap).attr('data-name');
+            wrap.attr('data-categoryid', selectedCid);
+
+            var liitemwrap = $(wrap).parents('li:eq(0)');
+            var k = $('[name="Published"]', wrap);
+
+            if ($(k).is(':checked')) {
+                wrap.attr('data-published', 'True');
+                liitemwrap.removeClass('notactive');
+            } else {
+                wrap.attr('data-published', 'False');
+                liitemwrap.addClass('notactive');
+            }
+
+
+            $('.groupname', wrap).text(name);
+            $('.groupeditor', wrap).html('').hide();
+            $('.nameeditbuttonwrap', wrap).show();
+        },
+        DeleteMenuItem: function (e, event) {
+            if (confirm('@RP.S("Member.Views.CategoryMenu.AreYouSureToRemove")')) {
+                var wrap = $(e).parents('.editwrap:eq(0)');
+                var liitemwrap = $(wrap).parents('li:eq(0)');
+                liitemwrap.remove();
+            }
+        },
+        AddSubMenuItem: function (e, event) {
+            var wrap = $(e).parents('.editwrap:eq(0)');
+            var liitemwrap = $(wrap).parents('li:eq(0)');
+            var group = $('ul:eq(0)', liitemwrap);
+            MenuBuilder.addNewSubMenu(group, '', 0, false);
+        },
+        SaveAll: function (e, event) {
+            var menu = [];
+            $('#sortable >  li > .editwrap').each(function (i, e) {
+                var subMenu = {
+                    Order: i,
+                    CategoryID: $(e).attr('data-categoryid'),
+                    Published: $(e).attr('data-published'),
+                    //Items: []
+                };
+                //menu.push(subMenu);
+                $('.editwrap', $(e).parents('li:eq(0)')).each(function (j, k) {
+                    var childMenu = {
+                        Order: i,
+                        CategoryID: $(k).attr('data-categoryid'),
+                        Published: $(k).attr('data-published')
+                    };
+
+                    menu.push(childMenu);
+                });
+
+
+            });
+            var things = JSON.stringify({ 'model': menu, ShopID: $('[name="ShopID"]').val() });
+            //  jQuery.ajaxSettings.traditional = true;
+            MenuBuilder.ShowLoading($('.barbottom, .toptoolbar'));
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: "@Url.Action("_SaveMenuAjax", "CategoryMenu")",
+            cache: false,
+            contentType: 'application/json',
+            data: things
+        }).done(function (data) {
+            console.log(data);
+        }).always(function () {
+            MenuBuilder.HideLoading($('.barbottom, .toptoolbar'));
+        });
+
+    }
+    };
+    $(function () {
+        $('[name="ShopID"]').change(function () {
+            MenuBuilder.onStart();
+        });
+        
+        $(".barbottom").scroll(function () {
+            $(".bartop").scrollLeft($(".barbottom").scrollLeft());
+        });
+        $(".bartop").scroll(function () {
+            $(".barbottom").scrollLeft($(".bartop").scrollLeft());
+        });
+
+        var width = 10;
+        var height = "100px";
+        setInterval(function () {
+            var w = $("#sortable").width();
+            if (width != w) {
+                width = w;
+                $('.emptycontent').width(width);
+            }
+
+        }, 1000);
+
+
+    });
+   // window.onbeforeunload = function (e) {
+    //    return '@RP.T("Member.Views.CategoryMenu.SaveMenu.AreYouSureToClose")';
+   // };
+   
+  </script>
+<div id="selecttemplate" style="display:none;">
+    <div class="selectwrap">
+        <label>@RP.T("Member.Views.CategoryMenu.Published")<input type="checkbox" name="Published" /></label>
+        <button class="k-button" role="button" onclick="MenuBuilder.SaveMenuItem(this, event);">
+        <span class="ui-button-icon-primary ui-icon ui-icon-disk"></span></button>
+        <select name="CategoryID">
+            <option value="0">@RP.T("Member.Views.CategoryMenu.SelectCategory")</option>
+        </select>
+        
+    </div>
+</div>
+
+<div id="edittemplateroot" style="display:none;">
+    <div class="editwrap" data-categoryid="0">
+        <div class="nameeditbuttonwrap">
+            <button class="k-button iconbutdelete" role="button" onclick="MenuBuilder.DeleteMenuItem(this, event);">
+        <span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span></button>
+
+        <button class="k-button iconbutedit" role="button" onclick="MenuBuilder.EditMenuItem(this, event);">
+        <span class="ui-button-icon-primary ui-icon ui-icon-pencil"></span></button>
+           
+             <button title="@RP.S("Member.Views.CategoryMenu.AddSubMenuItem")" class="k-button" role="button" onclick="MenuBuilder.AddSubMenuItem(this, event);">
+        <span class="ui-button-icon-primary ui-icon ui-icon-plus"></span></button>
+        <span class="groupname"></span>
+            </div>
+        <span class="groupeditor"></span>
+    </div>
+</div>
+
+<div id="edittemplate" style="display:none;">
+    <div class="editwrap" data-categoryid="0">
+        <div class="nameeditbuttonwrap">
+            <button class="k-button iconbutdelete" role="button" onclick="MenuBuilder.DeleteMenuItem(this, event);">
+        <span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span></button>
+
+        <button class="k-button iconbutedit" role="button" onclick="MenuBuilder.EditMenuItem(this, event);">
+        <span class="ui-button-icon-primary ui-icon ui-icon-pencil"></span></button>
+        <span class="groupname"></span>
+            </div>
+        <span class="groupeditor"></span>
+    </div>
+</div>
+
+<div class="ui-widget-header ui-corner-all toptoolbar">
+    <div>@Html.Editor("ShopID","ShopSelect")</div>
+   <hr/>
+    
+    <button onclick="MenuBuilder.addNewGroup();" class="k-button">@RP.T("Member.Views.CategoryMenu.AddNewGroup")</button>
+    <button onclick="MenuBuilder.SaveAll();" class="k-button">@RP.T("Member.Views.CategoryMenu.SaveMenu")</button>
+    *@RP.T("Member.Views.CategoryMenu.SaveMenu.Warning")
+
+     <button onclick="MenuBuilder.fillAllCategories();" class="k-button">@RP.T("Member.Views.CategoryMenu.AddAllCategories")</button>
+    
+    </div>
+<div class="sortwrap bartop">
+    <div class="emptycontent">&nbsp;</div>
+    </div>
+<div class="sortwrap barbottom">
+<ul id="sortable">
+
+</ul>
+</div>

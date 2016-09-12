@@ -1,0 +1,34 @@
+﻿@{
+    ViewBag.Title = RP.T("Admin.Views.Domain.Index.Title");
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutNoTree.cshtml";
+}
+<h2>@RP.T("Admin.Views.Domain.Index.Title")</h2>
+
+@(Html.Kendo().Grid<Uco.Models.Settings>()
+    .Name("Grid")
+    .DataSource(dataSource =>
+        dataSource.Ajax()
+            .Model(model => { model.Id(item => item.ID); })
+            .Read(r => r.Action("_AjaxIndex", "Domain"))
+            .Destroy(r => r.Action("_AjaxDelete", "Domain"))
+    )
+    .Columns(columns =>
+    {
+        columns.Bound(r => r.ID).Width(50);
+        columns.Bound(r => r.Domain);
+        columns.Bound(r => r.LanguageCode);
+        columns.Template(r => r.ID).ClientTemplate(
+            "<a class='k-button' href='" + Url.Action("Edit", "Domain") + "?ID=#= ID #'" + ">" + RP.T("Admin.Views.Command.Edit").ToString() + "</a>"
+        ).Width(100);
+        columns.Command(commands =>
+        {
+            commands.Destroy();
+        }).Width(100);
+    })
+    .Pageable()
+    .Sortable()
+    .Filterable()
+    .Groupable()
+)
+<br />
+@Html.ActionLink(RP.T("Admin.Views.Command.Create").ToString(), "Create", null, new { @class = "k-button k-state-default" })

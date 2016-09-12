@@ -1,0 +1,28 @@
+﻿@model List<Uco.PluginExample.Models.PluginExampleSomeData>
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Index</title>
+</head>
+<body>
+    <div>
+        @foreach (Uco.PluginExample.Models.PluginExampleSomeData item in Model)
+        {
+            <div>@item.Text</div>
+        }
+    </div>
+    @Html.Action("_TestAction", "Data")<br /><br />
+    @Html.ActionLink("link", "_TestAction", "Data")<br />
+    @Html.Partial("_TestPartial")<br />
+
+    @Html.Display("111","template1")
+
+    @Html.Editor("111", "template1")
+
+</body>
+</html>

@@ -1,0 +1,21 @@
+﻿
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutNoTree.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>CopyUnusedImages</title>
+</head>
+<body>
+    <p> 
+        @Html.Raw(Html.Encode(ViewBag.StatusInfo).Replace("\n", "<br />"))
+    </p>
+    <div>
+        <a class="k-button" href="/Admin/Product/Index">Back To Products</a>
+    </div>
+</body>
+</html>

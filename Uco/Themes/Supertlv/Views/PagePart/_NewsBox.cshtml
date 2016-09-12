@@ -1,0 +1,8 @@
+﻿@model List<Uco.Models.NewsPage>
+@foreach (Uco.Models.NewsPage item in Model)
+{
+    <div class="news_box_div">
+        <a href="@Url.Content(item.Url)">@item.Title</a>
+        @item.ShortDescription
+    </div>
+}

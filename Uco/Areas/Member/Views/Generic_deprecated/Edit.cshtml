@@ -1,0 +1,16 @@
+﻿@using System.Reflection
+@using System.Collections.Generic
+@using System.Linq
+@using System.ComponentModel.DataAnnotations
+@{
+    System.Type t = Model.GetType();
+    var ModelName = t.Name;
+    ViewBag.Title = RP.T("Admin.Views."+ModelName+".Index.Title");
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutNoTree.cshtml";
+}
+<h2>@RP.T("Admin.Views."+ModelName+".Index.Title")</h2>
+@Html.Partial("_EditOrCreate",(object)Model)
+@{
+    
+return;
+}

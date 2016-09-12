@@ -1,0 +1,387 @@
+﻿@model Uco.Models.Overview.ProductOverviewModel
+@{
+    var isProductInCart = Model.isInShoppingCart;
+}
+
+@helper WelcomeMessage(string username)
+{
+    <p>Welcome, @username.</p>
+}
+
+<script type="text/javascript">    
+        $(".fancybox").fancybox();         
+        
+        $(document.body).on("click","#removeProductToFavorite", function () {
+            var $this = $(this);
+            $.ajax({
+                type: "POST",
+                dataType: "html",
+                url: "/Shop/_RemoveProductFromFavorite",
+                data: { productShopID: @Model.ProductShopID },
+                cache: false,
+                error: function () {
+                    console.log("error");
+                }
+            }).done(function (html) {
+                $this.attr("id", "addProductToFavorite")
+                $this.attr("class", "addProductToFavorite shadowEffect");
+            });
+        });
+        $(document.body).on("click", "#addProductToFavorite", function () {
+            var $this = $(this);
+            $.ajax({
+                type: "POST",
+                dataType: "html",
+                url: "/Shop/_AddProductToFavorite",
+                data: { productShopID: @Model.ProductShopID  },
+                cache: false,
+                error: function () {
+                    console.log("error");
+                }
+            }).done(function (html) {
+                console.log('remove'+ $(this));
+                $this.attr("id", "removeProductToFavorite");
+                $this.attr("class", "removeProductToFavorite shadowEffect");
+            });
+        });        
+        
+        $("#zoom-image").on("click", function () {
+            alert("zoomImage click");
+        });
+        $(".ratingStar").raty({
+            path: '/Scripts/raty-2.7.0/lib/images',
+            half: false,
+            score: $("#productRate").val(),
+            halfShow: false,
+            readOnly: function () {
+                return false;
+            },
+            click: function (score) {
+                $.ajax({
+                    type: "POST",
+                    dataType: "html",
+                    url: "/Shop/_AddProductRate",
+                    data: { productID: $("#noteProductID").val(), score: score },
+                    cache: false,
+                }).done(function (html) {
+
+                });
+                $(".ratingStar").raty("readOnly", true);
+                $("#countVotedPerson").html(parseInt($("#countVotedPerson").html(), 10) + 1);
+            }
+        });
+
+        $(".ratingStarReadOnly").raty({
+            path: '/Scripts/raty-2.7.0/lib/images',
+            half: false,
+            score: $("#productRate").val(),
+            halfShow: false,
+            readOnly: function () {
+                return true;
+            }
+        });
+
+        var productCommentValidator = $("#productCommentForm").kendoValidator().data("kendoValidator");
+        $("#productCommentForm").submit(function () {
+            if (productCommentValidator.validate()) {
+                $.ajax({
+                    type: "POST",
+                    url: "/Shop/_AddProductComment",
+                    data: {
+                        ProductID: $("#noteProductID").val(),
+                        UserName: $("#fullName").val(),
+                        Text: $("#commentText").val(),
+                        Title: $("#commentTitle").val(),
+                    },
+                    error: function () {
+                        console.log("error");
+                    }
+                }).done(function (html) {
+                    $("#productCommentForm").toggle();
+                    $("#commentSuccessfullySend").toggle();
+                    
+                    $("#fullName").val("");
+                    $("#commentTitle").val("");
+                    $("#commentText").val("");
+                });
+            } 
+            else {
+                //alert("no valid form");
+            }
+            return false;
+        });
+</script>
+
+
+<div id="light3" class="white_content3">
+    <input type="hidden" name="noteProductID" id="noteProductID" value="@Model.ProductID" />    
+    <input type="hidden" name="productRate" id="productRate" value="@Model.Rate">
+
+    <div class="popup_close1">
+        <a href="javascript:void(0)" onclick="document.getElementById('light3').style.display='none';document.getElementById('fade3').style.display='none'">
+            <img src="~/Content/DesignFiles/popup_close1.png" alt="">
+        </a> <a href="#">
+        </a>
+    </div>
+    <div class="prct_pop_white">
+        <div class="product_popup_heading">
+            <h1 class="prdct_popup_h1">@Model.Name</h1>
+            <div class="prdct_popup_head_left">
+                <div class="addthis_toolbox addthis_default_style">
+                    <a class="addthis_button_facebook"></a>
+                    <a class="addthis_button_twitter"></a>
+                    <a class="addthis_button_print"></a>
+                    <a class="addthis_button_favorites"></a>
+                    <a class="addthis_button_addthis"></a>
+                    <a class="addthis_button_facebook_like" fb:like:layout="button_count"></a>
+                </div>
+                <div class="clear"></div>
+            </div>
+            <div class="clear"></div>
+        </div>
+        <div class="popup1_row1">
+            <div class="popup1_row1_right sh_protidctItemWrap">
+                <input type="hidden" name="ProductShopID" value="@Model.ProductShopID">
+                <input type="hidden" name="ShopID" value="@Model.ShopID">
+                <div class="pop1_row1_righ1">
+                    <div class="zoom_icon1">
+                        <a class="fancybox" rel="group" href="@Model.Image" id="zoom-image1">
+                            <img class="shadowEffect" alt="" src="~/Content/DesignFiles/zoom_icon.png">
+                        </a>
+                    </div>
+                    <div class="star_icon1">
+
+                        @if (ShoppingService.IsProductInFavorite(Model.ProductShopID, LS.CurrentUser.ID))
+                        {
+                            <a href="javascript:void(0)" id="removeProductToFavorite" class="removeProductToFavorite shadowEffect"></a>
+                        }
+                        else
+                        {
+                            <a href="javascript:void(0)" id="addProductToFavorite" class="addProductToFavorite shadowEffect"></a>
+                        }
+                    </div>
+                    <div class="prdct_big_img">
+                        <a href="@Model.Image" class="fancybox">
+                            <img alt="" src="@SF.GetImage(Model.Image, 132, 172, true, true)">
+                        </a>
+                    </div>
+                    <div class="product_rating">
+                        <ul>
+                            <li>@RP.T("Views.Shop._ProductPopup.RatingStarText")</li>
+                            @if (true || ShoppingService.IsCanVoteForProduct(Model.ProductID, LS.CurrentUser.ID))
+                            {
+                                <li class="ratingStar"></li>
+                            }
+                            else
+                            {
+                                <li class="ratingStarReadOnly"></li>
+                            }
+                        </ul>
+                        <div class="clear"></div>
+                    </div>
+                    <div class="rating_bott">@RP.T("Views.Shop._ProductPopup.RateCountRight")<span id="countVotedPerson">@Model.RateCount</span> @RP.T("Views.Shop._ProductPopup.RateCountLeft")</div>
+                </div>
+
+                @if (Model.Attributes.Count > 0)
+                {
+                    <div class="pop_prdct_select1">
+                        <input type="hidden" name="ProductAttributeOptionID" value="0" />
+                        <select name="ProductAttributeOptionID_box" class="drop_down"
+                                onchange="Shop.BoxChangeAttribute(this,event,@Model.ID);">
+                            <option data-sku="@Model.SKU" data-price="@ShoppingService.FormatPrice(Model.Price)" data-quantity="@Model.Quantity" value="0">@RP.T("Views.Shop._ProductPopup.SelectType")</option>
+                            @foreach (var atr in Model.Attributes)
+                            {
+                                string selected = "";
+
+                                <option data-sku="@(!string.IsNullOrEmpty(atr.OverridenSku) ? atr.OverridenSku : Model.SKU)"
+                                        data-price="@(atr.OverridenPrice > 0 ? atr.OverridenPriceStr : ShoppingService.FormatPrice(Model.Price))"
+                                        data-quantity="@atr.Quantity" value="@atr.ID" @selected>
+                                    @atr.Name
+                                </option>
+                            }
+                        </select>
+                    </div>
+                }
+
+                <div class="pop_qty">
+                    <div class="prdct_qty_part2">
+                        <div class="prdct_qty_minus2"><a href="#" onclick="Shop.BoxDecrease(this, event, @Model.ProductShopID, true);"></a></div>
+                        <div class="prdct_qty_show2"><input type="text" name="Quantity" id="quantityinputProductPopup_@(Model.ProductShopID)" value="@Model.QuantityToBuy" class="single-line"></div>
+                        <div class="prdct_qty_plus2"><a href="#" onclick="Shop.BoxIncreas(this, event, @Model.ProductShopID, true);"></a></div>
+                        <div class="clear"></div>
+                    </div>
+                    <div class="@(isProductInCart ? "product_brown_btn2" : "product_green_btn2")" role="button" onclick="Shop.Buy(this,event,@Model.ProductShopID);">
+                        <a href="javascript:void(0)">@(isProductInCart ? RP.T("Views.Shop._ProductGalleryItem.ItemInCartText") : RP.T("Views.Shop._ProductPopup.BuyBtnText"))</a>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <div class="qty2_bott1">
+                    <a href="javascript:void(0)" class="showNoteWindow" data-productid="@Model.ProductID">@RP.T("Views.Shop._ProductPopup.AddEditNote")</a>
+                </div>
+                <div class="poptabbottext noteForProduct" data-productid="@Model.ProductID">@ShoppingService.GetUserNoteForProduct(Model.ProductID, null)</div>
+            </div>
+
+            <div class="popup1_row1_left">
+                @if (Model.Specifications.Where(x => x.Attribute == "Energy").Any())
+                { 
+                <div class="popheading2">@RP.T("Views.Shop._ProductPopup.SpecificationTableTitle")</div>
+                <div class="poptable">
+                    <div class="poptablehead">
+                        <table width="100%" cellspacing="0" cellpadding="0" border="0">
+                            <tbody>
+                                <tr>
+                                    <td valign="middle" align="right">@RP.T("Views.Shop._ProductPopup.SpecificationTableFirstRow")</td>
+                                    <td valign="middle" align="right">@RP.T("Views.Shop._ProductPopup.SpecificationTableSecondRow")</td>
+                                    <td valign="middle" align="right">@RP.T("Views.Shop._ProductPopup.SpecificationTableThirdRow")</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                   
+                    @foreach (var sp in Model.Specifications.Where(x => x.Attribute == "Energy"))
+                    { 
+                        <div class="poptablelisting">
+                            <table width="100%" cellspacing="0" cellpadding="0" border="0">
+                                <tbody>
+                                    <tr>
+                                        <td valign="middle" align="right">@sp.Attribute</td>
+                                        <td valign="middle" align="right">@sp.Name</td>
+                                        <td valign="middle" align="right">@sp.Name</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+                }
+                @if (Model.Specifications.Where(x => x.Attribute == "Text").Any())
+                { 
+                    <div class="popup_table_bot">
+                        <div class="popuptablebothead">@RP.T("Views.Shop._ProductPopup.SpecificationFullText")</div>
+                        <div class="poptabbottext">
+                        
+                            @foreach (var sp in Model.Specifications)
+                            {
+                                if (sp.Attribute == "Text")
+                                { 
+                                    <p>@sp.CustomValue</p>
+                                }                           
+                            }
+                        </div> 
+                    </div>
+                }
+            </div>
+            <div class="clear"></div>
+        </div>
+
+        @if (!String.IsNullOrEmpty(Model.FullDescription) && Model.FullDescription != "null")
+        { 
+            <div class="popup1_row2">
+                <div class="popuptablebothead">@RP.T("Views.Shop._ProductPopup.FullDescription")</div>
+                <div class="poptabbottext">@Html.Raw(Model.FullDescription)</div>
+            </div>
+        }
+
+        @{
+            var relatedProductShops = new List<Uco.Models.Overview.RelatedProductShop>();// Model.RelatedProductShops.Where(x => x.ShopID != Model.ShopID);
+        }
+        @if(false && relatedProductShops.Any())
+        { 
+            <div class="popup1_row3">
+                <div class="popuptablebothead">@RP.T("Views.Shop._ProductPopup.SpecificationTitle")</div>               
+                <div class="poprow3tab">
+                    <div class="poptablehead2">
+                        <table width="100%" cellspacing="0" cellpadding="0" border="0">
+                            <tbody>
+                                <tr>
+                                    <td valign="middle" align="right" class="first">@RP.T("Views.Shop._ProductPopup.RelatedProductTableShopText")</td>
+                                    <td valign="middle" align="right" class="second">@RP.T("Views.Shop._ProductPopup.RelatedProductTablePriceText")</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    @foreach (var m in relatedProductShops)
+                    { 
+                        <div class="poptablelisting2">
+                            <table width="100%" cellspacing="0" cellpadding="0" border="0">
+                                <tbody>
+                                    <tr>
+                                        <td valign="middle" align="right" class="first">@m.ShopName</td>
+                                        <td valign="middle" align="right" class="second"><strong>@m.PriceStr</strong></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+                <div class="pop_qty">
+                    <div class="product_green_btn2 product_popup_change_shop">
+                        <a href="javascript:void(0)" class="productPopupChangeShop">@RP.T("Views.Shop._ProductPopup.ChangeShopText")</a>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+
+            </div>
+        }
+
+        @*@if(Model.RelatedProducts.Any())
+        { 
+        <div class="popup1_row4">
+            <div class="popuptablebothead">@RP.T("Views.Shop._ProductPopup.RelatedProductTitle")</div>
+            <div class="products_part" style=" width: 980px;">
+                <ul>
+                    @foreach (var m in Model.RelatedProducts)
+                    {
+                        <li class="sh_protidctItemWrap">
+                            @Html.Partial("_ProductGalleryItem", m)                            
+                        </li>
+                    }
+                </ul>
+                <div class="clear"></div>
+            </div>
+        </div>
+        }*@   
+
+        <div class="map_contant">
+            <div class="store_left_head1">@RP.T("Views.Shop._ShopInfoPopup.CommentBlockTitle")</div>
+            <div class="shopCommentsBlock">
+                @foreach (var comment in Model.ProductComments)
+                {
+                    @Html.Partial("_ProductComment", comment)
+                }
+            </div>
+        </div>
+
+        <div class="popup1_form">
+            <form class="form1" action="" method="post" name="productCommentForm" id="productCommentForm">
+                <div class="heading">@RP.T("Views.Shop._ProductPopup.CommentTitleText")</div>
+                <div class="right_sec_in_form1">
+                    <div class="row no_padding">
+                        <div class="editor-field">
+                            <input type="text" name="fullName" id="fullName" class="single-line" required data-required-msg="@RP.T("Views.Shop._ProductPopup.FullNameRequired")" placeholder="@RP.T("Views.Shop._ProductPopup.CommentUserNamePlaceholder")" value="">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="editor-field">
+                            <input type="text" name="commentTitle" id="commentTitle" required data-required-msg="@RP.T("Views.Shop._ProductPopup.CommentTitleRequired")" placeholder="@RP.T("Views.Shop._ProductPopup.CommentTitlePlaceholder")" class="single-line" value="">
+                        </div>
+                    </div>
+                </div>
+                <div class="left_sec_in_form1">
+                    <textarea class="multi-line" rows="5" cols="45" name="commentText" id="commentText" required data-required-msg="@RP.T("Views.Shop._ProductPopup.CommentTextRequired")" placeholder="@RP.T("Views.Shop._ProductPopup.CommentPlaceholder")"></textarea>
+                </div>
+                <div class="clear"></div>
+                <div class="form1_btn"><input width="89" type="image" height="34" alt="Send" src="~/Content/DesignFiles/form1_btn.png"></div>
+            </form>
+            <div id="commentSuccessfullySend" class="dn">
+                @RP.Text("Views.Shop._ProductPopup.CommentSuccessfullySend")
+            </div>
+        </div>
+    </div>
+</div>
+
+<a href="javascript:void(0)" onclick="document.getElementById('light3').style.display='none';document.getElementById('fade3').style.display='none'">
+    <div id="fade3" class="black_overlay"></div>
+</a>
+<div class="clear"></div>
+

@@ -1,0 +1,10 @@
+﻿@model Uco.Models.LanguagePage
+@{
+    Layout = ViewBag.Layout;
+}
+<div id="content">
+    <div class="editor_html">
+        @Html.Raw(Model.Text)
+    </div>
+    <div class="clear"></div>
+</div>

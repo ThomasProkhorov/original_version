@@ -1,0 +1,131 @@
+﻿@model IEnumerable<Uco.Models.Category>
+@{
+    Layout = null;
+    int shopID = ViewBag.ShopID;
+}
+<ul data-role="listview" data-type="group">
+    <li><div class="shopTotleInTopMenu">@RP.T("Views.Shared._TopMenu.Mobile.CurrentShopText")<br/>@LS.CurrentEntityContext.Shops.FirstOrDefault(r => r.ID == shopID).Name</div>
+        <ul class="categories">
+            @if (Session["OpenedFromHomePage" + shopID.ToString()] != null
+    && ((DateTime)Session["OpenedFromHomePage" + shopID.ToString()]) > DateTime.UtcNow.AddHours(-2))
+{ 
+             <li class="nav1">
+                <a href="#tabstrip-changeStore" data-role="button">@RP.T("Views.Shared._TopMenu.Mobile.ChangeStore")</a>
+            </li>
+            }
+            <li class="nav1" data-id="" data-name="@RP.T("Views.Shared._TopMenu.FirstCategoryName")">
+                <a href="#drawer-index" class="first category" id="firstCategoryProducts">
+                    @RP.T("Views.Shared._TopMenu.FirstCategoryName")
+                </a>
+                <a class="km-icon km-details categoryDetails"></a>
+                <ul class="dn">
+                    <li class="subCategory first sub" data-id="" data-name="@RP.T("Views.Shared._TopMenu.FavoriteProducts")">
+                        <a id="favoriteProducts" data-rel="drawer" href="#drawer-index">@RP.T("Views.Shared._TopMenu.FavoriteProducts")</a>
+                    </li>
+                    <li class="subCategory first sub" data-id="" data-name="@RP.T("Views.Shared._TopMenu.ProductsFromOrders")">
+                        <a id="orderedProducts" href="#drawer-index">@RP.T("Views.Shared._TopMenu.ProductsFromOrders")</a>
+                    </li>
+                    <li class="subCategory first sub" data-id="" data-name="@RP.T("Views.Shared._TopMenu.DealsProducts")">
+                        <a id="dealsProducts" href="#drawer-index">@RP.T("Views.Shared._TopMenu.DealsProducts")</a>
+                    </li>
+
+                </ul>
+            </li>
+           @foreach (var item in Model.Where(x => x.ParentCategoryID == 0))
+            {
+                bool has = false;
+               if (Model.Where(x => x.ParentCategoryID == item.ID).Any())
+               {
+                   has = true;
+               
+               }
+                <li class="nav1" data-id="@item.ID" data-name="@item.Name" >
+                    <a href="#drawer-index" class="category">
+                        @item.Name 
+                    </a>
+                    
+                     @if (has)
+                    {
+                       
+                        <a class="km-icon km-details categoryDetails"></a>
+                    }
+                     @if (has)
+                         {
+                    <ul class="dn">
+                        
+                            <li class="subCategory sub" data-id="@item.ID" data-name="@item.Name">
+                                <a href="#drawer-index">@RP.T("_TopMenu.SubCategories.OpenAll")</a>
+                            </li>
+                        
+                        @foreach (var subItem in Model.Where(x => x.ParentCategoryID == item.ID))
+                        {
+                            <li class="subCategory sub" data-id="@subItem.ID" data-name="@subItem.Name">
+                                <a href="#drawer-index">@subItem.Name</a>
+                            </li>
+                        }
+                    </ul>
+                         }
+                     else
+                     {
+                        <ul class="dn">
+                            </ul>
+                            }
+</li>
+            }
+            <li class="nav1">
+                <a href="#tabstrip-shopInfo" data-role="button" @*data-icon="info"*@>@RP.T("Views.Shared._TopMenu.Mobile.ShopInfo")</a>
+            </li>
+            <li class="nav1">
+                <a href="#tabstrip-contact" data-role="button" @*data-icon="phone"*@>@RP.T("Views.Shared._TopMenu.Mobile.Contact")</a>
+            </li>           
+            @if (LS.isLogined())
+            {                
+                <li class="nav1" data-id="">
+                    <a class="categoryDetails" style="position:static;float:none">
+                        @RP.T("Views.Shared._TopMenu.Mobile.ProfileLinkText")
+                    </a>
+                    <a class="km-icon km-details categoryDetails"></a>
+                    <ul class="dn">
+                        <li class="subCategory">
+                            <a onclick="Shop.GoTo('/Profile/Index');">@RP.T("Views.Shared._TopMenu.Mobile.Profile")</a>
+                        </li>
+                        <li class="subCategory">
+                            <a onclick="Shop.GoTo('/Profile/RegularOrders');">@RP.T("Views.Shared._TopMenu.Mobile.ProfileRegularOrders")</a>
+                        </li>
+                        <li class="subCategory">
+                            <a onclick="Shop.GoTo('/Profile/Address');">@RP.T("Views.Shared._TopMenu.Mobile.ProfileAddress")</a>
+                        </li>
+                        <li class="subCategory">
+                            <a onclick="Shop.GoTo('/Profile/Settings');">@RP.T("Views.Shared._TopMenu.Mobile.ProfileSettings")</a>
+                        </li>
+                        <li class="subCategory">
+                            <a onclick="Shop.GoTo('/Profile/Password');">@RP.T("Views.Shared._TopMenu.Mobile.ProfileChangePassword")</a>
+                        </li>
+                    </ul>
+                </li>                
+                <li class="nav1">
+                    <a href="#tabstrip-login" data-role="button">@RP.T("Views.Shared._TopMenu.Mobile.LogOut")</a>
+                </li>
+            }
+            else
+            {
+                <li class="nav1">
+                    <a href="#tabstrip-login" data-role="button" @*data-icon="contacts"*@>@RP.T("Views.Shared._TopMenu.Mobile.Login")</a>
+                </li>
+            }
+            @*<li class="nav1">
+                <a href="#tabstrip-poll" data-role="button" >@RP.T("Views.Shared._TopMenu.Mobile.QuestionPage")</a>
+
+            </li>*@                 
+            <li class="nav1">
+                <a onclick="Shop.GoTo('/f/contact');" data-role="button">@RP.T("Views.Shared._TopMenu.Mobile.AdminContactPage")</a>
+            </li>
+            @*<li class="nav1">
+                <a onclick="Shop.GoTo('/Shop/_ChangeShop');" data-role="button">@RP.T("Views.Shared._TopMenu.Mobile.ChangeStore2")</a>
+            </li>*@
+            <li class="nav1">
+                <a onclick="Shop.GoTo('/c/Terms');" data-role="button">@RP.T("Views.Shared._TopMenu.Mobile.Terms")</a>
+            </li>
+        </ul>
+    </li>
+</ul>

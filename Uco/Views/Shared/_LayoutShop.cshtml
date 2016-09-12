@@ -1,0 +1,299 @@
+﻿@using StackExchange.Profiling;
+@{
+    Script.AddHead("~/Scripts/jquery-1.10.2.min.js");
+    Script.AddHead("~/Scripts/Kendo/2014.1.318/kendo.web.min.js");
+    Script.AddHead("~/Scripts/Kendo/2014.1.318/kendo.aspnetmvc.min.js");
+    Script.AddHead("~/Scripts/kendo/2014.1.318/cultures/kendo.culture." + SF.GetLangCodeThreading() + ".min.js");
+    Script.AddHead("~/Scripts/kendo/2014.1.318/gridlocal/kendo." + SF.GetLangCodeThreading() + ".js");
+    Script.AddHead("~/Scripts/jquery.validate.min.js");
+    Script.AddHead("~/Scripts/jquery.validate.unobtrusive.min.js");
+    Script.AddHead("~/Scripts/jquery.unobtrusive-ajax.min.js");
+    Script.AddHead("~/Scripts/Custum/css_browser_selector.js");
+    Script.AddHead("~/Scripts/sammy-0.7.5.min.js");
+    //Script.AddHead("~/Scripts/Jquery.Tooltip/tooltip.js");
+    Script.AddHead("~/Scripts/Jquery.multiple.select/jquery.multiple.select.js");
+    Script.AddHead("~/Scripts/lazyLoad.js?v=4");
+    Script.AddHead("~/Scripts/Superfish-master/dist/js/superfish.js");
+    Script.AddHead("~/Scripts/Jquery.Sticky/jquery.sticky.js");
+    Script.AddHead("~/Scripts/raty-2.7.0/lib/jquery.raty.js");
+    Style.AddHead("~/Scripts/raty-2.7.0/lib/jquery.raty.css");
+    
+    Script.AddHead("~/Scripts/Custum/custum.js?v=37");
+    Script.AddHead("~/Scripts/Custum/shopapi.js?v=37");
+    Script.AddHead("~/Scripts/Custum/router.js?v=16");
+
+        
+    Script.AddHead("~/Scripts/gray-gh-pages/js/jquery.gray.min.js");
+    Script.AddHead("~/Scripts/ivupdown.js?v=5");
+    Script.AddHead("~/Scripts/pstooltip.js");
+    Style.AddHead("~/Scripts/gray-gh-pages/css/gray.css");  
+
+    Style.AddHead("~/Scripts/Fancyapps-fancyBox-2.1.5/source/jquery.fancybox.css?v=3");    
+    Script.AddHead("~/Scripts/Fancyapps-fancyBox-2.1.5/source/jquery.fancybox.pack.js?v=2");
+    Script.AddHead("~/Scripts/bootstrap.min.js");
+    Style.AddHead("~/Content/Kendo/2014.1.318/kendo.common.min.css");
+    Style.AddHead("~/Content/Kendo/2014.1.318/kendo.bootstrap.min.css");
+    Style.AddHead("~/Content/Kendo/2014.1.318/kendo.rtl.min.css");
+    Style.AddHead("~/Content/Site.css?b=21");
+    Style.AddHead("~/Scripts/Jquery.multiple.select/multiple-select.css");
+    Style.AddHead("~/Content/bootstrap.min.css?v=5");
+    Style.AddHead("~/Content/stylemodal.css?v=3");
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    <meta content="@ViewBag.Keywords" name="keywords" />
+    <meta content="@ViewBag.Description" name="description" />
+    <meta name="google-signin-client_id" content="377308744841-p7jii04ukvgfo05qthpu35lhsvn3lkih.apps.googleusercontent.com" />
+    <link href="http://@(Request.ServerVariables["HTTP_HOST"])@(Url.Content(ViewBag.Url))" rel="canonical" />
+    
+    <link href='//fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css' />
+    @if (ViewBag.FavIcon != null)
+    { 
+    <link rel="shortcut icon" href="@ViewBag.FavIcon">
+    }
+    @Style.RenderHead()
+    @Script.RenderHead()
+    @RenderSection("HeaderHtml", required: false)
+    @Html.Action("_HeaderScripts", "PagePart")
+    <script type="text/javascript">
+        kendo.culture("@(SF.GetLangCodeThreading())");
+   
+ga('require', 'ecommerce');
+   
+    </script>
+    
+    <!--[if lt IE 9]> <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script><script src="http://css3-mediaqueries-js.googlecode.com/svn/trunk/css3-mediaqueries.js"></script><![endif]-->
+    
+    
+    @*<link rel="stylesheet" href="//code.ionicframework.com/ionicons/1.5.2/css/ionicons.min.css" media="screen">*@
+   
+
+</head>
+<body class="k-rtl">
+  
+    <!--[if lt IE 7]><div class="ie67"><p style='font-weight:bold; font-size:20px; padding:0 10px; text-align:center; margin:20px 0 20px; color:red;'>Your using old and unsuported browser. Upgrade you browser!<br/><a href='http://www.microsoft.com/windows/internet-explorer/default.aspx'>Click here to upgrade.</a></p></div><![endif]-->
+    <div id="fb-root"></div>
+    <!-- Google Tag Manager -->
+<noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-T23MZ5"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-T23MZ5');</script>
+<!-- End Google Tag Manager -->
+    <script>
+        window.fbAsyncInit = function () {
+            FB.init({
+                appId: '1626666457575757',
+                xfbml: true,
+                version: 'v2.3'
+            });
+        };
+
+        (function (d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) { return; }
+            js = d.createElement(s); js.id = id;
+            js.src = "//connect.facebook.net/he_IL/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+        
+    </script>
+    <div class="header_main">
+        @Html.Partial("_Header")
+        @RenderSection("topmenu", required: false)
+    </div>
+    @if (System.Configuration.ConfigurationManager.AppSettings["Profiler"].ToString() == "true")
+    { @StackExchange.Profiling.MiniProfiler.RenderIncludes() }
+    <div class="@(RP.GetCurrentSettings().LanguageRTL ? "k-rtl" : "k-ltr")">
+        @RenderBody()
+    </div>
+<div>
+    @*@Html.Partial("_Footer")*@
+
+</div>
+
+@if(IsSectionDefined("FooterZone"))
+{
+@RenderSection("FooterZone")
+}else
+{
+    if (ViewBag.ShopID!=null)
+    { 
+@Html.Action("FooterCart","ShoppingCart", new {ID = ViewBag.ShopID })
+}
+}
+    @*@Html.Partial("_ShopingCart")*@
+    @Html.Partial("_EditIcon")
+    @Script.RenderFooter()
+    @RenderSection("FooterHtml", required: false)
+    @Html.Action("_FooterScripts", "PagePart")
+    
+    
+<!-- Modal -->
+<div class="specialcss specialbootstrap">
+    <div class="modal fade myModal login-window" id="myModal" role="dialog" style="display:none;">
+        <div class="modal-dialog">
+
+            <div class="col-lg-9 col-md-9  col-sm-9  col-xs-12 col-lg-offset-2  col-sm-offset-2  modal-content">
+                <div class="logologin">
+                    <img src="@(ViewBag.Logo != null ? ViewBag.Logo : "/Content/DesignFiles/logo.png")" class="center-block img-responsive"/>
+                </div>
+                <div class="col-lg-12">
+                    <form class="col-lg-12  center-block">
+                       <div class="clear20"></div>
+                        <div class="col-lg-12 no_padding" >
+                            <input name="UserName" type="text" id="loginFormUserName" autofocus="autofocus" class="form-control input_blok " placeholder="אימייל">
+                        </div>
+                        <div class="clear20"></div>
+                        <div class="col-lg-12 no_padding" >
+                            <input name="Password" type="password" class="form-control input_blok " placeholder="סיסמה">
+                        </div>
+                        <div class="clear20"></div>
+                        <button  onclick="Shop.DoLogin(this,event);" type="button" class=" col-lg-12 col-md-12  col-sm-12  col-xs-12  btn  org_btn">
+                        @RP.T("Views.Shop._LoginSignupPopup.DoLogin")</button>
+                        <div class="clear10"></div>
+                        <table class=" col-lg-12 col-md-12  col-sm-12  col-xs-12"><tr>
+                            <td style="width:47%"><hr/></td>
+                            <td style="vertical-align:middle; text-align: center">or</td>
+                            <td style="width:47%"><hr/></td>
+                        </tr></table>
+                        <div class="clear10"></div>
+                        <div id="socialfacebook"></div>
+                        @*<button  type="button" class=" col-lg-12 col-md-12  col-sm-12  col-xs-12  btn  fb_btn  no_padding" data-dismiss="modal">
+                            כניסה באמצעות פייסבוק
+                            <i class="ion-social-facebook step size-32 pull-left"></i>
+
+                        </button>*@
+                        <div class="clear10"></div>
+                        <!--<button type="button" class=" col-lg-12 col-md-12  col-sm-12  col-xs-12  btn  googl_btn  no_padding" data-dismiss="modal">-->
+                            <!--הלחא אלםושמושמ הניחט-->
+                       <!--<i class="ion-social-google step size-32  pull-left"></i>-->
+                        <!--</button>-->
+
+                        <div class="col=lg-12 pull-right no_padding">
+         <p class="underline">
+                            <a href="#" onclick="Shop.ShowRegModal(this, event);"  data-dismiss="modal">צריך לפתוח חשבון חדש? לחץ כאן</a>
+                            <br/><a href="#" onclick="Shop.ShowForgotPass(this, event);"  data-dismiss="modal">שכחת סיסמה? לחץ כאן</a></p>
+                        </div>
+                        <div class="clear10"></div>
+                    </form>
+
+                </div>
+                
+            </div>
+            <div class="clear10"></div>
+        </div>
+
+    </div>   
+
+    <!-- Modal -->
+    <div class="modal fade modalReg" id="myModalreg" role="dialog" style="display:none;">
+        <div class="modal-dialog">
+
+            <div class="col-lg-9 col-md-9  col-sm-9  col-xs-12 col-lg-offset-2  col-sm-offset-2  modal-content">
+                <div class="logologin">
+                    <img src="@(ViewBag.Logo != null ? ViewBag.Logo : "/Content/DesignFiles/logo.png")" class="center-block img-responsive"/>
+                </div>
+                <div class="col-lg-12">
+                    <form class="col-lg-12  center-block">
+                        <div class="clear20"></div>
+                        <div class=" col-lg-5 col-md-5  col-sm-5  col-xs-5  no_padding pull-left">
+                            <input type="text" name="FirstName" class="form-control input_blok " placeholder="@RP.T("Views.Shop._LoginSignupPopup.FirstName")">
+                        </div>
+                        <div class=" col-lg-5 col-md-5 col-sm-5 col-xs-5  no_padding pull-right">
+                            <input type="text"class="form-control input_blok " placeholder="@RP.T("Views.Shop._LoginSignupPopup.LastName")" name="LastName">
+                        </div>
+                        <div class="clear20"></div>
+                        <div class="col-lg-12 no_padding" >
+                            <input id="confemail" type="hidden" value="" name="ConfirmEmail" />
+                            <input onkeyup="$('#confemail').val(this.value);" type="email"class="form-control input_blok " placeholder="@RP.T("Views.Shop._LoginSignupPopup.Email")" name="Email">
+                        </div>
+                        <div class="clear20"></div>
+                        <div class="col-lg-12 no_padding" >
+                            <input type="password" class="form-control input_blok " placeholder="@RP.T("Views.Shop._LoginSignupPopup.Password")" name="Password">
+                        </div>
+                        <div class="clear20"></div>
+                        <div class="col=lg-12 no_padding">
+                            <p><input type="checkbox" value="true" checked="checked" name="NewsLetter" class="pull-right">
+                            <input name="NewsLetter" type="hidden" value="false">
+                             @RP.T("Views.Shop._LoginSignupPopup.NewsLetter")
+
+                                
+                           </p>
+                            <p> בלחיצה על הרשמה אני מסכימ/ה<a>לתקנון </a></p>
+                        </div>
+                        <div class="clear10"></div>
+                        <button onclick="Shop.DoReg(this,event);" type="button" class=" col-lg-12 col-md-12  col-sm-12  col-xs-12  btn  org_btn " >
+                        @RP.T("Views.Shop._LoginSignupPopup.DoRegister")</button>
+                        <div class="clear10"></div>
+                        <table class=" col-lg-12 col-md-12  col-sm-12  col-xs-12"><tr>
+                            <td style="width:47%"><hr/></td>
+                            <td style="vertical-align:middle; text-align: center">or</td>
+                            <td style="width:47%"><hr/></td>
+                        </tr></table>
+                        <div class="clear10"></div>
+                        <div id="socialfacebookreg"></div>
+                        <div class="clear10"></div>
+                        <div class="col=lg-12 pull-right no_padding">
+                            <p> אם כבר יש לך חשבון<a href="#" onclick="Shop.ShowLoginReg(this, event);"  data-dismiss="modal">לחץ כאן</a> </p>
+                        </div>
+                    </form>
+                    <div class="clear10"></div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>   
+</div>
+    <div class="showfarfaraway">
+    <div id="facebookbutton">
+        <fb:login-button id="fb-login-button-idnew" scope="public_profile,email" onlogin="afterFacebookConnect();"
+                         autologoutlink="false" size="xlarge"></fb:login-button>
+        </div>
+        </div>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+            <script language="javascript" type="text/javascript">
+                function onSignIn(googleUser) {
+                    
+                    var profile = googleUser.getBasicProfile();
+                    var data = {
+                        ID: profile.getId(),
+                        Name: profile.getName(),
+                        Image: profile.getImageUrl(),
+                        Email: profile.getEmail(),
+                    };
+                    Shop.DoGoogle(data);
+                   
+                }
+
+              
+
+                function afterFacebookConnect() {
+                    FB.getLoginStatus(function (response) {
+                        if (response.authResponse) {
+
+                           // console.log(response);
+                            Shop.DoFacebook(response.authResponse.accessToken);
+                            //  window.location = "../Account/FacebookLogin?token=" + response.authResponse.accessToken;
+                        } else {
+                            // user clicked Cancel
+                        }
+                    });
+                };
+                $(function () {
+
+                   
+                });
+                
+            </script>
+    @Html.Partial("CustomDesign")
+</body>
+</html>

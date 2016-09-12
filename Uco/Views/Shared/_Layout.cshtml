@@ -1,0 +1,97 @@
+﻿@{
+    Script.AddHead("~/Scripts/jquery-1.10.2.min.js");
+    Script.AddHead("~/Scripts/Kendo/2014.1.318/kendo.web.min.js");
+    Script.AddHead("~/Scripts/Kendo/2014.1.318/kendo.aspnetmvc.min.js");
+    Script.AddHead("~/Scripts/kendo/2014.1.318/cultures/kendo.culture." + SF.GetLangCodeThreading() + ".min.js");
+    Script.AddHead("~/Scripts/kendo/2014.1.318/gridlocal/kendo." + SF.GetLangCodeThreading() + ".js");
+    Script.AddHead("~/Scripts/jquery.validate.min.js");
+    Script.AddHead("~/Scripts/jquery.validate.unobtrusive.min.js");
+    Script.AddHead("~/Scripts/jquery.unobtrusive-ajax.min.js");
+    Script.AddHead("~/Scripts/Custum/css_browser_selector.js");
+    //Script.AddHead("~/Scripts/Jquery.Tooltip/tooltip.js");
+
+    Script.AddHead("~/Scripts/Jquery.multiple.select/jquery.multiple.select.js");
+    Script.AddHead("~/Scripts/lazyLoad.js");
+    //Script.AddHead("~/Scripts/Superfish-master/dist/js/hoverIntent.js");
+    Script.AddHead("~/Scripts/Superfish-master/dist/js/superfish.js");
+    Script.AddHead("~/Scripts/Jquery.Sticky/jquery.sticky.js");
+
+    Script.AddHead("~/Scripts/raty-2.7.0/lib/jquery.raty.js");
+    Style.AddHead("~/Scripts/raty-2.7.0/lib/jquery.raty.css");
+
+    Script.AddHead("~/Scripts/Custum/custum.js");
+    Script.AddHead("~/Scripts/Custum/shopapi.js");
+
+    Style.AddHead("~/Scripts/Fancyapps-fancyBox-2.1.5/source/jquery.fancybox.css");
+    Script.AddHead("~/Scripts/Fancyapps-fancyBox-2.1.5/source/jquery.fancybox.pack.js");
+
+    Style.AddHead("~/Content/Kendo/2014.1.318/kendo.common.min.css");
+    Style.AddHead("~/Content/Kendo/2014.1.318/kendo.bootstrap.min.css");
+    Style.AddHead("~/Content/Kendo/2014.1.318/kendo.rtl.min.css");
+    Style.AddHead("~/Content/Site.css");
+    Style.AddHead("~/Scripts/Jquery.multiple.select/multiple-select.css");
+
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    <meta content="@ViewBag.Keywords" name="keywords" />
+    <meta content="@ViewBag.Description" name="description" />
+    <link href="http://@(Request.ServerVariables["HTTP_HOST"])@(Url.Content(ViewBag.Url))" rel="canonical" />
+    <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css' />
+    @Style.RenderHead()
+    @Script.RenderHead()
+    @RenderSection("HeaderHtml", required: false)
+    @Html.Action("_HeaderScripts", "PagePart")
+    <script type="text/javascript">
+        kendo.culture("@(SF.GetLangCodeThreading())");
+    </script>
+    
+    <!--[if lt IE 9]> <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script><script src="http://css3-mediaqueries-js.googlecode.com/svn/trunk/css3-mediaqueries.js"></script><![endif]-->
+</head>
+<body class="k-rtl">
+    <!-- Google Tag Manager -->
+<noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-T23MZ5"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-T23MZ5');</script>
+<!-- End Google Tag Manager -->
+    <!--[if lt IE 7]><div class="ie67"><p style='font-weight:bold; font-size:20px; padding:0 10px; text-align:center; margin:20px 0 20px; color:red;'>Your using old and unsuported browser. Upgrade you browser!<br/><a href='http://www.microsoft.com/windows/internet-explorer/default.aspx'>Click here to upgrade.</a></p></div><![endif]-->
+    <div class="header_main bg_shadow">
+        @Html.Partial("_Header")
+        @RenderSection("topmenu", required: false)
+    </div>
+    @if (System.Configuration.ConfigurationManager.AppSettings["Profiler"].ToString() == "true")
+    { @StackExchange.Profiling.MiniProfiler.RenderIncludes() }
+    <div class="@(RP.GetCurrentSettings().LanguageRTL ? "k-rtl" : "k-ltr")">
+        <div class="midd_section2">
+            <div class="center_div">
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+    <div>
+        @Html.Partial("_Footer")
+    </div>
+
+    @if (IsSectionDefined("FooterZone"))
+    {
+        @RenderSection("FooterZone")
+    }
+    else if (ViewBag.ShopID != null)
+    {
+        @Html.Action("FooterCart", "ShoppingCart", new { ID = ViewBag.ShopID })
+    }
+    @*@Html.Partial("_ShopingCart")*@
+    @Html.Partial("_EditIcon")
+    @Script.RenderFooter()
+    @RenderSection("FooterHtml", required: false)
+    @Html.Action("_FooterScripts", "PagePart")
+</body>
+</html>

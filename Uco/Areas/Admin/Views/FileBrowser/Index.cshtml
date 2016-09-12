@@ -1,0 +1,33 @@
+﻿@{
+    ViewBag.Title = Html.R("Title");
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutNoTree.cshtml";
+}
+
+<h2>@Html.R("Title")</h2>
+<div id="imagebrowser"></div>
+<script>
+    $(document).ready(function () {
+        $("#imagebrowser").kendoImageBrowser({
+            transport: {
+                read: "/Admin/ImageBrowser/Read",
+                destroy: {
+                    url: "/Admin/ImageBrowser/Destroy",
+                    type: "POST"
+                },
+                create: {
+                    url: "/Admin/ImageBrowser/Create",
+                    type: "POST"
+                },
+                thumbnailUrl: "/Admin/ImageBrowser/Thumbnail",
+                uploadUrl: "/Admin/ImageBrowser/Upload",
+                imageUrl: "/Admin/ImageBrowser/Image?path={0}"
+            },
+            path: "/",
+            fileTypes: "*.*",
+            change: function () {
+                //this.value(); //Selected image URL
+                console.log(this.value());
+            }
+        });
+    });
+</script>

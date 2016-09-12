@@ -1,0 +1,23 @@
+﻿@model string
+@{
+    string YoutubeId = Model.Trim();
+    if (YoutubeId.Contains("https://www.youtube.com/watch?v=") || YoutubeId.Contains("http://www.youtube.com/watch?v="))
+    {
+        if (YoutubeId.Contains("https://www.youtube.com/watch?v="))
+        { 
+            YoutubeId = YoutubeId.Replace("https://www.youtube.com/watch?v=", "");
+        }
+        if (YoutubeId.Contains("http://www.youtube.com/watch?v="))
+        {
+            YoutubeId = YoutubeId.Replace("http://www.youtube.com/watch?v=", "");
+        }
+        if (YoutubeId.Contains("&")) { YoutubeId = YoutubeId.Remove(YoutubeId.IndexOf("&")); }
+        <text>
+            <object width='277' height='176'>
+        <param name='movie' value='http://www.youtube.com/v/@(YoutubeId)"?fs=1&amp;hl=iw_IL&amp;rel=0&amp;autoplay=0'></param>
+        <param name='allowFullScreen' value='true'></param>
+        <param name='allowscriptaccess' value='always'></param>
+    <embed src='http://www.youtube.com/v/@(YoutubeId)?fs=1&amp;hl=iw_IL&amp;rel=0&amp;autoplay=0' type='application/x-shockwave-flash' allowscriptaccess='always' allowfullscreen='true' width='277' height='176'></embed></object>
+        </text>
+    }
+}

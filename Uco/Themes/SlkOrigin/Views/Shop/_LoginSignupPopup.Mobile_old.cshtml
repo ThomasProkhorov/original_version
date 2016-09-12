@@ -1,0 +1,145 @@
+﻿
+@if (!LS.isLogined())
+                {
+<!--=========login_signup_popup =========== -->
+
+        <!-- p_area start here -->
+        <div class="">
+            <div class="login_sign_righ1">
+                <div class="p_area_right_head">@RP.T("Views.Shop._LoginSignupPopup.Title")</div>
+                <div class="p_arae_2_text1">
+                    @RP.Text("LoginSignup1")
+                </div>
+                <div class="p_arae_2_text1">
+                    @RP.Text("LoginSignup2")
+                </div>
+            </div>
+           <div class="clear"></div>
+            <!-- social_area start here -->
+            <div class="social_area">
+                <ul>
+                    <li>
+                        @*<a href="#"><img alt="" src="~/Content/DesignFiles/facebook_icon.png"></a>*@
+                        <fb:login-button perms="email,user_checkins" onlogin="afterFacebookConnect();"
+                                         autologoutlink="false" size="xlarge"></fb:login-button>
+                        <div id="fb-root" style="display:inline; margin-left:20px;"></div>
+                    </li>
+                    <li>
+                        @*<a href="#"><img alt="" src="~/Content/DesignFiles/google_plus.png"></a>*@
+                        <div class="g-signin2" data-onsuccess="onSignIn"></div>
+                      
+                    </li>
+                </ul>
+                <div class="clear"></div>
+            </div>
+           
+            <script src="https://apis.google.com/js/platform.js" async defer></script>
+            <script language="javascript" type="text/javascript">
+                function onSignIn(googleUser) {
+                    
+                    var profile = googleUser.getBasicProfile();
+                    var data = {
+                        ID: profile.getId(),
+                        Name: profile.getName(),
+                        Image: profile.getImageUrl(),
+                        Email: profile.getEmail(),
+                    };
+                    Shop.DoGoogle(data);
+                   
+                }
+
+                window.fbAsyncInit = function () {
+                    FB.init({
+                        appId: '1409618032599856',
+                        status: true, cookie: false, xfbml: true
+                    });
+                };
+                function afterFacebookConnect() {
+                    FB.getLoginStatus(function (response) {
+                        if (response.authResponse) {
+
+                           // console.log(response);
+                            Shop.DoFacebook(response.authResponse.accessToken);
+                            //  window.location = "../Account/FacebookLogin?token=" + response.authResponse.accessToken;
+                        } else {
+                            // user clicked Cancel
+                        }
+                    });
+                };
+                $(document).ready(function () {
+                    if (document.getElementById('fb-root') != undefined) {
+                        var e = document.createElement('script');
+                        e.type = 'text/javascript';
+                        e.src = document.location.protocol + '//connect.facebook.net/en_US/all.js';
+                        e.async = true;
+                        document.getElementById('fb-root').appendChild(e);
+                    }
+                });
+            </script>
+            
+            <!-- social_area end here -->
+        </div>
+        <!-- p_area end here -->
+        <div class="p_inner">
+            <div id="forgotwrap"></div>
+            <div class="">
+                <div class="login_box_heading1"><span class="heading2">@RP.T("Views.Shop._LoginSignupPopup.Login")</span></div>
+                <div class="login_box1_in">
+                    <form class="form4" action="" method="post" name="form1" id="form1">
+                        <div class="row"><input name="UserName" type="text" value="" class="single-line" placeholder="@RP.T("Views.Shop._LoginSignupPopup.Email")" id="textfield"></div>
+                        <div class="row"><input name="Password" type="password" value="" class="single-line" placeholder="@RP.T("Views.Shop._LoginSignupPopup.Password")" id="textfield"></div>
+                        <div class="links1"><a href="#" onclick="Shop.ShowForgotPass(this, event);">@RP.T("Views.Shop._LoginSignupPopup.RemeberPassword")</a></div>
+                        <div class="send_btn2"><a onclick="Shop.DoLogin(this,event);" href="#"><img width=" 106" height="35" alt="" src="~/Content/DesignFiles/form4_btn2.png" /></a></div>
+                    </form>
+                </div>
+            </div>
+            <div class="">
+                <div class="login_box_heading1"><span class="heading1">@RP.T("Views.Shop._LoginSignupPopup.Register")</span></div>
+                <div class="login_box1_in">
+                    <form class="form4" action="" method="post" name="form1" id="form1">
+                        <div class="row">
+                            <input type="text" class="single-line" placeholder="@RP.T("Views.Shop._LoginSignupPopup.FirstName")" id="textfield" name="FirstName">
+                        </div>
+                        <div class="row">
+                            <input type="text" class="single-line" placeholder="@RP.T("Views.Shop._LoginSignupPopup.LastName")" id="textfield" name="LastName">
+                        </div>
+                        <div class="row">
+                            <input type="email" class="single-line" placeholder="@RP.T("Views.Shop._LoginSignupPopup.Email")" id="textfield" name="Email">
+                        </div>
+                        <div class="row">
+                            <input type="email" class="single-line" placeholder="@RP.T("Views.Shop._LoginSignupPopup.ConfirmEmail")" id="textfield" name="ConfirmEmail">
+                        </div>
+                        <div class="row">
+                            <input type="password" class="single-line" placeholder="@RP.T("Views.Shop._LoginSignupPopup.Password")" id="textfield" name="Password">
+                        </div>
+                        <div class="row">
+                            <div class="check_box"><input type="checkbox" id="checkbox" value="true" checked="checked" name="NewsLetter">
+                                <input name="NewsLetter" type="hidden" value="false"></div>
+                            <div class="checkbox_text">@RP.T("Views.Shop._LoginSignupPopup.NewsLetter")</div>
+                            <div class="send_btn"><a onclick="Shop.DoReg(this,event);" href="#"><img width="106" height="35" alt="" src="~/Content/DesignFiles/form4_btn.png"></a></div>
+                            <div class="clear"></div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="clear"></div>
+        </div>
+   
+<!--=========login_signup_popup =========== -->
+}else
+{
+ <div class="header_btn">
+                <span>
+                    <a class="ligin_part_name" href="@Url.Action("Index","Profile")">@RP.T("Views.Shared._Header.Hello") @LS.CurrentUser.FirstName</a>
+                </span></div>       
+    
+     <div class="header_btn">
+         <span style="background: none;">
+             <a href="~/Account/LogOff">@RP.T("Views.Shared._Header.Logout")</a>
+         </span></div>            
+<script>
+if(Shop)
+    Shop.isLogined = true;
+</script>          
+}

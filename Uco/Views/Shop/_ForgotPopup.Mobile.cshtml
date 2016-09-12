@@ -1,0 +1,18 @@
+﻿<!--=========login_signup_popup =========== -->
+  <!-- p_area end here -->
+        
+            <div class="">
+                <div class="login_box_heading1"><span class="heading2">@RP.T("Views.Shop._LoginSignupPopup.SendPasswors")</span></div>
+                <div class="login_box1_in">
+                    <form class="form4" action="" method="post" name="form1" id="form1">
+                        @Html.Partial("_Captcha", new Uco.Models.Captcha())
+                        @Html.Partial("_InvisibleCaptcha", new Uco.Models.InvisibleCaptcha())
+                        <div class="row"><input name="Model" type="text" value="" class="single-line" placeholder="@RP.T("Views.Shop._LoginSignupPopup.Email")" id="textfield"></div>
+                        <div class="send_btn2"><a onclick="Shop.DoSendPass(this,event);" href="#"><img width=" 106" height="35" alt="" src="~/Content/DesignFiles/form4_btn2.png" /></a></div>
+                    </form>
+                </div>
+            </div>
+            <div class="clear"></div>
+        
+    
+<!--=========login_signup_popup =========== -->

@@ -1,0 +1,39 @@
+@model int
+<div class="clear"></div>
+@if(Model == 0)
+{
+    <div>אפשרות עריכת טופס תהיה זמינה לאחר יצירת העמוד</div>
+}
+else
+{
+    <a href="#" class="k-button" id="showLinkButton" >פתח ניהול טופס</a>
+}
+@(Html.Kendo().Window()
+        .Name("window")
+    .Title("Title")
+    .LoadContentFrom("http://" + Request.ServerVariables["HTTP_HOST"] + "/admin/ListItem/FormFildGrid/" + Model.ToString())
+    .Width(900)
+    .Height(300)
+    .Draggable(true)
+    .Resizable(resizing => resizing
+        .Enabled(true)
+        .MinHeight(600)
+        .MinWidth(300)
+    )
+    .Modal(true)
+    .Visible(false)
+)
+<script type="text/javascript">
+
+    $(function () {
+        // Notice that the Name() of the window is used to get its client-side instance
+        var window = $("#window").data("kendoWindow");
+
+        $("#showLinkButton").click(function (event) {
+            event.preventDefault();
+            window.center();
+            window.open();
+            window.restore();
+        });
+    });
+</script>

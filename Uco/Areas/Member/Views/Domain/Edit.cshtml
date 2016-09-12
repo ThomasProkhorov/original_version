@@ -1,0 +1,13 @@
+﻿@model Uco.Models.Settings
+@{
+    ViewBag.Title = RP.T("Admin.Views.Domain.Index.Title");
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutNoTree.cshtml";
+}
+<h2>@RP.T("Admin.Views.Domain.Index.Title")</h2>
+@using (Html.BeginForm()) {
+    @Html.ValidationSummary(true)
+    @Html.EditorForModel()
+    <p class="clear">
+        <input type="submit" class="k-button" value="@RP.T("Admin.Views.Command.Save").ToString()" /> @Html.ActionLink(@RP.T("Admin.Views.Command.BackToList").ToString(), "Index")
+    </p>
+}

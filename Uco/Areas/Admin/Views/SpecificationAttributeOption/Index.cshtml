@@ -1,0 +1,361 @@
+﻿@{
+    ViewBag.Title = RP.T("Admin.Views.SpecificationAttributeOption.Index.Title");
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutNoTree.cshtml";
+}
+
+<h2>@RP.T("Admin.Views.SpecificationAttributeOption.Index.Title")</h2>
+
+<div id="SpecificationAttributeOptiongrid"></div>
+
+
+<script>
+
+    var SpecificationAttributeOptiongridFiltering = {
+        filter: function (id) {
+            var data = { logic: "and", filters: [] };
+            //{ field: "name", operator: "startswith", value: "Jane" }
+            var grid = $("#SpecificationAttributeOptiongrid").data('kendoGrid');
+            //  console.log(grid.dataSource.options.schema.model);
+            $('#' + id + ' input').each(function (i, e) {
+                if ($(e).attr('name') && $(e).val())
+                {
+                    var inpname = $(e).attr('name');
+                    var objname = inpname.split(".")[0];
+                    if(objname in grid.dataSource.options.schema.model.fields)
+                    {
+
+                        var model = grid.dataSource.options.schema.model.fields[objname];
+                        if(model.type == 'number' || model.type == 'object'){
+                            if($(e).attr('data-zero') && $(e).val() < 1)
+                            {
+                                return;
+                            }
+                        }
+                        var operator = 'eq';
+                        if(model.type == 'date'){
+                            operator = 'gt'; // >
+                            var todate = $('#' + id + ' input[name="'+inpname+'_dateto"]');
+                            if(todate.length >0)
+                            {
+                                data.filters.push({ field: $(e).attr('name'), operator: 'lte', value: model.parse(todate.val()) });
+                            }
+                        }
+                        if(model.type == 'string'){
+                            operator = 'startswith'; // .startswith
+                        }
+                        //lte <=
+                        //  console.log(model);
+                        var parseVal = $(e).val();
+                        if(model.type != 'object')
+                        {
+                            parseVal =model.parse(parseVal);
+                        }
+                        data.filters.push({ field: $(e).attr('name'), operator: operator, value: parseVal });
+                    }
+
+                }
+            });
+
+            grid.dataSource.filter(data);
+
+        },
+        clear: function () {
+            var grid = $("#SpecificationAttributeOptiongrid").data('kendoGrid');
+            grid.dataSource.filter({});
+        },
+        setFilter: function (name, value) {
+            var grid = $("#SpecificationAttributeOptiongrid").data('kendoGrid');
+            grid.dataSource.filter({ field: name, operator: "eq", value: value });
+            //grid.dataSource.page(1);
+            // alert(name + value);
+        },
+    };
+
+    function IntToTime(i) {
+        var hr = Math.floor(i / 60);
+        var mn = i % 60 ; if(mn<10){mn='0'+mn;}
+        //  var part ="AM";
+        // if(hr>12)
+        //  {
+        //    hr-=12;
+        //     part="PM";
+        // }
+        // if(hr == 0){hr = 12;}
+        var time = hr + ":" + mn;// + " " + part;
+        return time;
+    }
+    $(document).ready(function () {
+        /*
+        Docs
+        http://docs.telerik.com/kendo-ui/api/javascript/ui/grid
+        */
+        var gridLocal = function(){
+            if('messages' in kendo.ui.Grid.prototype.options){
+                return  kendo.ui.Grid.prototype.options.messages.commands.create;
+            }else{
+                return "Add new";
+            }
+        }
+        $("#SpecificationAttributeOptiongrid").kendoGrid({
+   "toolbar": [   { name: "create" ,text:gridLocal()
+
+            },             ],
+            
+            dataSource: {
+
+                type: "json",
+                transport: {
+                    "prefix": "",
+                    read: {
+                        url: "/Admin/Manage/SpecificationAttributeOption/_AjaxRead",
+                        type: "POST",
+                        dataType: "json",
+                        // data: { filter:'ID~eq~3'  }
+                    },
+ 
+                    "update": {
+                        "url": "/Admin/Manage/SpecificationAttributeOption/_AjaxUpdate"
+                    },
+                                          
+                    "create": {
+                        "url": "/Admin/Manage/SpecificationAttributeOption/_AjaxInsert"
+                    },                      
+                    "destroy": {
+                        "url": "/Admin/Manage/SpecificationAttributeOption/_AjaxDelete"
+                    },
+                                     },
+
+                schema: {
+                    data: "Data",
+                    total: "Total",
+                    errors: "Errors",
+                    model: {
+                        "id": "ID",
+                        fields: {
+  "ID": { "type": "number" ,defaultValue: 0,editable: false,}, 
+  "SpecificationAttributeID": { "type": "number" ,defaultValue: 0}, 
+  "SpecificationAttribute": { "type": "object" ,editable: false,nullable: true, }, 
+  "Name": { "type": "string"  }, 
+                            // "ID": {"type":"number" ,editable: false}
+                        }
+
+                    }
+                },
+                requestEnd: function(e) {
+                    if($('#SpecificationAttributeOptiongride-checkall').length > 0)
+                    {
+                        $('#SpecificationAttributeOptiongride-checkall')[0].checked = false;
+                    }
+                },
+                pageSize: 20,
+                "error": error_handler,
+                "sync":function(e){ this.read(); },
+                "serverPaging": true,
+                "serverSorting": true,
+                "serverFiltering": true,
+                "serverGrouping": true,
+                "serverAggregates": true,
+                                 "filter": [], 
+                "type": "aspnetmvc-ajax",
+
+                sort: [],
+            },
+            refresh: true,
+            //  detailTemplate: kendo.template($("#template").html()),
+            // detailInit: detailInit,
+            // dataBound: function () {
+            //this.expandRow(this.tbody.find("tr.k-master-row").first());
+            //   },
+            pageable: {
+                refresh: true,
+                pageSize: 10
+            },
+
+            columns: [
+{ field: "ID",title: "Models.SpecificationAttributeOption.ID", sortable: false,filterable: false,editor:'<input data-val="true" data-val-number="The field Models.SpecificationAttributeOption.ID must be a number." data-val-required="The Models.SpecificationAttributeOption.ID field is required." id="ID" name="ID" type="hidden" value="0" /><span class="field-validation-valid" data-valmsg-for="ID" data-valmsg-replace="true"></span>', },
+{ field: "SpecificationAttributeID",title: "Models.SpecificationAttributeOption.SpecificationAttribute", filterable: {cell: {showOperators: true}},editor:'     \
+    <div class="k-widget k-tabstrip k-header" id="TabStrip"><ul class="k-reset k-tabstrip-items"><li class="k-item k-state-default k-state-active"><a class="k-link" href="#TabStrip-1">ModelsPrompt.SpecificationAttribute.Main</a></li><li class="k-item k-state-default"><a class="k-link" href="#TabStrip-2">ModelsPrompt.SpecificationAttribute.Options</a></li></ul><div class="k-content k-state-active" id="TabStrip-1" style="display:block"> \
+<input data-val="true" data-val-number="The field Models.SpecificationAttribute.ID must be a number." data-val-required="The Models.SpecificationAttribute.ID field is required." id="SpecificationAttribute_ID" name="SpecificationAttribute.ID" type="hidden" value="" />                                <div class="editor-label"><label for="SpecificationAttribute_Name">Models.SpecificationAttribute.Name</label> </div> \
+                            <div class="editor-field"><input class="k-textbox" id="SpecificationAttribute_Name" name="SpecificationAttribute.Name" type="text" value="" /> <span class="field-validation-valid" data-valmsg-for="SpecificationAttribute.Name" data-valmsg-replace="true"></span></div> \
+            </div><div class="k-content" id="TabStrip-2"> \
+            </div></div><script> \
+	jQuery(function(){jQuery("#TabStrip").kendoTabStrip({"animation":false});}); \
+</sc'+'ript> \
+     \
+                <div class="editor-label"><label for="SpecificationAttribute_SpecificationAttributeTypeID">Models.SpecificationAttribute.SpecificationAttributeTypeID</label> *</div> \
+            <div class="editor-field"><input data-val="true" data-val-number="The field Models.SpecificationAttribute.SpecificationAttributeTypeID must be a number." data-val-required="The Models.SpecificationAttribute.SpecificationAttributeTypeID field is required." id="SpecificationAttribute_SpecificationAttributeTypeID" name="SpecificationAttribute.SpecificationAttributeTypeID" type="number" /><script> \
+	jQuery(function(){jQuery("#SpecificationAttribute_SpecificationAttributeTypeID").kendoNumericTextBox({"format":"n0","decimals":0});}); \
+</sc'+'ript> \
+ <span class="field-validation-valid" data-valmsg-for="SpecificationAttribute.SpecificationAttributeTypeID" data-valmsg-replace="true"></span></div> \
+<span class="field-validation-valid" data-valmsg-for="SpecificationAttribute" data-valmsg-replace="true"></span>',template:"# if (SpecificationAttribute) { #  #: SpecificationAttribute.Name # # } #",  filterable: { ui: SpecificationAttributeFilter,operators: { number: {  eq: "Is equal to",neq: "Is not equal to" } } },  editor: ' \
+ \
+ \
+<input id="SpecificationAttributeID92897728" data-zero="false" name="SpecificationAttributeID" value="0" /> \
+ \
+<script> \
+    $(\'#SpecificationAttributeID92897728\') \
+                            .kendoComboBox( \
+    { \
+        placeholder: "Select ", \
+        dataTextField: "Name", \
+        dataValueField: "ID", \
+ \
+        filter: "contains", \
+        minLength: 1, \
+        "autoBind": true, \
+        dataSource: { \
+            schema: { \
+                data: "Data", \
+                total: "Total", \
+                errors: "Errors", \
+            }, \
+            type: "json", \
+            serverFiltering: true, \
+            filter: [], \
+            transport: { \
+                "prefix": "", \
+                read: { \
+                    url: "/Admin/Manage/SpecificationAttribute/_AjaxAutoComplete" \
+, \
+                    type: "POST", \
+                    data: function () { \
+                        var data = kendo.ui.ComboBox.requestData(\'#SpecificationAttributeID92897728\'); \
+ \
+                        /** data["filter"] = "SpecificationAttributeID~eq~1"; \
+                        console.log(data); \
+                        **/ \
+                        return data; \
+                    }, \
+                } \
+            } \
+        } \
+    }); \
+ \
+</sc'+'ript> \
+ \
+', },
+{ field: "Name",title: "Models.SpecificationAttributeOption.Name", sortable: false,filterable: {cell: {showOperators: true}},editor:'<input class="k-textbox" id="Name" name="Name" type="text" value="" /><span class="field-validation-valid" data-valmsg-for="Name" data-valmsg-replace="true"></span>', },
+
+
+
+
+{
+    "width": "100px",
+    "template": "<a class=\"k-button\" href=\"/Admin/Manage/SpecificationAttributeOption/Edit/#= ID #\">עריכה</a>"
+},
+
+
+{
+    "width": "190px",
+    "buttonType": "Image",
+    "command": [
+
+      {  "name": "edit",
+          "buttonType": "Icon",
+          "text": "עריכה"
+      },
+
+
+{
+    "name": "destroy",
+    "buttonType": "Image",
+    "text": "מחיקה"
+},
+
+    ]
+},
+
+            ],
+            //   height: 600,
+            "scrollable": false,
+            filterable:true,
+            sortable: true,
+            "editable": {
+                "confirmation": "האם אתה בטוח?",
+                "confirmDelete": "מחיקה",
+                "cancelDelete": "בטל",
+                "mode": "inline",
+                "create": true,
+                "update": true,
+                "destroy": true
+            },
+
+
+
+        });
+        var SpecificationAttributeOptiongrid = $("#SpecificationAttributeOptiongrid").data('kendoGrid');
+        SpecificationAttributeOptiongrid.dataSource.transport.parameterMap = function(data,type){
+
+            // console.log(type);
+            if(type != "read")
+            {
+                for(var i in data)
+                {
+                    //console.log(Object.prototype.toString.call( data[i] ));
+                    if( Object.prototype.toString.call( data[i] ) === '[object Object]' ) {
+                        delete data[i];
+                    }
+                    if( Object.prototype.toString.call( data[i] ) === '[object Array]' ) {
+                        delete data[i];
+                    }
+                    if( Object.prototype.toString.call( data[i] ) === '[object Date]' ) {
+                        data[i] = kendo.toString(kendo.parseDate(data[i]), "G");// Date.parse(data[i]);
+                    }
+                    //if(i == 'UserID' && !data[i]){
+                    //    data[i]=
+                    // }
+                    //@ViewBag.AdditionalFilterField", operator: "eq", value: ''
+                }
+            }
+
+            kendo.data.transports["aspnetmvc-ajax"](data);
+            data = new kendo.data.transports["aspnetmvc-ajax"]({ prefix: "" }).parameterMap(data, type);
+            //  console.log(data);
+            return data;
+        }
+
+        function error_handler(e) {
+
+            if (e.errors) {
+                e.preventDefault();   // cancel grid rebind if error occurs
+                var message = "Errors:\n";
+                $.each(e.errors, function (key, value) {
+                    if ('errors' in value) {
+                        $.each(value.errors, function () {
+                            message += this + "\n";
+                        });
+                    }
+                });
+                alert(message);
+            }
+        }
+        function detailInit(e) {
+            var detailRow = e.detailRow;
+            console.log(e);
+
+
+        }
+            
+        function SpecificationAttributeFilter(element) {
+            element.kendoDropDownList({
+                dataSource: [
+
+
+                ],
+                dataTextField: "Name",
+                dataValueField: "ID",
+                optionLabel: "--Select Value--"
+            });
+        }
+        
+
+    });
+
+</script>
+
+
+
+
+
+<br />
+<a class="k-button" href="/Admin/Manage/SpecificationAttributeOption/Create">הוספה</a>

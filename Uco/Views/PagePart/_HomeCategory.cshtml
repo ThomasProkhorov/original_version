@@ -1,0 +1,21 @@
+﻿@{
+    List<Uco.Models.SearchPage> l = ViewBag.Items;
+}
+<div class="home_categories">
+@foreach (Uco.Models.SearchPage item1 in l.Where(r => r.ShowInMainPage && string.IsNullOrEmpty(r.SearchText) && r.SearchCategory1ID != 0 && r.SearchCategory2ID == 0 && r.SearchCategory3ID == 0).OrderBy(r => r.Order))
+{
+    <div class="home_categories_box">
+        <div class="home_categories_box_top">
+            <img alt="@item1.Title" src="@Url.Content(item1.Pic_33_16)" />
+            <a href="@Url.Content(@item1.Url)">@item1.Title</a>
+        </div>
+        <ul>
+            @foreach (Uco.Models.SearchPage item2 in l.Where(r => r.ShowInMainPage && string.IsNullOrEmpty(r.SearchText) && r.SearchCategory1ID == item1.SearchCategory1ID && r.SearchCategory2ID != 0 && r.SearchCategory3ID == 0).OrderBy(r => r.Order).Take(4))
+            {
+            <li><a href="@Url.Content(@item2.Url)">@item2.Title</a></li>
+            }
+        </ul>
+            <div class="right_list_center_for_all"><a href="@Url.Content(@item1.Url)">לכל המאמרים</a></div>
+    </div>
+}
+</div>

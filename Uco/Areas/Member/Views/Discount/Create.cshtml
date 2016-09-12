@@ -1,0 +1,36 @@
+﻿@model Discount
+@using System.Reflection
+@using System.Collections.Generic
+@using System.Linq
+@using System.ComponentModel.DataAnnotations
+@using Uco.Models
+
+@{
+    var name = Model.GetType().Name;
+    ViewBag.Title = RP.T("Admin.Views." + name + ".Create.Title");
+    TempData["FilterShopID"] = Model.ShopID;
+    Layout = "~/Areas/" + LS.GetArea() + "/Views/Shared/_LayoutNoTree.cshtml";
+}
+<h2>@RP.T("Admin.Views." + name + ".Create.Title")</h2>
+@Html.Partial("_EditOrCreate", (object)Model)
+@{
+
+    return;
+}
+@using (Html.BeginForm())
+{
+    @Html.ValidationSummary(true)
+    @Html.EditorForModel()
+    <p class="clear">
+        <input type="submit" class="k-button" value="@RP.T("Admin.Views.Command.Create")" />
+        @if (ViewBag.BackUrl != null)
+        {
+            <a href="@ViewBag.BackUrl">@RP.T("Admin.Views.Command.BackToList")</a>
+
+        }
+        else
+        {
+            @Html.ActionLink(@RP.T("Admin.Views.Command.BackToList").ToString(), "Index")
+        }
+    </p>
+}

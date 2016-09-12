@@ -1,0 +1,27 @@
+@model string
+
+@if (SF.UsePermissions() && Uco.Infrastructure.Livecycle.LS.CurrentUser.IsInRole("Admin"))
+{
+    List<string> CurrentRoles = Uco.Infrastructure.SF.RolesStringToList(Model);
+    List<string> ConfigRoles = Uco.Infrastructure.SF.GetRoleList();
+
+    <div class="roles">
+    <ul style="list-style:none; margin:0; padding:0;">
+    @foreach (string item in ConfigRoles)
+    {
+        if (item != "Admin")
+        {
+        <li>
+            <input type="checkbox" name="@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))" id="@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))_@(item)" value="@item" @(CurrentRoles.Contains(item) ? "checked=checked" : "")> 
+            <label for="@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))_@(item)">@item</label>
+        </li>
+        }
+    }
+    </ul>
+    </div>
+    <div class="clear"></div>
+}
+else
+{
+    <div>Permissions disabled in site config. To allow permissions please contact your site admin.</div>
+}

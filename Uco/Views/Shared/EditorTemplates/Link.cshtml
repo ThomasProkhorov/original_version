@@ -1,0 +1,9 @@
+﻿@model System.String
+@if (!string.IsNullOrEmpty(Model))
+{
+<a target="_blank" href="@Url.Content(Model)">@Url.Content(Model)</a>
+}
+else
+{
+    <span>&nbsp;</span>
+}

@@ -1,0 +1,58 @@
+﻿@model string
+@{
+  int month = LS.GetRandom();
+  string FieldID = ViewData.TemplateInfo.HtmlFieldPrefix.Replace(".", "_");
+ 
+ 
+}
+
+
+<input id="@FieldID@(month)" data-zero="false" name="@ViewData.TemplateInfo.HtmlFieldPrefix.Replace("_",".")" value="@Model" />
+
+<script>
+    $('#@FieldID@(month)')
+                            .kendoComboBox(
+    {
+        placeholder: "Select ",
+        dataTextField: "Name+' '+d.SKU",
+        dataValueField: "SKU",
+
+        filter: "contains",
+        template: '<span class="k-state-default" style="vertical-align:middle; background-image: url(#:data.Image#); no-repeat center center fixed; ' +
+  '-webkit-background-size: cover;  -moz-background-size: cover; -o-background-size: cover; background-size: cover; width:60px; height:60px; display:inline-block; "></span>' +
+                  '<span class="k-state-default" style="margin-right:5px; margin-left:5px;display:inline-block; vertical-align:middle;">#: data.Name # <br/> #: data.SKU #  </span>',
+
+        minLength: 1,
+        "autoBind": true,
+        height: 320,
+        dataSource: {
+            schema: {
+                data: "Data",
+                total: "Total",
+                errors: "Errors",
+            },
+            type: "json",
+            serverFiltering: true,
+            filter: [],
+            transport: {
+                "prefix": "",
+                read: {
+                    url: "@Url.Action("_AjaxDetailAutoComplete", "Product")"
+,
+                    type: "POST",
+                    data: function () {
+                        var data = kendo.ui.ComboBox.requestData('#@FieldID@(month)');
+                       
+
+                        /** data["filter"] = "SpecificationAttributeID~eq~1";
+                        console.log(data);
+                        **/
+                        return data;
+                    },
+                }
+            }
+        }
+    });
+
+</script>
+

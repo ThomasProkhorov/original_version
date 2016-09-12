@@ -1,0 +1,17 @@
+@model string
+@{
+    List<string> CurrentRoles = Uco.Infrastructure.SF.RolesStringToList(Model);
+    List<string> Roles = Uco.Infrastructure.SF.GetRoleObjectsList().Where(r => r.IsSystem == false).Select(r => r.Title).ToList();
+}
+<div class="roles">
+<ul style="list-style:none; margin:0; padding:0;">
+@foreach (string item in Roles)
+{
+    <li>
+        <input type="checkbox" name="@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))" id="@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))_@(item)" value="@item" @(CurrentRoles.Contains(item) ? "checked=checked" : "")> 
+        <label for="@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))_@(item)">@item</label>
+    </li>
+}
+</ul>
+</div>
+<div class="clear"></div>

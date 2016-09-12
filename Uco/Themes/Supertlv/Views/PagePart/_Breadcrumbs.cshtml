@@ -1,0 +1,18 @@
+﻿@model Stack<Uco.Models.CustumMenuItem>
+<div class="brdcms">
+    <ul>
+        <li><a href="/">עמוד הבית</a></li>
+        @foreach(Uco.Models.CustumMenuItem item in Model)
+        {
+            if (ViewBag.ID != item.ID)
+            { 
+                <li><a href="@Url.Content(item.Url)">@item.Title</a></li>
+            }
+            else
+            {
+                <li class="current"><a href="#">@item.Title</a></li>
+            }
+        }
+    </ul>
+    <div class="clear"></div>
+</div>

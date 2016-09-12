@@ -1,0 +1,8 @@
+@model IEnumerable<TreeViewItemModel>
+<div style="border: 1px solid #999999; display: block; margin-bottom: 10px; min-height: 100px; max-height:100px;">
+@(Html.Kendo().TreeView()
+    .Name("TreeView__@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))")
+    .BindTo(Model)
+    .DragAndDrop(true)
+)
+</div>

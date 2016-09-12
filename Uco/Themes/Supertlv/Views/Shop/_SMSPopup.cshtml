@@ -1,0 +1,55 @@
+﻿<div id="light2" class="white_content3">
+
+    <div class="popup_close1">
+        <a href="javascript:void(0)" onclick="document.getElementById('light2').style.display='none';document.getElementById('fade').style.display='none'">
+        <img src="~/Content/DesignFiles/popup_close1.png" alt=""></a> <a href="#"></a>
+    </div>
+    <div class="prct_pop_white">
+        <div class="p_area">
+            <div class="login_sign_righ1">
+                <div class="p_area_right_head">@RP.T("Views.Shop._SMSPopup.RightHead")</div>
+                <div class="p_arae_2_text1">
+                    @RP.Text("Views.Shop._SMSPopup.MainText")
+                </div>                
+            </div>
+            <div class="sms_pic"><img src="~/Content/DesignFiles/p_pic.png"></div>
+            <div class="clear"></div>
+        </div>
+        <div class="p_inner">
+            <div class="left_inner2">
+                <div class="login_box_heading1">
+                    <span class="heading3">@RP.T("Views.Shop._SMSPopup.SendCodeText")</span>
+                </div>
+                <div class="login_box1_in">
+                    <form id="form1" name="form1" method="post" action="" class="form4">
+                        <div class="row">
+                            <input type="text" name="phone" id="phone" value="" placeholder="@RP.T("Views.Shop._SMSPopup.PhonePlaceholder")" class="single-line"></div>
+                        <div class="sms_btn">
+                            <a href="#" onclick="Shop.SendSMS(this,event);">
+                                <img width="106" type="image" height="35" alt="" src="~/Content/DesignFiles/sms_now.png">
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="left_inner2 float_lft">
+                <div class="login_box_heading1"><span class="heading4">@RP.T("Views.Shop._SMSPopup.InputCodeText")</span></div>
+                <div class="login_box1_in">
+                    <form id="form1" name="form1" method="post" action="" class="form4">
+                        <div class="row"><input type="text" name="smscode" id="smscode" value="" placeholder="@RP.T("Views.Shop._SMSPopup.SmsCodePlaceholder")" class="single-line"></div>
+                        <div class="sms_btn">
+                            <a href="#" onclick="Shop.CheckSMSCode(this,event);">
+                                <img width="106" type="image" height="35" alt="" src="~/Content/DesignFiles/sms2.png">
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="clear"></div>
+        </div>
+    </div>
+</div>
+
+<a href="javascript:void(0)" onclick="document.getElementById('light2').style.display='none';document.getElementById('fade').style.display='none'">
+    <div id="fade" class="black_overlay"></div>
+</a>

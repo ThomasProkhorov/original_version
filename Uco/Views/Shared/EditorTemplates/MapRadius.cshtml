@@ -1,0 +1,67 @@
+﻿@{
+    int month = LS.GetRandom();
+    string FieldID = ViewData.TemplateInfo.HtmlFieldPrefix.Replace(".", "_");
+    string FieldName = ViewData.TemplateInfo.HtmlFieldPrefix.Replace("_", ".");
+    string mapId = FieldID + month.ToString();
+}
+
+<input type="text" class="k-textbox" name="@FieldName" id="@FieldID" value="@Model" /> Km
+<a href="javascript:void(0);" onclick="_initmap@(mapId)();" >@RP.T("View.Editor.MapRadius.SelectOnMap")</a>
+<div style="padding-bottom:4px;">
+    <div id="map-canvas@(mapId)" style="width:100%;"></div>
+</div>
+<script type="text/javascript">
+  
+        /*========Map Veiw================*/
+
+        var geocoder = new google.maps.Geocoder();
+        var @(mapId);
+    var _initmap@(mapId) = function () {
+        var latttt =parseFloat(  $('#RadiusLatitude').val() );
+        if(latttt > 80) { latttt = 80; }
+        if(latttt < -80) { latttt = -80; }
+        $("#map-canvas@(mapId)").css("height", 500);
+            var mapOptions = {
+                zoom: 10,
+                center: {
+                    lat: latttt, // fallback lat
+                    lng: parseFloat( $('#RadiusLongitude').val()) // fallback lng
+                },
+                bounds_changed: function () {
+
+
+                }
+            }
+            @(mapId) = new google.maps.Map(document.getElementById("map-canvas@(mapId)"), mapOptions);
+            var CircleOptions = {
+                strokeColor: '#FF0000',
+                strokeOpacity: 0.9,
+                strokeWeight: 1,
+                fillColor: '#A6F07D',
+                fillOpacity: 0.6,
+                center: {
+                    lat: latttt, // fallback lat
+                    lng: parseFloat($('#RadiusLongitude').val()) // fallback lng
+                },
+                draggable: true,
+                editable:true,
+                map: @(mapId),
+                radius: @(Model*1000),
+                center_changed: function (a) {
+                    var center = this.getCenter();
+                    $('#RadiusLatitude').val(center.lat()); 
+                    $('#RadiusLongitude').val(center.lng()) ;
+                    console.log(center.lat() + ' '+center.lng());
+                   
+                },
+                radius_changed: function (a) {
+                    $('#@FieldID').val( this.getRadius() / 1000);
+                    @(mapId).fitBounds(this.getBounds());
+                },
+            };
+            var circle = new google.maps.Circle(CircleOptions);
+            @(mapId).fitBounds(circle.getBounds());
+        }
+       
+  
+</script>

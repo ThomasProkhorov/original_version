@@ -1,0 +1,16 @@
+﻿@{
+    ViewBag.Title = RP.T("Admin.Views.Settings.ApplicationClear.Title");
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutNoTree.cshtml";
+}
+
+<h2>@RP.T("Admin.Views.Settings.ApplicationClear.Title")</h2>
+@using (Html.BeginForm())
+{
+    @Html.CheckBox("Memory",true) @RP.T("Admin.Views.Settings.ApplicationClear.Memory")<br />
+    @Html.CheckBox("Search", false) @RP.T("Admin.Views.Settings.ApplicationClear.Search")<br />
+    @Html.CheckBox("Images", false) @RP.T("Admin.Views.Settings.ApplicationClear.Images")<br />
+@Html.CheckBox("Scripts", true) @RP.T("Admin.Views.Settings.ApplicationClear.Scripts")<br />
+@Html.CheckBox("Styles", true) @RP.T("Admin.Views.Settings.ApplicationClear.Styles")<br />
+    <br />
+    <input type="submit" value="@RP.T("Admin.Views.Command.Save")" class="k-button" />
+}

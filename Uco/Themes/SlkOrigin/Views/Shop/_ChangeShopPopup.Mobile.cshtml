@@ -1,0 +1,125 @@
+﻿@using Uco.Models.Overview;
+@using Uco.Models;
+@using System.Collections.Generic;
+@using Uco.Infrastructure.Livecycle;
+@using Uco.Infrastructure.Services;
+@using Uco.Infrastructure;
+@model IList<ShoppingCartOverviewModel>
+
+    <script type="text/javascript">
+        $(function () {
+            $(".ratingStar2").each(function (i, el) {
+                var _shopID = $(this).parent(".rating_shops").attr("data-shopid");
+                console.log()
+                $(this).raty({
+                    path: '/Scripts/raty-2.7.0/lib/images',
+                    half: false,
+                    score: $(this).parent(".rating_shops").attr("data-rating"),
+                    halfShow: false,
+                    readOnly: function () {
+                        return false;
+                    },
+                    click: function (score) {
+                        $.ajax({
+                            type: "POST",
+                            dataType: "html",
+                            url: "/Shop/_AddShopRate",
+                            data: { shopID: _shopID, score: score },
+                            cache: false,
+                        }).done(function (html) {
+
+                        });
+                        $(".ratingStar").raty("readOnly", true);
+                        $("#countVotedPerson").html(parseInt($("#countVotedPerson").html(), 10) + 1);
+                    }
+                });
+            });
+
+            $(".ratingStarReadOnly2").each(function (i, el) {
+                $(this).raty({
+                    path: '/Scripts/raty-2.7.0/lib/images',
+                    half: false,
+                    score: $(this).parent(".rating_shops").attr("data-rating"),
+                    halfShow: false,
+                    readOnly: function () {
+                        return true;
+                    }
+                });
+            });
+
+
+        });
+    </script>
+
+    <div id="light4" class="white_content3">
+        <div class="prct_pop_white">           
+            @foreach (var s in Model)
+            {
+                var m = s.Shop;
+                <div class="pop_wrap">
+                    <div class="po_pi">
+                        <div class="p_icon"><img alt="" src="@SF.GetImage(m.Image, 122, 69, true, true)"></div>
+                        <div class="p_ico_text">דירוג בכוכבים:</div>
+                        <div class="ra">
+                            <ul class="rating_shops" data-rating="@m.Rate" data-shopid="@m.ID">
+                                @if (ShoppingService.IsCanVoteForShop(m.ID, LS.CurrentUser.ID))
+                                {
+                                    <li class="ratingStar2"></li>
+                                }
+                                else
+                                {
+                                    <li class="ratingStarReadOnly2"></li>
+                                }
+                            </ul>
+                            <div class="clear"></div>
+                        </div>
+                    </div>
+                    <div class="pop_t">
+                        <div class="pop_t_head">@m.Name</div>
+                        <ul>
+                            <li><strong>כתובת:</strong> @m.AddressMap</li>
+                            <li><strong>שעות פעילות:</strong></li>
+                            @foreach (var wd in s.WorkTimes)
+                            {
+                                <li>@wd.TimeFromeStr - @wd.TimeToStr @wd.DayStr</li> 
+                            }
+                            @Html.Raw(m.Kosher ? "<li><strong>כשרות:</strong> כשר</li>" : "")
+                        </ul>
+                        <div class="clear"></div>
+                    </div>
+                    <div class="pop_links">
+                        <ul>
+                            @{ TimeSpan ts = TimeSpan.FromMinutes(m.DeliveryTime); }
+                            <li class="icon1">
+                                <strong>@(string.Format(RP.T("Views.Shop._ChangeShopPopUp.ShipTimeFormated").ToString(), string.Format("{0:00}:{1:00}", ts.Hours, ts.Minutes))) </strong>
+                            </li>
+                            <li class="icon2">
+                                <strong>@RP.T("Views.Shop._ChangeShopPopUp.ShippingPrice") @ShoppingService.FormatPrice(m.ShipCost)</strong>
+                            </li>
+                            <li>@RP.T("Views.Shop._ChangeShopPopUp.ShipFreeFrom") @ShoppingService.FormatPrice(m.FreeShipFrom)</li>
+                            <li style="line-height: 20px;">
+                                <div class="tooltipmissprod" title="@RP.T("Views.Shop._ChangeShopPopUp.MissingProductsTooltip")">
+                                    <div>@(string.Format(RP.T("Views.Shop._ChangeShopPopUp.MissProductFormated").ToString(), s.NotAvaliableItems.Count))</div>
+                                    @foreach (var pitem in s.NotAvaliableItems)
+                                    {
+                                        @pitem.Name<text>,</text>
+                                    }
+
+                                </div>
+                                
+                        </li>
+                    </ul>
+                        <div class="clear"></div>
+                    </div>
+                    <div class="po_bt">                         
+                        <div class="@(ViewBag.CurrentShopID == m.ID ? "bt_p" : "bt_p2")">
+                            <a href="@Url.Action("ChangeShop", new { ID = ViewBag.CurrentShopID, ToShopID = m.ID })">@RP.T("Views.Shop._ChangeShopPopUp.ChangeShop")</a>
+                        </div>                        
+                        <div class="po_bt_text"><span>@s.TotalStr</span> @RP.T("Views.Shop._ChangeShopPopUp.TotalShop")</div>
+                        <div class="clear"></div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            }
+        </div>
+    </div>

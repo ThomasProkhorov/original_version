@@ -1,0 +1,18 @@
+@model string
+@{
+    string[] Directories = Directory.GetDirectories(Server.MapPath("~/Themes/"));
+    List<string> DirectoriesList = new List<string>();
+    DirectoriesList.Add("");
+    foreach (string item in Directories)
+    {
+        string t = new DirectoryInfo(item).Name;
+        DirectoriesList.Add(t);
+    }
+    SelectList Items = new SelectList(DirectoriesList, Model);
+}
+@(Html.Kendo().DropDownListFor(model => model)
+    .DataTextField("Text")
+    .DataValueField("Value")
+    .BindTo(Items)
+    .Value(Model)
+)

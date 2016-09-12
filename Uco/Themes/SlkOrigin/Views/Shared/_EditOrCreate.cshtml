@@ -1,0 +1,363 @@
+﻿@using System.Reflection
+@using System.Collections.Generic
+@using System.Linq
+@using System.ComponentModel.DataAnnotations
+@{
+System.Type t = Model.GetType();
+var ModelName = t.Name;
+   
+  var pDict = t.GetProperties().ToDictionary(x=>x.Name);
+  // getting config
+  var dnAttribute = LS.GetModelGeneral(t, ViewBag.CurrentRole);
+         // assdd=",editable: false"; 
+       // var opt = (ModelAttribute)p.GetCustomAttributes<ModelAttribute>().Where(x=>x.Role == ViewBag.CurrentRole || x.Role==null).OrderByDescending(x=>x.Role).ToList().FirstOrDefault();
+}
+
+@using (Html.BeginForm())
+{
+    @Html.ValidationSummary(true)
+   
+
+if (ViewData.TemplateInfo.TemplateDepth > 1)
+{
+    if (Model == null)
+    {
+        @ViewData.ModelMetadata.NullDisplayText
+    }
+    else
+    {
+        @ViewData.ModelMetadata.SimpleDisplayText
+    }
+}
+else
+{
+ //   ViewData.Clear();
+    <text>
+    @(Html.Kendo().TabStrip()
+    .Name("TabStrip")
+    .Animation(false)
+    .Items(tabstrip =>
+    {
+        foreach (var prop0 in ViewData.ModelMetadata.Properties.Where(pm =>  !ViewData.TemplateInfo.Visited(pm) && pm.Watermark != null).OrderBy(r => r.Order).Select(r => r.Watermark).Distinct())
+        {
+            string Watermark = prop0;
+            if ((Watermark == "Permissions" || Watermark == "הרשאות") && (SF.UsePermissions() != true || !Uco.Infrastructure.Livecycle.LS.CurrentUser.IsInRole("Admin"))) { continue; }
+
+
+            if (Watermark == "Hidden") continue;
+            tabstrip.Add().Text(Watermark).Content(@<text>
+                @foreach (var prop in ViewData.ModelMetadata.Properties.Where(pm =>  !ViewData.TemplateInfo.Visited(pm) && pm.Watermark == Watermark).OrderBy(r => r.Order))
+                {
+                    if (!prop.IsComplexType)
+        {
+if(pDict.ContainsKey(prop.PropertyName)){
+var opt = pDict[prop.PropertyName].GetCustomAttributes<ModelAttribute>().Where(x=>x.Role == ViewBag.CurrentRole || x.Role==null).OrderByDescending(x=>x.Role).ToList().FirstOrDefault();
+if (opt != null)
+{
+   
+    if (!opt.ShowInEdit && !opt.Edit)
+    {
+      
+    if (prop.PropertyName.Contains("ID") && pDict.ContainsKey(prop.PropertyName.Replace("ID", ""))
+        && pDict[prop.PropertyName.Replace("ID", "")].PropertyType.Namespace == "Uco.Models"
+    ){
+        
+            var opt3 = pDict[prop.PropertyName.Replace("ID", "")].GetCustomAttributes<ModelAttribute>().Where(x=>x.Role == ViewBag.CurrentRole || x.Role==null).OrderByDescending(x=>x.Role).ToList().FirstOrDefault();
+        if(opt3!= null && !opt3.Edit)
+        {
+            @Html.Hidden(prop.PropertyName)
+        }
+                    
+            continue;
+    }
+ 
+@Html.Hidden(prop.PropertyName)
+continue;
+}
+if( !opt.Edit){
+if(prop.PropertyName.Contains("ID") && pDict.ContainsKey(prop.PropertyName.Replace("ID",""))
+     && pDict[prop.PropertyName.Replace("ID", "")].PropertyType.Namespace == "Uco.Models")
+{
+      
+            continue;
+        }
+   
+<div class="editor-label">@Html.Label(prop.PropertyName) @(prop.IsRequired ? "*" : "")</div>
+ <div class="editor-field">@Html.Display(prop.PropertyName) <nobr>&nbsp;&nbsp;</nobr> @Html.Hidden(prop.PropertyName) @Html.ValidationMessage(prop.PropertyName)</div>
+           
+
+continue;
+}
+}else{
+
+}
+}
+            if (prop.HideSurroundingHtml)
+            {
+            @Html.Editor(prop.PropertyName)
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(Html.Label(prop.PropertyName).ToHtmlString()))
+                {
+                <div class="editor-label">@Html.Label(prop.PropertyName) @(prop.IsRequired ? "*" : "")</div>
+                }
+
+            <div class="editor-field">@Html.Editor(prop.PropertyName) @Html.ValidationMessage(prop.PropertyName)</div>
+            }
+        }else{
+
+
+
+if(pDict.ContainsKey(prop.PropertyName)){
+var opt = pDict[prop.PropertyName].GetCustomAttributes<ModelAttribute>().Where(x=>x.Role == ViewBag.CurrentRole || x.Role==null).OrderByDescending(x=>x.Role).ToList().FirstOrDefault();
+var refKey = ModelName+"ID";
+    var HiddenIDKey = prop.PropertyName+"ID";
+    if (opt != null)
+    {
+       
+        if (!opt.ShowInEdit && !opt.Edit)
+        {
+@Html.Hidden(refKey)
+                      
+continue;
+}
+if(!string.IsNullOrEmpty(opt.ForeignKey))
+{
+refKey=opt.ForeignKey;
+}
+if( !opt.Edit){
+
+    if (prop.PropertyName == "User")
+    {
+        var refP = pDict[prop.PropertyName + "ID"];
+<div class="editor-label">@Html.Label(prop.PropertyName) @(prop.IsRequired ? "*" : "")</div>
+ <div class="editor-field">
+     <a target="_blank" href="/Admin/User/Edit?ID=@( refP.GetValue(Model))">@RP.T("Admin.Show")</a>
+     <nobr>&nbsp;&nbsp;</nobr> 
+   
+    </div>
+        ///Admin/User/Edit?ID=d17670bf-ba8f-468d-8015-09c09eccc0ee
+                }
+  @Html.Hidden(HiddenIDKey) @Html.ValidationMessage(HiddenIDKey)
+continue;
+}
+
+}else{
+
+}
+if(pDict[prop.PropertyName].PropertyType.Name == "List`1"){
+
+if(Html.IsPartialExist(prop.PropertyName))
+{
+@Html.Partial(prop.PropertyName,(object)Model)
+}
+else
+{
+@Html.Action("Grid", "Generic", new { Filed=refKey,ID=Model.ID, model=pDict[prop.PropertyName].PropertyType.GenericTypeArguments[0].Name })
+}
+
+}else if(pDict[prop.PropertyName].PropertyType.Namespace =="Uco.Models")
+{
+
+    var oldpref = ViewData.TemplateInfo.HtmlFieldPrefix;
+    ViewData.TemplateInfo.HtmlFieldPrefix = oldpref + (oldpref != "" ? "_" : "") + prop.PropertyName + "ID";
+            string editorTemplate = "GenericDropDown";
+            var UIhint = (UIHintAttribute)pDict[prop.PropertyName].GetCustomAttribute<UIHintAttribute>();
+            if (UIhint != null)
+            {
+                editorTemplate = UIhint.UIHint;
+            }
+            var newModel = Activator.CreateInstance(pDict[prop.PropertyName].PropertyType);
+            var refP = pDict[prop.PropertyName + "ID"];
+            pDict[prop.PropertyName].PropertyType.GetProperty("ID").SetValue(newModel, (object)refP.GetValue(Model));
+            <div class="editor-label">@Html.Label(prop.PropertyName) @(prop.IsRequired ? "*" : "")</div>
+<div class="editor-field">
+@Html.Partial("EditorTemplates/" + editorTemplate, newModel)
+</div>
+    ViewData.TemplateInfo.HtmlFieldPrefix = oldpref;
+}
+}
+
+
+
+}
+                    }
+            </text>);
+
+
+        }
+        //custom tabs
+
+
+
+
+        var controllerContext = Html.ViewContext.Controller.ControllerContext;
+        var viewfolder = controllerContext.RouteData.Values["controller"];
+        controllerContext.RouteData.Values["controller"] = ModelName;
+        if(Html.IsPartialExist("AdditionalTab"))
+        {
+            tabstrip.Add().Text(RP.S("Admin." + ModelName + ".AdditionalTab")).Content(@<text>
+   @{   
+       viewfolder = controllerContext.RouteData.Values["controller"];
+       controllerContext.RouteData.Values["controller"] = ModelName;
+    }
+   @Html.Partial("AdditionalTab", (object)Model)
+@{
+    controllerContext.RouteData.Values["controller"] = viewfolder;
+}   </text>);
+    }
+        controllerContext.RouteData.Values["controller"] = viewfolder;
+        
+    }).SelectedIndex(0))
+    </text>
+
+    foreach (var prop in ViewData.ModelMetadata.Properties.Where(pm => !ViewData.TemplateInfo.Visited(pm) && pm.Watermark == null).OrderBy(r => r.Order))
+    {
+        if (!prop.IsComplexType)
+        {
+if(pDict.ContainsKey(prop.PropertyName)){
+var opt = pDict[prop.PropertyName].GetCustomAttributes<ModelAttribute>().Where(x=>x.Role == ViewBag.CurrentRole || x.Role==null).OrderByDescending(x=>x.Role).ToList().FirstOrDefault();
+var refKey = ModelName+"ID";
+if (opt != null)
+{
+
+    if (!opt.ShowInEdit && !opt.Edit)
+    {
+if(prop.PropertyName.Contains("ID") && pDict.ContainsKey(prop.PropertyName.Replace("ID",""))
+     && pDict[prop.PropertyName.Replace("ID", "")].PropertyType.Namespace == "Uco.Models")
+{
+     var opt3 = pDict[prop.PropertyName.Replace("ID", "")].GetCustomAttributes<ModelAttribute>().Where(x=>x.Role == ViewBag.CurrentRole || x.Role==null).OrderByDescending(x=>x.Role).ToList().FirstOrDefault();
+        if(opt3!= null && !opt3.Edit)
+        {
+            @Html.Hidden(prop.PropertyName)
+        }
+            continue;
+        }
+@Html.Hidden(prop.PropertyName)
+continue;
+}
+if(!string.IsNullOrEmpty(opt.ForeignKey))
+{
+refKey=opt.ForeignKey;
+}
+if( !opt.Edit){
+if(prop.PropertyName.Contains("ID") && pDict.ContainsKey(prop.PropertyName.Replace("ID",""))
+     && pDict[prop.PropertyName.Replace("ID", "")].PropertyType.Namespace == "Uco.Models")
+{
+            continue;
+        }
+<div class="editor-label">@Html.Label(prop.PropertyName) @(prop.IsRequired ? "*" : "")</div>
+ <div class="editor-field">@Html.Display(prop.PropertyName) <nobr>&nbsp;&nbsp;</nobr> @Html.Hidden(prop.PropertyName) @Html.ValidationMessage(prop.PropertyName)</div>
+           
+
+continue;
+}
+}else{
+
+}
+}
+            if (prop.HideSurroundingHtml)
+            {
+            @Html.Editor(prop.PropertyName)
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(Html.Label(prop.PropertyName).ToHtmlString()))
+                {
+                <div class="editor-label">@Html.Label(prop.PropertyName) @(prop.IsRequired ? "*" : "")</div>
+                }
+
+            <div class="editor-field">@Html.Editor(prop.PropertyName) @Html.ValidationMessage(prop.PropertyName)</div>
+            }
+        }else{
+
+
+
+if(pDict.ContainsKey(prop.PropertyName)){
+var opt = pDict[prop.PropertyName].GetCustomAttributes<ModelAttribute>().Where(x=>x.Role == ViewBag.CurrentRole || x.Role==null).OrderByDescending(x=>x.Role).ToList().FirstOrDefault();
+
+if (opt != null)
+{
+
+    if (!opt.ShowInEdit && !opt.Edit)
+    {
+ 
+//@Html.Hidden(prop.PropertyName)
+continue;
+}
+if( !opt.Edit){
+
+<div class="editor-label">@Html.Label(prop.PropertyName) @(prop.IsRequired ? "*" : "")</div>
+ <div class="editor-field">@Html.Display(prop.PropertyName) <nobr>&nbsp;&nbsp;</nobr> 
+    @*@Html.Hidden(prop.PropertyName)*@ 
+    @Html.ValidationMessage(prop.PropertyName)</div>
+           
+
+continue;
+}
+}else{
+
+}
+if(pDict[prop.PropertyName].PropertyType.Name == "List`1"){
+
+if(Html.IsPartialExist(prop.PropertyName))
+{
+@Html.Partial(prop.PropertyName,(object)Model)
+}else
+{
+@Html.Action("Grid", "Generic", new { Filed=ModelName+"ID",ID=Model.ID, model=pDict[prop.PropertyName].PropertyType.GenericTypeArguments[0].Name })
+}
+}else if(pDict[prop.PropertyName].PropertyType.Namespace =="Uco.Models")
+        {
+            var oldpref = ViewData.TemplateInfo.HtmlFieldPrefix;
+    ViewData.TemplateInfo.HtmlFieldPrefix = oldpref + (oldpref!="" ? "_" : "") + prop.PropertyName + "ID";
+            string editorTemplate = "GenericDropDown";
+            var UIhint = (UIHintAttribute)pDict[prop.PropertyName].GetCustomAttribute<UIHintAttribute>();
+            if (UIhint != null)
+            {
+                editorTemplate = UIhint.UIHint;
+            }
+            var newModel = Activator.CreateInstance(pDict[prop.PropertyName].PropertyType);
+            var refP = pDict[prop.PropertyName + "ID"];
+            pDict[prop.PropertyName].PropertyType.GetProperty("ID").SetValue(newModel, (object)refP.GetValue(Model));
+            <div class="editor-label">@Html.Label(prop.PropertyName) @(prop.IsRequired ? "*" : "")</div>
+<div class="editor-field">
+@Html.Partial("EditorTemplates/" + editorTemplate, newModel)
+</div>
+            ViewData.TemplateInfo.HtmlFieldPrefix = oldpref;
+}
+}
+
+
+}
+    }
+}
+
+
+
+@* @Html.EditorForModel()*@
+    if (ViewBag.HideButtons == null)
+    { 
+    <p class="clear">
+        @if (dnAttribute.SubmitButton || Model.ID == 0)
+        { 
+        <input type="submit" class="k-button" value="@RP.T("Admin.Views.Command.Save")" />
+       
+        }
+         @if (dnAttribute.CanBack || Model.ID == 0)
+        {
+            if (ViewBag.BackUrl != null)
+            {
+                <a href="@ViewBag.BackUrl">@RP.T("Admin.Views.Command.BackToList")</a>
+
+            }
+            else
+            {
+                @Html.ActionLink(@RP.T("Admin.Views.Command.BackToList").ToString(), "Index")
+            }
+
+        }
+    </p>
+    }
+}

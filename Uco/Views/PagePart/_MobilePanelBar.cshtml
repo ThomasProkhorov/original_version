@@ -1,0 +1,28 @@
+﻿@model IEnumerable<Uco.Models.CustumMenuItem>
+@(Html.Telerik().PanelBar()
+    .Name("PanelBar")
+    .ExpandMode(PanelBarExpandMode.Single)
+    .Items(panelBar => 
+    {
+        foreach (Uco.Models.CustumMenuItem item1 in Model.Where(r => r.ParentID == ViewBag.MainID))
+        {
+            panelBar.Add()
+                .Text(item1.Title)
+                .ImageUrl(string.IsNullOrEmpty(item1.PicMobile) ? "/Areas/Admin/Content/icons/bullet_blue.png" : item1.PicMobile)
+                .Url("/" + item1.RouteUrl + "/" + item1.SeoUrlName)
+                //.Expanded((ViewBag.CurrentID == item1.ID ? true : false))
+                .Selected((ViewBag.CurrentID == item1.ID ? true : false))
+                .Items(panelBar2 =>
+                {
+                    foreach (Uco.Models.CustumMenuItem item2 in Model.Where(r => r.ParentID == item1.ID))
+                {
+                    panelBar2.Add()
+                        .Text(item2.Title)
+                        .ImageUrl(string.IsNullOrEmpty(item2.PicMobile) ? "/Areas/Admin/Content/icons/bullet_blue.png" : item2.PicMobile)
+                        .Selected((ViewBag.CurrentID == item2.ID ? true : false))
+                        .Url("/" + item2.RouteUrl + "/" + item2.SeoUrlName);
+                }
+            });
+        }
+    })
+)

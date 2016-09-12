@@ -1,0 +1,23 @@
+@model List<string>
+@{
+    List<string> Items = new List<string>();
+    string item1 = RP.GetSettingsRepositoryList().FirstOrDefault(r => r.DomainPageID == 1).SearchCourceSubject;
+    if (!string.IsNullOrEmpty(item1))
+    {
+        foreach (string item2 in item1.Replace("\r", "").Split('\n'))
+        {
+            Items.Add(item2.Trim());
+        }
+    }
+    Items = Items.Distinct().OrderBy(r => r).ToList();
+}
+<div class="editor-label"><label for="@ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty)">נושא הקורס</label></div>
+<div class="clear"></div>
+<div class="editor-field">
+    @(Html.Kendo().MultiSelect()
+    .Name(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))
+    .Placeholder("בחר נושא הקורס...")
+    .Value(Model)
+    .BindTo(Items)
+    )
+</div>

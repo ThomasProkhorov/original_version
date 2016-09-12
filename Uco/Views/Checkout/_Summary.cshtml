@@ -1,0 +1,88 @@
+﻿@model Uco.Models.Overview.ShoppingCartOverviewModel
+@{
+var half = (int)Math.Ceiling(((decimal)Model.Count / 2));
+}
+@if (Model.Count > 0)
+{
+    <div class="shpng_cart2_tab">
+        <div class="shoping_cart2_tab_head">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td align="center" valign="middle" class="tab_width1">&nbsp;</td>
+                    <td align="right" valign="middle" class="tab_width2">@RP.T("Views.Checkout._Summary.TableProductName")</td>
+                    <td align="right" valign="middle" class="tab_width3">@RP.T("Views.Checkout._Summary.TableManufacter")</td>
+                    <td align="center" valign="middle" class="tab_width4">@RP.T("Views.Checkout._Summary.TablePriceForEach")</td>
+                    <td align="center" valign="middle" class="tab_width5">@RP.T("Views.Checkout._Summary.TableCountOfUnits")</td>
+@if(Model.CanEditCart){
+                    <td align="center" valign="middle" class="tab_width6">@RP.T("Views.Checkout._Summary.TableProductOption")</td>
+}
+                    <td align="center" valign="middle" class="tab_width7">@RP.T("Views.Checkout._Summary.TablePrice")</td>
+                    <td align="right" valign="middle" class="tab_width8">@RP.T("Views.Checkout._Summary.TableNote")</td>
+@if(Model.CanEditCart){
+                    <td align="center" valign="middle" class="tab_width9">@RP.T("Views.Checkout._Summary.TableDeleteProduct")</td>
+}
+                </tr>
+            </table>
+        </div>
+        @for (var i = 0; i < Model.Count; i++)
+        {
+            @*string addclass="";
+                if( i % 2 == 1)
+                {addclass="bg_change";}*@
+            var item = Model.Items[i];
+            <div class="shoping_cart2_tab_listing sh_cartitem">
+                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td align="center" valign="middle" class="tab_width1"><img src="@SF.GetImage(item.Image, 16, 27, true, true)" alt=""></td>
+                        <td align="right" valign="middle" class="tab_width2">@item.Name</td>
+                        <td align="right" valign="middle" class="tab_width3 shsku">@item.SKU</td>
+                        <td align="center" valign="middle" class="tab_width4 shPrice">@ShoppingService.FormatPrice(item.Price)</td>
+                        <td align="center" valign="middle" class="tab_width5">
+@if(Model.CanEditCart){
+                            <table width="64" border="0" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td align="center" valign="middle" class="shoping_cart_minus"><a href="#" onclick="Shop.CartDecrease(this,event,@item.ID);"></a></td>
+                                    <td align="center" valign="middle" class="shpng_qty_show"><input type="text" class="single-line" value="@item.Quantity" id="textfield" name="Quantity"></td>
+                                    <td align="center" valign="middle" class="shoping_cart_plus"><a href="#" onclick="Shop.CartIncreas(this,event,@item.ID);"></a></td>
+                                </tr>
+                            </table>
+}else
+{
+@item.Quantity
+}
+                        </td>
+@if(Model.CanEditCart){
+                        <td align="center" valign="middle" class="tab_width6">
+                            @if (item.Attributes.Count > 0)
+                            {
+                                <select name="ProductAttributeOptionID" class="drop_down" onchange="Shop.CartChangeAttribute(this,event,@item.ID);">
+                                    <option value="0">@RP.T("Views.Checkout._Summary.ChooseProductAttr")</option>
+                                    @foreach (var atr in item.Attributes)
+                                    {
+                                        string selected = "";
+                                        if (atr.ID == item.ProductAttributeOptionID) { selected = "selected=\"selected\""; }
+                                        <option value="@atr.ID" @selected>@atr.Name</option>
+                                    }
+                                </select>}
+                        </td>
+}
+                        <td align="center" valign="middle" class="tab_width7"><span class="price shUnitPrice">@ShoppingService.FormatPrice(item.UnitPrice)</span></td>
+                        <td align="right" valign="middle" class="tab_width8 shAttributeDescription">@item.AttributeDescription</td>
+                     @if(Model.CanEditCart){
+   <td align="center" valign="middle" class="tab_width9"><a href="#" onclick="Shop.CartDelete(this,event,@item.ID);"><img src="/Content/DesignFiles/remove_icon1.png" alt=""></a></td>
+                   
+}
+
+                    </tr>
+                </table>
+            </div>
+
+        }
+
+
+    </div>
+}
+else
+{
+    @RP.T("ShoppingCart._CartTable.NoItems")
+}

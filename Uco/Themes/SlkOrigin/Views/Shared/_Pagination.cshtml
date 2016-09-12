@@ -1,0 +1,45 @@
+﻿@model Uco.Models.Pagination
+@if (Model.PageTotal > Model.PageItems)
+{
+    int PageTotal = Convert.ToInt32(Math.Ceiling(((decimal)Model.PageTotal / (decimal)Model.PageItems)));
+    int PageFrom = 1;
+    int PageTo = PageTotal;
+    if (PageTo > 10)
+    {
+        if (Model.PageNumber > 6)
+        {
+            PageFrom = Model.PageNumber - 5;
+            PageTo = Model.PageNumber + 5;
+        }
+        else
+        {
+            PageFrom = 1;
+            PageTo = 11;
+        }
+        if (PageTotal < PageTo)
+        {
+            PageTo = PageTotal;
+        }
+    }
+    <div class="page6_bott_part">
+        <div class="pagination">
+            <ul>
+                @if (Model.PageNumber != PageFrom)
+                {
+                    <li><a href="@(Model.Url)?page=@(Model.PageNumber - 10 > 0 ? (Model.PageNumber - 10) : 1)"><img alt="Back" src="~/Content/DesignFiles/back_pagination.png"></a></li>
+                }
+                @for (int i = PageFrom; i <= PageTo; ++i)
+                {
+                    <li><a class="link  @(Model.PageNumber == i ? "current" : "")" href="@(Model.Url)?page=@(i)">@(i)</a></li>
+                }
+                @if (Model.PageNumber != PageTo)
+                {
+                    <li><a href="@(Model.Url)?page=@(Model.PageNumber + 10 < PageTotal ? (Model.PageNumber + 10) : PageTotal)"><img alt="Next" src="~/Content/DesignFiles/next_pagination.png"></a></li> 
+                }
+            </ul>
+            <div class="clear"></div>
+        </div>
+        <div class="showing_rslt">Showing @Model.PageItems of @Model.PageTotal search results</div>
+        <div class="clear"></div>
+    </div>
+}

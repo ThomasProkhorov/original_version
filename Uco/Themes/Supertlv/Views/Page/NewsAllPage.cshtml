@@ -1,0 +1,17 @@
+﻿@model Uco.Models.NewsListPage
+@{
+    Layout = ViewBag.Layout;
+}
+<div id="content">
+    <h1>@ViewBag.H1</h1>
+    <div class="editor_html">
+        @Html.Raw(Model.Text)
+    </div>
+    <div class="clear"></div>
+    <ul>
+        @foreach (Uco.Models.NewsPage item in ViewBag.Items)
+        {
+            <li><a href="@Url.Content(item.Url)">@item.Title</a></li>
+        }
+    </ul>
+</div>

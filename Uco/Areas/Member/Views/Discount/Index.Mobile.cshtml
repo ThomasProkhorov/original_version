@@ -1,0 +1,392 @@
+﻿@model object
+@using System.Reflection
+@using System.Collections.Generic
+@using System.Linq
+@using System.ComponentModel.DataAnnotations
+@{
+    ViewBag.Title = RP.T("Admin.Views.Discount.Index.Title");
+    Layout = "~/Areas/Member/Views/Shared/_LayoutNoTree.cshtml";
+    string Lang = ViewBag.Lang;
+}
+@*@Html.Partial("~/Views/Generic/_Grid.cshtml", Model)*@
+<h2>@ViewBag.Title</h2>
+<div id="Discountgrid"></div>
+
+
+<script>
+
+    var DiscountgridFiltering = {
+        filter: function (id) {
+            var data = { logic: "and", filters: [] };
+            //{ field: "name", operator: "startswith", value: "Jane" }
+            var grid = $("#Discountgrid").data('kendoGrid');
+            //  console.log(grid.dataSource.options.schema.model);
+            $('#' + id + ' input').each(function (i, e) {
+                if ($(e).attr('name') && $(e).val()) {
+                    var inpname = $(e).attr('name');
+                    var objname = inpname.split(".")[0];
+                    if (objname in grid.dataSource.options.schema.model.fields) {
+
+                        var model = grid.dataSource.options.schema.model.fields[objname];
+                        if (model.type == 'number' || model.type == 'object') {
+                            if ($(e).attr('data-zero') && $(e).val() < 1) {
+                                return;
+                            }
+                        }
+                        var operator = 'eq';
+                        if (model.type == 'date') {
+                            operator = 'gt'; // >
+                            var todate = $('#' + id + ' input[name="' + inpname + '_dateto"]');
+                            if (todate.length > 0) {
+                                data.filters.push({ field: $(e).attr('name'), operator: 'lte', value: model.parse(todate.val()) });
+                            }
+                        }
+                        if (model.type == 'string') {
+                            operator = 'startswith'; // .startswith
+                        }
+                        //lte <=
+                        //  console.log(model);
+                        var parseVal = $(e).val();
+                        if (model.type != 'object') {
+                            parseVal = model.parse(parseVal);
+                        }
+                        data.filters.push({ field: $(e).attr('name'), operator: operator, value: parseVal });
+                    }
+
+                }
+            });
+
+            grid.dataSource.filter(data);
+
+        },
+        clear: function () {
+            var grid = $("#Discountgrid").data('kendoGrid');
+            grid.dataSource.filter({});
+        },
+        setFilter: function (name, value) {
+            var grid = $("#Discountgrid").data('kendoGrid');
+            grid.dataSource.filter({ field: name, operator: "eq", value: value });
+            //grid.dataSource.page(1);
+            // alert(name + value);
+        },
+    };
+
+    function IntToTime(i) {
+        var hr = Math.floor(i / 60);
+        var mn = i % 60; if (mn < 10) { mn = '0' + mn; }
+        //  var part ="AM";
+        // if(hr>12)
+        //  {
+        //    hr-=12;
+        //     part="PM";
+        // }
+        // if(hr == 0){hr = 12;}
+        var time = hr + ":" + mn;// + " " + part;
+        return time;
+    }
+
+
+    var DiscountLimitTypeEnums = {
+        0: 'ללא הגבלה',
+        1: 'המבצע תקף X פעמים בלבד',
+        2: 'המבצע תקף X פעמים לקוח',
+
+    };
+
+
+
+    var DiscountTypeEnums = {
+        0: 'מוצרים',
+        1: 'סכום ללא משלוח',
+        2: 'סכום כולל משלוח',
+        3: 'משלוח',
+
+    };
+
+
+
+    var DiscountCartItemTypeEnums = {
+        0: 'מופעל על שורה בחשבונית',
+        1: 'מופעל על סה"כ בחשבונית',
+
+    };
+
+    $(document).ready(function () {
+        /*
+        Docs
+        http://docs.telerik.com/kendo-ui/api/javascript/ui/grid
+        */
+        var gridLocal = function () {
+            if ('messages' in kendo.ui.Grid.prototype.options) {
+                return kendo.ui.Grid.prototype.options.messages.commands.create;
+            } else {
+                return "Add new";
+            }
+        }
+        $("#Discountgrid").kendoGrid({
+            dataSource: {
+
+                type: "json",
+                transport: {
+                    "prefix": "",
+                    read: {
+                        url: "/Member/Manage/Discount/_AjaxRead",
+                        type: "POST",
+                        dataType: "json",
+                        // data: { filter:'ID~eq~3'  }
+                    },
+
+                    "destroy": {
+                        "url": "/Member/Manage/Discount/_AjaxDelete"
+                    },
+                },
+
+                schema: {
+                    data: "Data",
+                    total: "Total",
+                    errors: "Errors",
+                    model: {
+                        "id": "ID",
+                        fields: {
+                            "ID": { "type": "number", defaultValue: 0, editable: false, },
+                            "ShopID": { "type": "number", defaultValue: 0 },
+                            "Name": { "type": "string" },
+                            "Active": { "type": "boolean" },
+                            "IsPercent": { "type": "boolean" },
+                            "Amount": { "type": "number", defaultValue: 0 },
+                            "Percent": { "type": "number", defaultValue: 0 },
+                            "IsCodeRequired": { "type": "boolean" },
+                            "DiscountCode": { "type": "string" },
+                            "LimitType": { "type": "number", defaultValue: 0 },
+                            "Limit": { "type": "number", defaultValue: 0 },
+                            "DiscountType": { "type": "number", defaultValue: 0 },
+                            "DiscountCartItemType": { "type": "number", defaultValue: 0 },
+                            "ProductShopIDs": { "type": "number", defaultValue: 0, editable: false, },
+                            "StartDate": { "type": "date", nullable: true, },
+                            "EndDate": { "type": "date", nullable: true, },
+                            "DisplayOrder": { "type": "number", defaultValue: 0 },
+                            "PreventNext": { "type": "boolean" },
+                            "RulesData": { "type": "string" },
+                            // "ID": {"type":"number" ,editable: false}
+                        }
+
+                    }
+                },
+                requestEnd: function (e) {
+                    if ($('#Discountgride-checkall').length > 0) {
+                        $('#Discountgride-checkall')[0].checked = false;
+                    }
+                },
+                pageSize: 20,
+                "error": error_handler,
+                "sync": function (e) { this.read(); },
+                "serverPaging": true,
+                "serverSorting": true,
+                "serverFiltering": true,
+                "serverGrouping": true,
+                "serverAggregates": true,
+
+                filter: { field: "ShopID", operator: "eq", value: '@ViewBag.AdditionalFilterID' },
+
+                "type": "aspnetmvc-ajax",
+
+                sort: [],
+            },
+            refresh: true,
+            //  detailTemplate: kendo.template($("#template").html()),
+            // detailInit: detailInit,
+            // dataBound: function () {
+            //this.expandRow(this.tbody.find("tr.k-master-row").first());
+            //   },
+            pageable: {
+                refresh: true,
+                pageSize: 10
+            },
+
+            columns: [
+{ field: "ID", title: "ID", sortable: false, hidden: true, filterable: false, editor: '<input data-val="true" data-val-number="The field ID must be a number." data-val-required="The ID field is required." id="ID" name="ID" type="hidden" value="0" /><span class="field-validation-valid" data-valmsg-for="ID" data-valmsg-replace="true"></span>', },
+{
+    field: "ShopID", title: "ShopID", sortable: false, filterable: false, hidden: true, editor: '<input data-val="true" data-val-number="The field ID must be a number." data-val-required="The ID field is required." id="ShopID" name="ShopID" type="number" value="0" /><script> \
+	jQuery(function(){jQuery("#ShopID").kendoNumericTextBox({"format":"n0","decimals":0});}); \
+</sc'+ 'ript> \
+<span class="field-validation-valid" data-valmsg-for="ShopID" data-valmsg-replace="true"></span>',
+},
+{ field: "Name", title: "הנחה", sortable: false, template: "<a href=\"/Member/Manage/Discount/Edit/#= ID #\">#= Name #</a>", filterable: { cell: { showOperators: true } }, editor: '<input class="k-textbox" id="Name" name="Name" type="text" value="" /><span class="field-validation-valid" data-valmsg-for="Name" data-valmsg-replace="true"></span>', },
+{ field: "Active", title: "פעיל", sortable: false, hidden: true, filterable: { cell: { showOperators: true } }, editor: '<input class="check-box" data-val="true" data-val-required="The פעיל field is required." id="Active" name="Active" type="checkbox" value="true" /><input name="Active" type="hidden" value="false" /><span class="field-validation-valid" data-valmsg-for="Active" data-valmsg-replace="true"></span>', },
+{ field: "IsPercent", title: "באחוזים", sortable: false, hidden: true, filterable: { cell: { showOperators: true } }, editor: '<input class="check-box" data-val="true" data-val-required="The באחוזים field is required." id="IsPercent" name="IsPercent" type="checkbox" value="true" /><input name="IsPercent" type="hidden" value="false" /><span class="field-validation-valid" data-valmsg-for="IsPercent" data-valmsg-replace="true"></span>', },
+{
+    field: "Amount", title: "סכום", sortable: false, hidden: true, filterable: false, editor: '<input id="Amount" name="Amount" type="number" value="0" /><script> \
+	jQuery(function(){jQuery("#Amount").kendoNumericTextBox({"decimals":4});}); \
+</sc'+ 'ript> \
+ \
+<span class="field-validation-valid" data-valmsg-for="Amount" data-valmsg-replace="true"></span>',
+},
+{
+    field: "Percent", title: "אחוז", sortable: false, hidden: true, filterable: false, editor: '<input data-val="true" data-val-number="The field אחוז must be a number." data-val-required="The אחוז field is required." id="Percent" name="Percent" type="number" value="0" /><script> \
+	jQuery(function(){jQuery("#Percent").kendoNumericTextBox({"format":"n0","decimals":0});}); \
+</sc'+ 'ript> \
+<span class="field-validation-valid" data-valmsg-for="Percent" data-valmsg-replace="true"></span>',
+},
+{ field: "IsCodeRequired", title: "קופון", sortable: false, hidden: true, filterable: { cell: { showOperators: true } }, editor: '<input class="check-box" data-val="true" data-val-required="The קופון field is required." id="IsCodeRequired" name="IsCodeRequired" type="checkbox" value="true" /><input name="IsCodeRequired" type="hidden" value="false" /><span class="field-validation-valid" data-valmsg-for="IsCodeRequired" data-valmsg-replace="true"></span>', },
+{ field: "DiscountCode", title: "קוד קופון", sortable: false, hidden: true, filterable: { cell: { showOperators: true } }, editor: '<input class="k-textbox" id="DiscountCode" name="DiscountCode" type="text" value="" /><span class="field-validation-valid" data-valmsg-for="DiscountCode" data-valmsg-replace="true"></span>', },
+{
+    field: "LimitType", title: "סוג הגבלה", hidden: true, sortable: false, filterable: false, editor: ' \
+ \
+<input data-val="true" data-val-required="The סוג הגבלה field is required." id="LimitType" name="LimitType" type="text" value="0" /><script> \
+	jQuery(function(){jQuery("#LimitType").kendoDropDownList({"dataSource":[{"Text":"ללא הגבלה","Value":"0"},{"Text":"המבצע תקף X פעמים בלבד","Value":"1"},{"Text":"המבצע תקף X פעמים לקוח","Value":"2"}],"dataTextField":"Text","dataValueField":"Value"});}); \
+</sc'+ 'ript><span class="field-validation-valid" data-valmsg-for="LimitType" data-valmsg-replace="true"></span>', template: "# if (DiscountLimitTypeEnums[LimitType]) { # #: DiscountLimitTypeEnums[LimitType] # # } #",
+},
+{
+    field: "Limit", title: "Limit", sortable: false, filterable: false, hidden: true, editor: '<input data-val="true" data-val-number="The field כמות לשימוש must be a number." data-val-required="The כמות לשימוש field is required." id="Limit" name="Limit" type="number" value="0" /><script> \
+	jQuery(function(){jQuery("#Limit").kendoNumericTextBox({"format":"n0","decimals":0});}); \
+</sc'+ 'ript> \
+<span class="field-validation-valid" data-valmsg-for="Limit" data-valmsg-replace="true"></span>',
+},
+{
+    field: "DiscountType", title: "סוג הנחה", sortable: false, hidden: true, filterable: { cell: { showOperators: true } }, editor: ' \
+ \
+<input data-val="true" data-val-required="The סוג הנחה field is required." id="DiscountType" name="DiscountType" type="text" value="0" /><script> \
+	jQuery(function(){jQuery("#DiscountType").kendoDropDownList({"dataSource":[{"Text":"מוצרים","Value":"0"},{"Text":"סכום ללא משלוח","Value":"1"},{"Text":"סכום כולל משלוח","Value":"2"},{"Text":"משלוח","Value":"3"}],"dataTextField":"Text","dataValueField":"Value"});}); \
+</sc'+ 'ript><span class="field-validation-valid" data-valmsg-for="DiscountType" data-valmsg-replace="true"></span>', template: "# if (DiscountTypeEnums[DiscountType]) { # #: DiscountTypeEnums[DiscountType] # # } #",
+},
+{
+    field: "DiscountCartItemType", title: "DiscountCartItemType", sortable: false, filterable: false, hidden: true, editor: ' \
+ \
+<input data-val="true" data-val-required="The סוג פריט בסל קניות field is required." id="DiscountCartItemType" name="DiscountCartItemType" type="text" value="0" /><script> \
+	jQuery(function(){jQuery("#DiscountCartItemType").kendoDropDownList({"dataSource":[{"Text":"מופעל על שורה בחשבונית","Value":"0"},{"Text":"מופעל על סה\"כ בחשבונית","Value":"1"}],"dataTextField":"Text","dataValueField":"Value"});}); \
+</sc'+ 'ript><span class="field-validation-valid" data-valmsg-for="DiscountCartItemType" data-valmsg-replace="true"></span>', template: "# if (DiscountCartItemTypeEnums[DiscountCartItemType]) { # #: DiscountCartItemTypeEnums[DiscountCartItemType] # # } #",
+},
+{
+    field: "StartDate", title: "StartDate", format: "{0: dd/MM/yyyy HH:mm}", sortable: false, filterable: false, hidden: true, editor: '<input data-val="true" data-val-date="The field תאריך התחלה must be a date." id="StartDate" name="StartDate" type="datetime" /><script> \
+	jQuery(function(){jQuery("#StartDate").kendoDateTimePicker({"format":"d/M/yyyy HH:mm","timeFormat":"HH:mm","min":new Date(1900,0,1,0,0,0,0),"max":new Date(2099,11,31,0,0,0,0),"interval":30});}); \
+</sc'+ 'ript><span class="field-validation-valid" data-valmsg-for="StartDate" data-valmsg-replace="true"></span>',
+},
+{
+    field: "EndDate", title: "EndDate", format: "{0: dd/MM/yyyy HH:mm}", sortable: false, filterable: false, hidden: true, editor: '<input data-val="true" data-val-date="The field תאריך סיום must be a date." id="EndDate" name="EndDate" type="datetime" /><script> \
+	jQuery(function(){jQuery("#EndDate").kendoDateTimePicker({"format":"d/M/yyyy HH:mm","timeFormat":"HH:mm","min":new Date(1900,0,1,0,0,0,0),"max":new Date(2099,11,31,0,0,0,0),"interval":30});}); \
+</sc'+ 'ript><span class="field-validation-valid" data-valmsg-for="EndDate" data-valmsg-replace="true"></span>',
+},
+{
+    field: "DisplayOrder", title: "סדר הפעלת מבצע", sortable: false, hidden: true, filterable: false, editor: '<input data-val="true" data-val-number="The field סדר הפעלת מבצע must be a number." data-val-required="The סדר הפעלת מבצע field is required." id="DisplayOrder" name="DisplayOrder" type="number" value="0" /><script> \
+	jQuery(function(){jQuery("#DisplayOrder").kendoNumericTextBox({"format":"n0","decimals":0});}); \
+</sc'+ 'ript> \
+<span class="field-validation-valid" data-valmsg-for="DisplayOrder" data-valmsg-replace="true"></span>',
+},
+{ field: "PreventNext", title: "PreventNext", sortable: false, filterable: false, hidden: true, editor: '<input class="check-box" data-val="true" data-val-required="The התעלם מבצעים פחות חשובים field is required." id="PreventNext" name="PreventNext" type="checkbox" value="true" /><input name="PreventNext" type="hidden" value="false" /><span class="field-validation-valid" data-valmsg-for="PreventNext" data-valmsg-replace="true"></span>', },
+{
+    field: "RulesData", title: "RulesData", sortable: false, filterable: false, hidden: true, editor: '<textarea class="text-box multi-line k-textbox" id="RulesData" name="RulesData"> \
+</textarea> \
+<span class="field-validation-valid" data-valmsg-for="RulesData" data-valmsg-replace="true"></span>',
+},
+
+
+
+
+
+
+
+{
+    "width": "90px",
+    "buttonType": "Image",
+    "command": [
+
+{
+    "name": "destroy",
+    "buttonType": "Image",
+    "text": "מחיקה"
+},
+
+    ]
+},
+
+            ],
+            //   height: 600,
+            "scrollable": false,
+            filterable: true,
+            sortable: true,
+            "editable": {
+                "confirmation": "האם אתה בטוח?",
+                "confirmDelete": "מחיקה",
+                "cancelDelete": "בטל",
+                "mode": "inline",
+                "create": true,
+                "update": true,
+                "destroy": true
+            },
+
+
+
+        });
+        var Discountgrid = $("#Discountgrid").data('kendoGrid');
+        Discountgrid.dataSource.transport.parameterMap = function (data, type) {
+
+            // console.log(type);
+            if (type != "read") {
+                for (var i in data) {
+                    //console.log(Object.prototype.toString.call( data[i] ));
+                    if (Object.prototype.toString.call(data[i]) === '[object Object]') {
+                        delete data[i];
+                    }
+                    if (Object.prototype.toString.call(data[i]) === '[object Array]') {
+                        delete data[i];
+                    }
+                    if (Object.prototype.toString.call(data[i]) === '[object Date]') {
+                        data[i] = kendo.toString(kendo.parseDate(data[i]), "G");// Date.parse(data[i]);
+                    }
+                    //if(i == 'UserID' && !data[i]){
+                    //    data[i]=
+                    // }
+                    //@ViewBag.AdditionalFilterField", operator: "eq", value: '29'
+
+                    if (i == 'ShopID') {
+                        data[i] = '@ViewBag.AdditionalFilterID';
+                    }
+                    if (i in Discountgrid.dataSource.options.schema.model.fields) {
+                        var model = Discountgrid.dataSource.options.schema.model.fields[i];
+                        if (!data[i] && 'defaultValue' in model) {
+
+                            data[i] = model.defaultValue;
+                        }
+                    }
+
+                }
+            }
+
+            kendo.data.transports["aspnetmvc-ajax"](data);
+            data = new kendo.data.transports["aspnetmvc-ajax"]({ prefix: "" }).parameterMap(data, type);
+            //  console.log(data);
+            return data;
+        }
+
+        function error_handler(e) {
+
+            if (e.errors) {
+                e.preventDefault();   // cancel grid rebind if error occurs
+                var message = "Errors:\n";
+                $.each(e.errors, function (key, value) {
+                    if ('errors' in value) {
+                        $.each(value.errors, function () {
+                            message += this + "\n";
+                        });
+                    }
+                });
+                alert(message);
+            }
+        }
+        function detailInit(e) {
+            var detailRow = e.detailRow;
+            console.log(e);
+
+
+        }
+
+    });
+
+</script>
+
+
+
+
+
+<br />
+<a class="k-button" href="/Member/Manage/Discount/Create?ShopID=@ViewBag.AdditionalFilterID">הוספה</a>

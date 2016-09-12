@@ -1,0 +1,6 @@
+﻿@model string
+<object type="application/x-shockwave-flash" data="@Url.Content("~/Content/Mp3Player/dewplayer-vol.swf")" width="240" height="20" id="dewplayer" name="dewplayer">
+    <param name="wmode" value="transparent" />
+    <param name="movie" value="@Url.Content("~/Content/Mp3Player/dewplayer-vol.swf")" />
+    <param name="flashvars" value="mp3=@Model&amp;autostart=1&amp;showtime=1" />
+</object>

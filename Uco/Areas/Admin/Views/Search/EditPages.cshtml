@@ -1,0 +1,22 @@
+﻿@model Uco.Models.SearchPage
+
+@{
+    ViewBag.Title = "EditPages";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutNoTree.cshtml";
+}
+
+<h2>עריכה - @Model.Title</h2>
+
+@using (Html.BeginForm()) {
+    @Html.ValidationSummary(true)
+
+    @Html.EditorForModel()
+
+    <p>
+        <input type="submit" value="שמור" class="t-button t-state-default" />
+    </p>
+}
+
+<div>
+    @Html.ActionLink("חזרה לרשימה", "IndexPages")
+</div>

@@ -1,0 +1,43 @@
+﻿@{
+    Uco.Models.Newsletter n = new Uco.Models.Newsletter();
+}
+@using (Ajax.BeginForm("_NewsletterAdd", "PagePart", new AjaxOptions
+{
+    UpdateTargetId = "newsletter_update",
+    InsertionMode = InsertionMode.Replace,
+    LoadingElementId = "newsletter_loading",
+    HttpMethod = "POST"
+}))
+{
+    <div class="right_newsletter" id="newsletter_update">
+        <div class="right_newsletter_text">הרשימה לניוזליטר:</div>
+        
+        @Html.ValidationSummary(true)
+        <div class="editor-label">@Html.LabelFor(model => n.NewsletterName) *</div>
+        <div class="editor-field">
+            @Html.EditorFor(model => n.NewsletterName)
+            @Html.ValidationMessageFor(model => n.NewsletterName)
+        </div>
+        
+        <div class="editor-label">@Html.LabelFor(model => n.NewsletterEmail) *</div>
+        <div class="editor-field no_margin">
+            @Html.EditorFor(model => n.NewsletterEmail)
+            @Html.ValidationMessageFor(model => n.NewsletterEmail)
+        </div>
+
+        <div class="editor-label">@Html.LabelFor(model => n.NewsletterAccept) *</div>
+        <div class="editor-field no_margin">
+            @Html.EditorFor(model => n.NewsletterAccept)
+            @Html.ValidationMessageFor(model => n.NewsletterAccept)
+        </div>
+        
+        <div class="right_newsletter_submit">
+            @Html.Partial("_InvisibleCaptcha", new Uco.Models.InvisibleCaptcha())
+            <input type="image" alt="" class="submit_ajax_button" disabled="disabled" src="@Url.Content("~/Content/DesignFiles/right_newsletter_submit.png")" />
+            <span id="newsletter_loading" class="dn">...Loading...</span>
+        </div>
+    </div>
+    
+    
+  
+}

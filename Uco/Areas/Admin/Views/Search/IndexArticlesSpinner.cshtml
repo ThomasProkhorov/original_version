@@ -1,0 +1,39 @@
+﻿@model IEnumerable<Uco.Models.ArticlesSpinner>
+@using Telerik.Web.Mvc.UI
+
+@{
+    ViewBag.Title = "Pages";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutNoTree.cshtml";
+}
+
+<h2>הגדרות יצירת מאמרים</h2>
+
+@(Html.Telerik().Grid(Model)
+        .Name("Grid")
+        .DataKeys(keys =>
+        {
+            keys.Add(r => r.ID);
+        })
+        .DataBinding(dataBinding =>
+        {
+            dataBinding.Ajax()
+                .Select("_AjaxIndexArticlesSpinner", "Search")
+                .Delete("_AjaxDeleteArticlesSpinner", "Search");
+        })
+        .Columns(columns =>
+        {
+            columns.Bound(r => r.ID);
+            columns.Bound(r => r.ArticlesSpinnerType);
+            columns.Bound(r => r.LangCode);
+            columns.Command(commands =>
+            {
+                commands.Custom("Edit").Text("עריכה").DataRouteValues(route => route.Add(r => r.ID).RouteKey("ID")).Action("EditArticlesSpinner", "Search");
+                commands.Delete();
+            }).Width(270).Title("פקודות");
+        })
+        .Pageable()
+        .Sortable()
+        .Filterable()
+)
+<br />
+@Html.ActionLink("יצירת חדש", "CreateArticlesSpinner", null, new { @class = "t-button t-state-default" })

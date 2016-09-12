@@ -1,0 +1,209 @@
+﻿@using Uco.Models.Overview
+@using Uco.Models
+@model User
+@{
+    ViewBag.Title = RP.T("Views.Profile.DiscountHistory.ViewBagTitle");
+    Layout = "~/Views/Shared/_LayoutShop.cshtml";
+    ViewBag.Url = "~/Profile/DiscountHistory/";
+}
+@section topmenu{
+    @Html.Action("_TopStatus", "Profile")
+}
+<div class="midd_section">
+    <div class="center_div">
+        <div class="container one">
+            <table class="shoparea">
+                <tr>
+                    <td class="leftcol">
+                        @* Menu *@
+                        @Html.Partial("_Menu")
+                    </td>
+                    <td class="contentcol">
+                        <div class="profile_left_container">
+                            <div class="right_sec">
+
+                                <h1 class="main_heading_h1_profile main_heading_h1_profile_br">@RP.T("Views.Profile.Menu.DiscountHistory")</h1>
+                                <div id="DiscountHistorygrid"></div>
+                                <script>
+                        var gridFiltering = {
+                            setFilter: function (name, value) {
+                                var grid = $("#DiscountHistorygrid").data('kendoGrid');
+                                grid.dataSource.filter({ field: name, operator: "eq", value: value });
+                                //grid.dataSource.page(1);
+                                // alert(name + value);
+                            },
+                        };
+                        function toDate(value) {
+                            var dateRegExp = /^\/Date\((.*?)\)\/$/;
+                            var date = dateRegExp.exec(value);
+                            return new Date(parseInt(date[1]));
+                        }
+                        $(document).ready(function () {
+
+                            /*
+                            Docs
+                            http://docs.telerik.com/kendo-ui/api/javascript/ui/grid
+                            */
+
+                            $("#DiscountHistorygrid").kendoGrid({
+                                // "toolbar": [],
+                                dataSource: {
+
+                                    type: "json",
+                                    transport: {
+                                        "prefix": "",
+                                        read: {
+                                            url: '@Url.Action("DiscountHistoryAjax", "Profile")',
+                                            type: "POST",
+                                            dataType: "json",
+                                            // data: { filter:'ID~eq~3'  }
+                                        },
+                                    },
+
+                                    schema: {
+                                        data: "Data",
+                                        total: "Total",
+                                        errors: "Errors",
+                                        model: {
+                                            "id": "ID",
+                                            fields: {
+                                                "ID": { "type": "number", editable: false, },
+                                                "UserID": { "type": "string", editable: false, },
+                                                "Shop": { "type": "object", editable: false, nullable: true, },
+                                                "Order": { "type": "object", editable: false, nullable: true, },
+                                                "Discount": { "type": "object", editable: false, nullable: true, },
+                                                "UsedTimes": { "type": "number" }
+
+                                                // "OrderStatus": { "type": "object", editable: false, nullable: true, },
+                                                // "ID": {"type":"number" ,editable: false}
+                                            }
+
+                                        }
+                                    },
+
+                                    pageSize: 20,
+                                    "error": error_handler,
+                                    "sync": function (e) { this.read(); },
+                                    "serverPaging": true,
+                                    "serverSorting": true,
+                                    "serverFiltering": true,
+                                    "serverGrouping": true,
+                                    "serverAggregates": true,
+                                    filter: { field: 'UserID', operator: "eq", value: '@LS.CurrentUser.ID' },
+                                    "type": "aspnetmvc-ajax",
+                                },
+                                refresh: true,
+                                //  detailTemplate: kendo.template($("#template").html()),
+                                // detailInit: detailInit,
+                                // dataBound: function () {
+                                //this.expandRow(this.tbody.find("tr.k-master-row").first());
+                                //   },
+                                pageable: {
+                                    refresh: true,
+                                    // pageSizes: [10, 20, 50],
+                                    pageSize: 10
+                                },
+
+                                columns: [
+                    { field: "ID", title: "@M("DiscountUsage", "ID")", hidden: true, sortable: false, filterable: false, },
+                    {
+                        field: "Shop", title: "@M("DiscountUsage", "Shop")", sortable: false, filterable: false
+                        , template: '# if(Shop) { # #: Shop.Name # # } #'
+                    },
+                    {
+                        field: "Order", title: "@M("DiscountUsage", "Order")", sortable: false, filterable: false
+                        , template: '# if(Order) { # #: Order.TotalStr # # } #'
+                    },
+                     {
+                         field: "Order", title: "@M("DiscountUsage", "Date")", sortable: false, filterable: false
+                         , template: '# if(Order) { # #= kendo.toString(toDate(Order.CreateOn),"M/d/yyyy HH:mm") # # } #'
+                        },
+                    {
+                        field: "Discount", title: "@M("DiscountUsage", "Discount")", sortable: false, filterable: false
+                        , template: '# if(Discount) { # #: Discount.Name # # } #'
+                        },
+
+
+
+
+                                ],
+                                //   height: 600,
+                                "scrollable": false,
+                                filterable: true,
+                                sortable: true,
+                                "editable": {
+                                    "confirmation": "@RP.T("Views.Profile.OrderDetail.ConfirmationDeleteText")",
+                                    "confirmDelete": "@RP.T("Views.Profile.OrderDetail.ConfirmDeleteText")",
+                                    "cancelDelete": "@RP.T("Views.Profile.OrderDetail.CancelDeleteText")",
+                                    "mode": "inline",
+                                    "create": true,
+                                    "update": true,
+                                    "destroy": true
+                                },
+
+
+
+                            });
+                            var Ordergrid = $("#DiscountHistorygrid").data('kendoGrid');
+                            Ordergrid.dataSource.transport.parameterMap = function (data, type) {
+
+                                // console.log(type);
+                                if (type != "read") {
+                                    for (var i in data) {
+                                        //console.log(Object.prototype.toString.call( data[i] ));
+                                        if (Object.prototype.toString.call(data[i]) === '[object Object]') {
+                                            delete data[i];
+                                        }
+                                        if (Object.prototype.toString.call(data[i]) === '[object Array]') {
+                                            delete data[i];
+                                        }
+                                        if (Object.prototype.toString.call(data[i]) === '[object Date]') {
+                                            data[i] = kendo.toString(kendo.parseDate(data[i]), "G");// Date.parse(data[i]);
+                                        }
+                                        //if(i == 'UserID' && !data[i]){
+                                        //    data[i]=
+                                        // }
+                                        //@ViewBag.AdditionalFilterField", operator: "eq", value:
+                                    }
+                                }
+
+                                kendo.data.transports["aspnetmvc-ajax"](data);
+                                data = new kendo.data.transports["aspnetmvc-ajax"]({ prefix: "" }).parameterMap(data, type);
+                                //  console.log(data);
+                                return data;
+                            }
+
+                            function error_handler(e) {
+
+                                if (e.errors) {
+                                    e.preventDefault();   // cancel grid rebind if error occurs
+                                    var message = "Errors:\n";
+                                    $.each(e.errors, function (key, value) {
+                                        if ('errors' in value) {
+                                            $.each(value.errors, function () {
+                                                message += this + "\n";
+                                            });
+                                        }
+                                    });
+                                    alert(message);
+                                }
+                            }
+                            function detailInit(e) {
+                                var detailRow = e.detailRow;
+                                console.log(e);
+
+
+                            }
+
+                        });
+
+                                </script>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="clear"></div>
+    </div>
+</div>

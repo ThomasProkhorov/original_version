@@ -1,0 +1,830 @@
+﻿@{
+    ViewBag.Title = RP.T("Admin.Views.Order.Index.Title");
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutNoTree.cshtml";
+}
+
+<h2>@RP.T("Admin.Views.Order.Index.Title")</h2>
+
+
+<br/>
+ <a href="javascript:void(0);" onclick="$('#Ordergridfilterbox').toggle();" class="k-button">@RP.T("Views.Common.Search") <span class="k-icon k-i-search"></span></a>
+<br/>
+<div id="Ordergridfilterbox" class="gridfilterbox" style="display:none;">
+  <br/>
+
+            <div class="editor-label">
+<label for="CreateOn">תאריך יצירה</label></div>
+            <div class="editor-field">
+                <input data-val="true" data-val-date="The field תאריך יצירה must be a date." data-val-required="The תאריך יצירה field is required." id="CreateOn" name="CreateOn" type="datetime" value="1/1/0001 00:00" /><script>
+	jQuery(function(){jQuery("#CreateOn").kendoDateTimePicker({"format":"d/M/yyyy HH:mm","timeFormat":"HH:mm","min":new Date(1900,0,1,0,0,0,0),"max":new Date(2099,11,31,0,0,0,0),"interval":30});});
+</script>                        - 
+<input data-val="true" data-val-date="The field DateTime must be a date." data-val-required="The DateTime field is required." id="CreateOn_dateto" name="CreateOn_dateto" type="datetime" value="@DateTime.Now" /><script>
+	jQuery(function(){jQuery("#CreateOn_dateto").kendoDateTimePicker({"format":"d/M/yyyy HH:mm","timeFormat":"HH:mm","min":new Date(1900,0,1,0,0,0,0),"max":new Date(2099,11,31,0,0,0,0),"interval":30});});
+</script>            </div>
+            <div class="editor-label">
+<label for="OrderStatus">סטטוס ההזמנה</label></div>
+            <div class="editor-field">
+
+
+<input data-val="true" data-zero="true" data-val-required="The סטטוס ההזמנה field is required." id="OrderStatus" name="OrderStatus" type="text" value="0" /><script>
+	jQuery(function(){jQuery("#OrderStatus").kendoDropDownList({"dataSource":[{"Text":"-","Value":"0"},{"Text":"חדש","Value":"1"},{"Text":"שולמה","Value":"2"},{"Text":"אושרה","Value":"3"},{"Text":"נשלחה","Value":"4"},{"Text":"התקבלה","Value":"5"},{"Text":"נדחתה","Value":"6"},{"Text":"בוטלה","Value":"7"},{"Text":"הושלמה","Value":"10"}],"dataTextField":"Text","dataValueField":"Value"});});
+</script>            </div>
+    
+
+    <div class="editor-label">
+<label for="Name">@RP.T("Models.Order.ID")</label></div>
+            <div class="editor-field">
+<input class="k-textbox" id="ID" name="ID" type="text" value="" />            </div>
+
+
+     <div class="editor-label">
+<label for="Name">@RP.T("Models.Order.FullName")</label></div>
+            <div class="editor-field">
+<input class="k-textbox" id="FullName" name="FullName" type="text" value="" />            </div>
+
+
+        <div class="editor-label">
+<label for="Name">@RP.T("Models.Order.Phone")</label></div>
+            <div class="editor-field">
+<input class="k-textbox" id="Phone" name="Phone" type="text" value="" />            </div>
+
+      <div class="editor-label">
+<label for="Name">@RP.T("Models.Order.Email")</label></div>
+            <div class="editor-field">
+<input class="k-textbox" id="Email" name="Email" type="text" value="" />            </div>
+
+
+     
+
+
+    <div class="button-wrap">
+        <a href="javascript:void(0);" class="k-button" onclick="OrdergridFiltering.filter('Ordergridfilterbox');">חיפוש</a>
+        <a href="javascript:void(0);" class="k-button" onclick="OrdergridFiltering.clear();">נקה</a>
+    </div>
+
+</div>
+<br/>
+<div id="Ordergrid"></div>
+
+
+<script>
+
+    var OrdergridFiltering = {
+        filter: function (id) {
+            var data = { logic: "and", filters: [] };
+            //{ field: "name", operator: "startswith", value: "Jane" }
+            var grid = $("#Ordergrid").data('kendoGrid');
+            //  console.log(grid.dataSource.options.schema.model);
+            $('#' + id + ' input').each(function (i, e) {
+                if ($(e).attr('name') && $(e).val())
+                {
+                    var inpname = $(e).attr('name');
+                    var objname = inpname.split(".")[0];
+                    if(objname in grid.dataSource.options.schema.model.fields)
+                    {
+
+                        var model = grid.dataSource.options.schema.model.fields[objname];
+                        if(model.type == 'number' || model.type == 'object'){
+                            if($(e).attr('data-zero') && $(e).val() < 1)
+                            {
+                                return;
+                            }
+                        }
+                        var operator = 'eq';
+                        if(model.type == 'date'){
+                            operator = 'gt'; // >
+                            var todate = $('#' + id + ' input[name="'+inpname+'_dateto"]');
+                            if(todate.length >0)
+                            {
+                                data.filters.push({ field: $(e).attr('name'), operator: 'lte', value: model.parse(todate.val()) });
+                            }
+                        }
+                        if(model.type == 'string'){
+                            operator = 'startswith'; // .startswith
+                        }
+                        //lte <=
+                        //  console.log(model);
+                        var parseVal = $(e).val();
+                        if(model.type != 'object')
+                        {
+                            parseVal =model.parse(parseVal);
+                        }
+                        data.filters.push({ field: $(e).attr('name'), operator: operator, value: parseVal });
+                    }
+
+                }
+            });
+
+            grid.dataSource.filter(data);
+
+        },
+        clear: function () {
+            var grid = $("#Ordergrid").data('kendoGrid');
+            grid.dataSource.filter({});
+        },
+        setFilter: function (name, value) {
+            var grid = $("#Ordergrid").data('kendoGrid');
+            grid.dataSource.filter({ field: name, operator: "eq", value: value });
+            //grid.dataSource.page(1);
+            // alert(name + value);
+        },
+    };
+
+    function IntToTime(i) {
+        var hr = Math.floor(i / 60);
+        var mn = i % 60 ; if(mn<10){mn='0'+mn;}
+        //  var part ="AM";
+        // if(hr>12)
+        //  {
+        //    hr-=12;
+        //     part="PM";
+        // }
+        // if(hr == 0){hr = 12;}
+        var time = hr + ":" + mn;// + " " + part;
+        return time;
+    }
+        
+
+    var RegularIntervalEnums = {
+1:'משלוח חד פעמי', 
+2:'כל יום', 
+3:'כל שבוע', 
+4:'כל שבועיים', 
+5:'כל חודש', 
+6:'כל 3 חודשים', 
+
+    };
+    
+        
+
+    var PaymentMethodEnums = {
+1:'כרטיס אשראי', 
+2:'מזומן', 
+3:'טלפון', 
+4:'אשראי לבעל חנות', 
+
+    };
+    
+        
+
+    var ShippingMethodEnums = {
+1:'שליח', 
+2:'איסוף עצמי', 
+
+    };
+    
+        
+
+    var OrderStatusEnums = {
+1:'חדש', 
+2:'שולמה', 
+3:'אושרה', 
+4:'נשלחה', 
+5:'התקבלה', 
+6:'נדחתה', 
+7:'בוטלה', 
+10:'הושלמה', 
+
+    };
+    
+    $(document).ready(function () {
+        /*
+        Docs
+        http://docs.telerik.com/kendo-ui/api/javascript/ui/grid
+        */
+        var gridLocal = function(){
+            if('messages' in kendo.ui.Grid.prototype.options){
+                return  kendo.ui.Grid.prototype.options.messages.commands.create;
+            }else{
+                return "Add new";
+            }
+        }
+        $("#Ordergrid").kendoGrid({
+            dataSource: {
+
+                type: "json",
+                transport: {
+                    "prefix": "",
+                    read: {
+                        url: "/Admin/Manage/Order/_AjaxRead",
+                        type: "POST",
+                        dataType: "json",
+                        // data: { filter:'ID~eq~3'  }
+                    },
+                                         
+                    "destroy": {
+                        "url": "/Admin/Manage/Order/_AjaxDelete"
+                    },
+                                     },
+
+                schema: {
+                    data: "Data",
+                    total: "Total",
+                    errors: "Errors",
+                    model: {
+                        "id": "ID",
+                        fields: {
+  "ID": { "type": "number" ,defaultValue: 0,editable: false,}, 
+  "UserID": { "type": "string",defaultValue: "00000000-0000-0000-0000-000000000000" ,editable: false,}, 
+  "ShopID": { "type": "number" ,defaultValue: 0}, 
+  "Shop": { "type": "object" ,editable: false,nullable: true, }, 
+  "Address": { "type": "string"  }, 
+  "FullName": { "type": "string"  }, 
+  "Phone": { "type": "string"  }, 
+  "CompanyName": { "type": "string"  }, 
+  "ShippOn": { "type": "boolean"  }, 
+  "ShipTime": { "type": "date"  }, 
+  "RegularOrder": { "type": "boolean"  }, 
+  "RegularInterval": { "type": "number",defaultValue: 0  }, 
+  "RegularIntervalStr": { "type": "string"  }, 
+  "OrderStatusStr": { "type": "string"  }, 
+  "Active": { "type": "boolean"  }, 
+  "Questioned": { "type": "boolean"  }, 
+  "NotSentMailed": { "type": "boolean"  }, 
+  "ParentOrderID": { "type": "number" ,defaultValue: 0}, 
+  "MessageToOwner": { "type": "string"  }, 
+  "Email": { "type": "string"  }, 
+  "PaymentMethod": { "type": "number",defaultValue: 0  }, 
+  "ShippingMethod": { "type": "number",defaultValue: 0  }, 
+  "Note": { "type": "string"  }, 
+  "CouponCode": { "type": "string"  }, 
+  "UID": { "type": "string",defaultValue: "00000000-0000-0000-0000-000000000000" }, 
+  "User": { "type": "object" ,editable: false,nullable: true, }, 
+  "SubTotal": { "type": "number",defaultValue: 0  }, 
+  "TotalCard": { "type": "number",defaultValue: 0  }, 
+  "TotalStr": { "type": "string"  }, 
+  "TotalCash": { "type": "number",defaultValue: 0  }, 
+  "TotalDiscountAmount": { "type": "number",defaultValue: 0  }, 
+  "TotalDiscountDescription": { "type": "string"  }, 
+  "Fee": { "type": "number",defaultValue: 0 ,editable: false, }, 
+  "ShipCost": { "type": "number",defaultValue: 0 ,editable: false, }, 
+  "ShipAddress": { "type": "string"  }, 
+  "PaymentToShopOwner": { "type": "number",defaultValue: 0 ,editable: false, }, 
+  "IsPaidUp": { "type": "boolean" ,editable: false, }, 
+  "CreateOn": { "type": "date"  }, 
+  "PayedOn": { "type": "date" ,nullable: true, }, 
+  "DeliveredOn": { "type": "date" ,nullable: true, }, 
+  "SentOn": { "type": "date" ,nullable: true, }, 
+  "RefundOn": { "type": "date" ,nullable: true, }, 
+  "RefundAmount": { "type": "number",defaultValue: 0 ,editable: false, }, 
+  "MemberComment": { "type": "string" ,editable: false, }, 
+  "ApprovedGuid": { "type": "string"  }, 
+  "ApprovedToken": { "type": "string"  }, 
+  "ApprovedDate": { "type": "date" ,nullable: true,}, 
+  "OrderStatus": { "type": "number",defaultValue: 0  }, 
+                            // "ID": {"type":"number" ,editable: false}
+                        }
+
+                    }
+                },
+                requestEnd: function(e) {
+                    if($('#Ordergride-checkall').length > 0)
+                    {
+                        $('#Ordergride-checkall')[0].checked = false;
+                    }
+                },
+                pageSize: 20,
+                "error": error_handler,
+                "sync":function(e){ this.read(); },
+                "serverPaging": true,
+                "serverSorting": true,
+                "serverFiltering": true,
+                "serverGrouping": true,
+                "serverAggregates": true,
+                                 "filter": [], 
+                "type": "aspnetmvc-ajax",
+
+                sort: { field: "ID", dir: "desc" },
+            },
+            refresh: true,
+            //  detailTemplate: kendo.template($("#template").html()),
+            // detailInit: detailInit,
+            // dataBound: function () {
+            //this.expandRow(this.tbody.find("tr.k-master-row").first());
+            //   },
+            pageable: {
+                refresh: true,
+                pageSize: 10
+            },
+
+            columns: [
+{ field: "ID",title: "ID", sortable: false,filterable: false,editor:'<input data-val="true" data-val-number="The field ID must be a number." data-val-required="The ID field is required." id="ID" name="ID" type="hidden" value="0" /><span class="field-validation-valid" data-valmsg-for="ID" data-valmsg-replace="true"></span>', },
+{ field: "ShopID",title: "חנות", sortable: false,filterable: false,editor:'     \
+    <div class="k-widget k-tabstrip k-header" id="TabStrip"><ul class="k-reset k-tabstrip-items"><li class="k-item k-state-default k-state-active"><a class="k-link" href="#TabStrip-1">ראשי</a></li><li class="k-item k-state-default"><a class="k-link" href="#TabStrip-2">הגדרות משלוח</a></li><li class="k-item k-state-default"><a class="k-link" href="#TabStrip-3">זמן עבודה</a></li><li class="k-item k-state-default"><a class="k-link" href="#TabStrip-4">קטגוריות</a></li><li class="k-item k-state-default"><a class="k-link" href="#TabStrip-5">זמני עבודה מיוחדים</a></li><li class="k-item k-state-default"><a class="k-link" href="#TabStrip-6">זמן משלוח</a></li><li class="k-item k-state-default"><a class="k-link" href="#TabStrip-7">זמני משלוח מיוחדים</a></li><li class="k-item k-state-default"><a class="k-link" href="#TabStrip-8">סוג חנות</a></li><li class="k-item k-state-default"><a class="k-link" href="#TabStrip-9">תשלום</a></li></ul><div class="k-content k-state-active" id="TabStrip-1" style="display:block"> \
+                                <div class="editor-label"><label for="Shop_Name">שם חנות</label> *</div> \
+                            <div class="editor-field"><input class="k-textbox" data-val="true" data-val-required="שם חובה" id="Shop_Name" name="Shop.Name" type="text" value="" /> <span class="field-validation-valid" data-valmsg-for="Shop.Name" data-valmsg-replace="true"></span></div> \
+                                <div class="editor-label"><label for="Shop_SeoUrl">כתובת סיומת לדומיין</label> </div> \
+                            <div class="editor-field"><div> \
+<input class="k-textbox" id="Shop_SeoUrl" name="Shop.SeoUrl" type="text" value="" /> \
+    </div> \
+<p> \
+<a href="/" target="_blank"></a> \
+</p> \
+ <span class="field-validation-valid" data-valmsg-for="Shop.SeoUrl" data-valmsg-replace="true"></span></div> \
+                                <div class="editor-label"><label for="Shop_Email">דוא״ל למשלוח הזמנות</label> *</div> \
+                            <div class="editor-field"><input class="k-textbox" data-val="true" data-val-email="בדוק אימייל" data-val-required="דוא&quot;ל חובה" id="Shop_Email" name="Shop.Email" type="email" value="" /> <span class="field-validation-valid" data-valmsg-for="Shop.Email" data-valmsg-replace="true"></span></div> \
+                                <div class="editor-label"><label for="Shop_Phone">טלפון</label> *</div> \
+                            <div class="editor-field"><input class="k-textbox" data-val="true" data-val-required="טלפון חובה" id="Shop_Phone" name="Shop.Phone" type="text" value="" /> <span class="field-validation-valid" data-valmsg-for="Shop.Phone" data-valmsg-replace="true"></span></div> \
+                                <div class="editor-label"><label for="Shop_Phone2">סלולרי</label> </div> \
+                            <div class="editor-field"><input class="k-textbox" id="Shop_Phone2" name="Shop.Phone2" type="text" value="" /> <span class="field-validation-valid" data-valmsg-for="Shop.Phone2" data-valmsg-replace="true"></span></div> \
+                                <div class="editor-label"><label for="Shop_DisplayOrder">חשיבות החנות (0-70)</label> *</div> \
+                            <div class="editor-field"><input data-val="true" data-val-number="The field חשיבות החנות (0-70) must be a number." data-val-required="The חשיבות החנות (0-70) field is required." id="Shop_DisplayOrder" name="Shop.DisplayOrder" type="number" /><script> \
+	jQuery(function(){jQuery("#Shop_DisplayOrder").kendoNumericTextBox({"format":"n0","decimals":0});}); \
+</sc'+'ript> \
+ <span class="field-validation-valid" data-valmsg-for="Shop.DisplayOrder" data-valmsg-replace="true"></span></div> \
+                                <div class="editor-label"><label for="Shop_AddressMap">כתובת</label> </div> \
+                            <div class="editor-field"><input class="k-textbox" id="Shop_AddressMap" name="Shop.AddressMap" type="text" value="" /> <span class="field-validation-valid" data-valmsg-for="Shop.AddressMap" data-valmsg-replace="true"></span></div> \
+                                <div class="editor-label"><label for="Shop_Kosher">כשר</label> *</div> \
+                            <div class="editor-field"><input class="check-box" data-val="true" data-val-required="The כשר field is required." id="Shop_Kosher" name="Shop.Kosher" type="checkbox" value="true" /><input name="Shop.Kosher" type="hidden" value="false" /> <span class="field-validation-valid" data-valmsg-for="Shop.Kosher" data-valmsg-replace="true"></span></div> \
+                                <div class="editor-label"><label for="Shop_Youtube">Youtube</label> </div> \
+                            <div class="editor-field"><input class="k-textbox" id="Shop_Youtube" name="Shop.Youtube" type="text" value="" /> <span class="field-validation-valid" data-valmsg-for="Shop.Youtube" data-valmsg-replace="true"></span></div> \
+                                <div class="editor-label"><label for="Shop_PercentFee">אחוזי עמלה</label> *</div> \
+                            <div class="editor-field"><input id="Shop_PercentFee" name="Shop.PercentFee" type="number" /><script> \
+	jQuery(function(){jQuery("#Shop_PercentFee").kendoNumericTextBox({"decimals":4});}); \
+</sc'+'ript> \
+ \
+ <span class="field-validation-valid" data-valmsg-for="Shop.PercentFee" data-valmsg-replace="true"></span></div> \
+                                <div class="editor-label"><label for="Shop_MounthlyFee">מחיר חודשי</label> *</div> \
+                            <div class="editor-field"><input data-val="true" data-val-number="The field מחיר חודשי must be a number." data-val-required="The מחיר חודשי field is required." id="Shop_MounthlyFee" min="0" name="Shop.MounthlyFee" type="number" /><script> \
+	jQuery(function(){jQuery("#Shop_MounthlyFee").kendoNumericTextBox({"format":"c"});}); \
+</sc'+'ript> \
+ \
+ \
+ <span class="field-validation-valid" data-valmsg-for="Shop.MounthlyFee" data-valmsg-replace="true"></span></div> \
+                                <div class="editor-label"><label for="Shop_Image">תמונה</label> </div> \
+                            <div class="editor-field"><img id="img_Shop.Image" src="" alt="Shop.Image" style=" max-width:280px; max-height:40px;" /> \
+ \
+<input id="value_Shop.Image" name="Shop.Image" type="hidden" value="" /> \
+ \
+<input class="file-upload-box" id="attachments_Shop.Image" name="attachments_Shop.Image" type="file" /><script> \
+	jQuery(function(){jQuery("#attachments_Shop_Image").kendoUpload({"success":OnSuccess_Shop.Image,"multiple":false,"async":{"saveUrl":"/Admin/Upload/Save","autoUpload":true,"removeUrl":"/Admin/Upload/Remove"}});}); \
+</sc'+'ript> \
+ \
+<script type="text/javascript"> \
+ \
+    $(document).ready(function () { \
+ \
+         \
+ \
+        var PARAM_NAME = "attachments"; \
+        var uploadElement = $("#attachments_Shop.Image"); \
+        uploadElement.data("kendoUpload").name = PARAM_NAME; \
+ \
+             \
+        $(\'#img_Shop.Image\').addClass("dn"); \
+         \
+    }); \
+ \
+    var OnSuccess_Shop.Image=function(e) { \
+        if (e.operation == "upload") { \
+            $("#value_Shop.Image").attr("value", "/Content/UserFiles/Admin/Upload/" + e.files[0].name); \
+            $(\'#img_Shop.Image\').attr("src", "/Content/UserFiles/Admin/Upload/" + e.files[0].name); \
+            $(\'#img_Shop.Image\').removeClass("dn"); \
+        } \
+        else if (e.operation == "remove") { \
+            $("#value_Shop.Image").attr("value", ""); \
+            $(\'#img_Shop.Image\').attr("src", ""); \
+            $(\'#img_Shop.Image\').addClass("dn"); \
+        } \
+    } \
+</sc'+'ript> \
+ \
+ <span class="field-validation-valid" data-valmsg-for="Shop.Image" data-valmsg-replace="true"></span></div> \
+                                <div class="editor-label"><label for="Shop_ShortDescription">תאור קצר</label> </div> \
+                            <div class="editor-field"><textarea class="text-box multi-line k-textbox" id="Shop_ShortDescription" name="Shop.ShortDescription"> \
+</textarea> \
+ <span class="field-validation-valid" data-valmsg-for="Shop.ShortDescription" data-valmsg-replace="true"></span></div> \
+                                <div class="editor-label"><label for="Shop_FullDescription">תאור מלא</label> </div> \
+                            <div class="editor-field"><textarea cols="20" id="Shop_FullDescription" name="Shop.FullDescription" rows="5"></textarea><script> \
+	jQuery(function(){jQuery("#Shop_FullDescription").kendoEditor({"tools":[{"name":"bold"},{"name":"italic"},{"name":"underline"},{"name":"strikethrough"},{"name":"justifyLeft"},{"name":"justifyCenter"},{"name":"justifyRight"},{"name":"justifyFull"},{"name":"insertUnorderedList"},{"name":"insertOrderedList"},{"name":"outdent"},{"name":"indent"},{"name":"createLink"},{"name":"unlink"},{"name":"insertImage"},{"name":"subscript"},{"name":"superscript"},{"name":"createTable"},{"name":"addColumnLeft"},{"name":"addColumnRight"},{"name":"addRowAbove"},{"name":"addRowBelow"},{"name":"deleteRow"},{"name":"deleteColumn"},{"name":"formatting"},{"name":"fontName"},{"name":"fontSize"},{"name":"foreColor"},{"name":"backColor"},{"name":"viewHtml"}],"encoded":false,"imageBrowser":{"transport":{"read":{"url":"/Admin/ImageBrowser/Read"},"type":"imagebrowser-aspnetmvc","thumbnailUrl":"/Admin/ImageBrowser/Thumbnail","uploadUrl":"/Admin/ImageBrowser/Upload","destroy":{"url":"/Admin/ImageBrowser/Destroy"},"create":{"url":"/Admin/ImageBrowser/Create"},"imageUrl":"/Content/UserFiles/Admin/{0}"}}});}); \
+</sc'+'ript> <span class="field-validation-valid" data-valmsg-for="Shop.FullDescription" data-valmsg-replace="true"></span></div> \
+            </div><div class="k-content" id="TabStrip-2"> \
+                                <div class="editor-label"><label for="Shop_InStorePickUpEnabled">איסוף עצמי פעיל</label> *</div> \
+                            <div class="editor-field"><input class="check-box" data-val="true" data-val-required="The איסוף עצמי פעיל field is required." id="Shop_InStorePickUpEnabled" name="Shop.InStorePickUpEnabled" type="checkbox" value="true" /><input name="Shop.InStorePickUpEnabled" type="hidden" value="false" /> <span class="field-validation-valid" data-valmsg-for="Shop.InStorePickUpEnabled" data-valmsg-replace="true"></span></div> \
+                                <div class="editor-label"><label for="Shop_ShipCost">מחיר משלוח</label> *</div> \
+                            <div class="editor-field"><input id="Shop_ShipCost" name="Shop.ShipCost" type="number" /><script> \
+	jQuery(function(){jQuery("#Shop_ShipCost").kendoNumericTextBox({"decimals":4});}); \
+</sc'+'ript> \
+ \
+ <span class="field-validation-valid" data-valmsg-for="Shop.ShipCost" data-valmsg-replace="true"></span></div> \
+                                <div class="editor-label"><label for="Shop_FreeShipFrom">משלוח חינם מעל</label> *</div> \
+                            <div class="editor-field"><input id="Shop_FreeShipFrom" name="Shop.FreeShipFrom" type="number" /><script> \
+	jQuery(function(){jQuery("#Shop_FreeShipFrom").kendoNumericTextBox({"decimals":4});}); \
+</sc'+'ript> \
+ \
+ <span class="field-validation-valid" data-valmsg-for="Shop.FreeShipFrom" data-valmsg-replace="true"></span></div> \
+                                <div class="editor-label"><label for="Shop_DeliveryTime">זמן משלוח (דקות)</label> *</div> \
+                            <div class="editor-field"><input data-val="true" data-val-number="The field זמן משלוח (דקות) must be a number." data-val-required="The זמן משלוח (דקות) field is required." id="Shop_DeliveryTime" name="Shop.DeliveryTime" type="number" /><script> \
+	jQuery(function(){jQuery("#Shop_DeliveryTime").kendoNumericTextBox({"format":"n0","decimals":0});}); \
+</sc'+'ript> \
+ <span class="field-validation-valid" data-valmsg-for="Shop.DeliveryTime" data-valmsg-replace="true"></span></div> \
+                                <div class="editor-label"><label for="Shop_DeliveryManualDescription">אפשרויות משלוח</label> </div> \
+                            <div class="editor-field"><textarea class="text-box multi-line k-textbox" id="Shop_DeliveryManualDescription" name="Shop.DeliveryManualDescription"> \
+</textarea> \
+ <span class="field-validation-valid" data-valmsg-for="Shop.DeliveryManualDescription" data-valmsg-replace="true"></span></div> \
+                                <div class="editor-label"><label for="Shop_ShipRadius">רדיוס משלוח</label> *</div> \
+                            <div class="editor-field"> \
+ \
+<input type="text" class="k-textbox" name="Shop.ShipRadius" id="Shop_ShipRadius" /> Km \
+<a href="javascript:void(0);" onclick="_initmapShop_ShipRadius86263702();" >לבחור אזור משלוח</a> \
+<div style="padding-bottom:4px;"> \
+    <div id="map-canvasShop_ShipRadius86263702" style="width:100%;"></div> \
+</div> \
+<script type="text/javascript"> \
+   \
+        /*========Map Veiw================*/ \
+ \
+        var geocoder = new google.maps.Geocoder(); \
+        var Shop_ShipRadius86263702; \
+    var _initmapShop_ShipRadius86263702 = function () { \
+        $("#map-canvasShop_ShipRadius86263702").css("height", 500); \
+            var mapOptions = { \
+                zoom: 10, \
+                center: { \
+                    lat: parseFloat( $(\'#RadiusLatitude\').val()), // fallback lat \
+                    lng: parseFloat( $(\'#RadiusLongitude\').val()) // fallback lng \
+                }, \
+                bounds_changed: function () { \
+ \
+ \
+                } \
+            } \
+            Shop_ShipRadius86263702 = new google.maps.Map(document.getElementById("map-canvasShop_ShipRadius86263702"), mapOptions); \
+            var CircleOptions = { \
+                strokeColor: \'#FF0000\', \
+                strokeOpacity: 0.9, \
+                strokeWeight: 1, \
+                fillColor: \'#A6F07D\', \
+                fillOpacity: 0.6, \
+                center: { \
+                    lat: parseFloat($(\'#RadiusLatitude\').val()), // fallback lat \
+                    lng: parseFloat($(\'#RadiusLongitude\').val()) // fallback lng \
+                }, \
+                draggable: true, \
+                editable:true, \
+                map: Shop_ShipRadius86263702, \
+                radius: , \
+                center_changed: function (a) { \
+                    var center = this.getCenter(); \
+                    $(\'#RadiusLatitude\').val(center.lat());  \
+                    $(\'#RadiusLongitude\').val(center.lng()) ; \
+                    console.log(center.lat() + \' \'+center.lng()); \
+                    \
+                }, \
+                radius_changed: function (a) { \
+                    $(\'#Shop_ShipRadius\').val( this.getRadius() / 1000); \
+                    Shop_ShipRadius86263702.fitBounds(this.getBounds()); \
+                }, \
+            }; \
+            var circle = new google.maps.Circle(CircleOptions); \
+            Shop_ShipRadius86263702.fitBounds(circle.getBounds()); \
+        } \
+        \
+   \
+</sc'+'ript> \
+ <span class="field-validation-valid" data-valmsg-for="Shop.ShipRadius" data-valmsg-replace="true"></span></div> \
+            </div><div class="k-content" id="TabStrip-3"> \
+                                <div class="editor-label"><label for="Shop_Active">פעיל</label> *</div> \
+                            <div class="editor-field"><input class="check-box" data-val="true" data-val-required="The פעיל field is required." id="Shop_Active" name="Shop.Active" type="checkbox" value="true" /><input name="Shop.Active" type="hidden" value="false" /> <span class="field-validation-valid" data-valmsg-for="Shop.Active" data-valmsg-replace="true"></span></div> \
+            </div><div class="k-content" id="TabStrip-4"> \
+            </div><div class="k-content" id="TabStrip-5"> \
+            </div><div class="k-content" id="TabStrip-6"> \
+                                <div class="editor-label"><label for="Shop_IsShipEnabled">לאפשר משלוח</label> *</div> \
+                            <div class="editor-field"><input class="check-box" data-val="true" data-val-required="The לאפשר משלוח field is required." id="Shop_IsShipEnabled" name="Shop.IsShipEnabled" type="checkbox" value="true" /><input name="Shop.IsShipEnabled" type="hidden" value="false" /> <span class="field-validation-valid" data-valmsg-for="Shop.IsShipEnabled" data-valmsg-replace="true"></span></div> \
+            </div><div class="k-content" id="TabStrip-7"> \
+            </div><div class="k-content" id="TabStrip-8"> \
+            </div><div class="k-content" id="TabStrip-9"> \
+                                <div class="editor-label"><label for="Shop_IsToShopOwnerCredit">תשלום לחנות?</label> *</div> \
+                            <div class="editor-field"><input class="check-box" data-val="true" data-val-required="The תשלום לחנות? field is required." id="Shop_IsToShopOwnerCredit" name="Shop.IsToShopOwnerCredit" type="checkbox" value="true" /><input name="Shop.IsToShopOwnerCredit" type="hidden" value="false" /> <span class="field-validation-valid" data-valmsg-for="Shop.IsToShopOwnerCredit" data-valmsg-replace="true"></span></div> \
+                                <div class="editor-label"><label for="Shop_CreditGuardUser">CreditGuardUser</label> </div> \
+                            <div class="editor-field"><input class="k-textbox" id="Shop_CreditGuardUser" name="Shop.CreditGuardUser" type="text" value="" /> <span class="field-validation-valid" data-valmsg-for="Shop.CreditGuardUser" data-valmsg-replace="true"></span></div> \
+                                <div class="editor-label"><label for="Shop_CreditGuardPass">CreditGuardPass</label> </div> \
+                            <div class="editor-field"><input class="k-textbox" id="Shop_CreditGuardPass" name="Shop.CreditGuardPass" type="text" value="" /> <span class="field-validation-valid" data-valmsg-for="Shop.CreditGuardPass" data-valmsg-replace="true"></span></div> \
+                                <div class="editor-label"><label for="Shop_CreditGuardTerminal">CreditGuardTerminal</label> </div> \
+                            <div class="editor-field"><input class="k-textbox" id="Shop_CreditGuardTerminal" name="Shop.CreditGuardTerminal" type="text" value="" /> <span class="field-validation-valid" data-valmsg-for="Shop.CreditGuardTerminal" data-valmsg-replace="true"></span></div> \
+                                <div class="editor-label"><label for="Shop_CreditGuardMid">CreditGuardMid</label> </div> \
+                            <div class="editor-field"><input class="k-textbox" id="Shop_CreditGuardMid" name="Shop.CreditGuardMid" type="text" value="" /> <span class="field-validation-valid" data-valmsg-for="Shop.CreditGuardMid" data-valmsg-replace="true"></span></div> \
+            </div></div><script> \
+	jQuery(function(){jQuery("#TabStrip").kendoTabStrip({"animation":false});}); \
+</sc'+'ript> \
+     \
+                <div class="editor-label"><label for="Shop_ID">Main</label> *</div> \
+            <div class="editor-field"><input data-val="true" data-val-number="The field Main must be a number." data-val-required="The Main field is required." id="Shop_ID" name="Shop.ID" type="number" /><script> \
+	jQuery(function(){jQuery("#Shop_ID").kendoNumericTextBox({"format":"n0","decimals":0});}); \
+</sc'+'ript> \
+ <span class="field-validation-valid" data-valmsg-for="Shop.ID" data-valmsg-replace="true"></span></div> \
+                <div class="editor-label"><label for="Shop_CreateTime">זמן יצירה</label> *</div> \
+            <div class="editor-field"><input data-val="true" data-val-date="The field זמן יצירה must be a date." data-val-required="The זמן יצירה field is required." id="Shop_CreateTime" name="Shop.CreateTime" type="datetime" /><script> \
+	jQuery(function(){jQuery("#Shop_CreateTime").kendoDateTimePicker({"format":"d/M/yyyy HH:mm","timeFormat":"HH:mm","min":new Date(1900,0,1,0,0,0,0),"max":new Date(2099,11,31,0,0,0,0),"interval":30});}); \
+</sc'+'ript> <span class="field-validation-valid" data-valmsg-for="Shop.CreateTime" data-valmsg-replace="true"></span></div> \
+                <div class="editor-label"><label for="Shop_Address">כתובת</label> </div> \
+            <div class="editor-field"><input class="k-textbox" id="Shop_Address" name="Shop.Address" type="text" value="" /> <span class="field-validation-valid" data-valmsg-for="Shop.Address" data-valmsg-replace="true"></span></div> \
+                <div class="editor-label"><label for="Shop_Longitude">Longitude</label> *</div> \
+            <div class="editor-field"><input id="Shop_Longitude" name="Shop.Longitude" type="number" /><script> \
+	jQuery(function(){jQuery("#Shop_Longitude").kendoNumericTextBox({"decimals":4});}); \
+</sc'+'ript> \
+ \
+ <span class="field-validation-valid" data-valmsg-for="Shop.Longitude" data-valmsg-replace="true"></span></div> \
+                <div class="editor-label"><label for="Shop_Latitude">Latitude</label> *</div> \
+            <div class="editor-field"><input id="Shop_Latitude" name="Shop.Latitude" type="number" /><script> \
+	jQuery(function(){jQuery("#Shop_Latitude").kendoNumericTextBox({"decimals":4});}); \
+</sc'+'ript> \
+ \
+ <span class="field-validation-valid" data-valmsg-for="Shop.Latitude" data-valmsg-replace="true"></span></div> \
+                <div class="editor-label"><label for="Shop_UserID">מספר משתמש</label> *</div> \
+            <div class="editor-field"><input class="k-textbox" data-val="true" data-val-required="The מספר משתמש field is required." id="Shop_UserID" name="Shop.UserID" type="text" value="" /> <span class="field-validation-valid" data-valmsg-for="Shop.UserID" data-valmsg-replace="true"></span></div> \
+                <div class="editor-label"><label for="Shop_RadiusLongitude">Longitude</label> *</div> \
+            <div class="editor-field"><input id="Shop_RadiusLongitude" name="Shop.RadiusLongitude" type="number" /><script> \
+	jQuery(function(){jQuery("#Shop_RadiusLongitude").kendoNumericTextBox({"decimals":4});}); \
+</sc'+'ript> \
+ \
+ <span class="field-validation-valid" data-valmsg-for="Shop.RadiusLongitude" data-valmsg-replace="true"></span></div> \
+                <div class="editor-label"><label for="Shop_RadiusLatitude">Latitude</label> *</div> \
+            <div class="editor-field"><input id="Shop_RadiusLatitude" name="Shop.RadiusLatitude" type="number" /><script> \
+	jQuery(function(){jQuery("#Shop_RadiusLatitude").kendoNumericTextBox({"decimals":4});}); \
+</sc'+'ript> \
+ \
+ <span class="field-validation-valid" data-valmsg-for="Shop.RadiusLatitude" data-valmsg-replace="true"></span></div> \
+                <div class="editor-label"><label for="Shop_Rate">דירוג</label> *</div> \
+            <div class="editor-field"><input id="Shop_Rate" name="Shop.Rate" type="number" /><script> \
+	jQuery(function(){jQuery("#Shop_Rate").kendoNumericTextBox({"decimals":4});}); \
+</sc'+'ript> \
+ \
+ <span class="field-validation-valid" data-valmsg-for="Shop.Rate" data-valmsg-replace="true"></span></div> \
+                <div class="editor-label"><label for="Shop_RateCount">כמות הצבעות</label> *</div> \
+            <div class="editor-field"><input data-val="true" data-val-number="The field כמות הצבעות must be a number." data-val-required="The כמות הצבעות field is required." id="Shop_RateCount" name="Shop.RateCount" type="number" /><script> \
+	jQuery(function(){jQuery("#Shop_RateCount").kendoNumericTextBox({"format":"n0","decimals":0});}); \
+</sc'+'ript> \
+ <span class="field-validation-valid" data-valmsg-for="Shop.RateCount" data-valmsg-replace="true"></span></div> \
+<input data-val="true" data-val-length="שגיאת אורך" data-val-length-max="450" id="Shop_ShopTypeIDs" name="Shop.ShopTypeIDs" type="hidden" value="" /><span class="field-validation-valid" data-valmsg-for="Shop" data-valmsg-replace="true"></span>',template:"# if (Shop) { #  #: Shop.Name # # } #",  editor: ' \
+ \
+ \
+<input id="ShopID17851955" data-zero="false" name="ShopID" value="0" /> \
+ \
+<script> \
+    $(\'#ShopID17851955\') \
+                            .kendoComboBox( \
+    { \
+        placeholder: "Select ", \
+        dataTextField: "Name", \
+        dataValueField: "ID", \
+ \
+        filter: "contains", \
+        minLength: 1, \
+        "autoBind": true, \
+        dataSource: { \
+            schema: { \
+                data: "Data", \
+                total: "Total", \
+                errors: "Errors", \
+            }, \
+            type: "json", \
+            serverFiltering: true, \
+            filter: [], \
+            transport: { \
+                "prefix": "", \
+                read: { \
+                    url: "/Admin/Manage/Shop/_AjaxAutoComplete" \
+, \
+                    type: "POST", \
+                    data: function () { \
+                        var data = kendo.ui.ComboBox.requestData(\'#ShopID17851955\'); \
+ \
+                        /** data["filter"] = "SpecificationAttributeID~eq~1"; \
+                        console.log(data); \
+                        **/ \
+                        return data; \
+                    }, \
+                } \
+            } \
+        } \
+    }); \
+ \
+</sc'+'ript> \
+ \
+', },
+{ field: "Address",title: "Address", sortable: false,filterable: false,hidden: true, editor:'<input class="k-textbox" id="Address" name="Address" type="text" value="" /><span class="field-validation-valid" data-valmsg-for="Address" data-valmsg-replace="true"></span>', },
+{ field: "FullName",title: "FullName", sortable: false,filterable: false,hidden: true, editor:'<input class="k-textbox" id="FullName" name="FullName" type="text" value="" /><span class="field-validation-valid" data-valmsg-for="FullName" data-valmsg-replace="true"></span>', },
+{ field: "Phone",title: "Phone", sortable: false,filterable: false,hidden: true, editor:'<input class="k-textbox" id="Phone" name="Phone" type="text" value="" /><span class="field-validation-valid" data-valmsg-for="Phone" data-valmsg-replace="true"></span>', },
+{ field: "CompanyName",title: "CompanyName", sortable: false,filterable: false,hidden: true, editor:'<input class="k-textbox" id="CompanyName" name="CompanyName" type="text" value="" /><span class="field-validation-valid" data-valmsg-for="CompanyName" data-valmsg-replace="true"></span>', },
+{ field: "ShippOn",title: "ShippOn", sortable: false,filterable: false,hidden: true, editor:'<input class="check-box" data-val="true" data-val-required="The נשלח ב field is required." id="ShippOn" name="ShippOn" type="checkbox" value="true" /><input name="ShippOn" type="hidden" value="false" /><span class="field-validation-valid" data-valmsg-for="ShippOn" data-valmsg-replace="true"></span>', },
+{ field: "ShipTime",title: "ShipTime" ,format: "{0: dd/MM/yyyy HH:mm}", sortable: false,filterable: false,hidden: true, editor:'<input data-val="true" data-val-date="The field זמן משלוח must be a date." data-val-required="The זמן משלוח field is required." id="ShipTime" name="ShipTime" type="datetime" value="1/1/0001 00:00" /><script> \
+	jQuery(function(){jQuery("#ShipTime").kendoDateTimePicker({"format":"d/M/yyyy HH:mm","timeFormat":"HH:mm","min":new Date(1900,0,1,0,0,0,0),"max":new Date(2099,11,31,0,0,0,0),"interval":30});}); \
+</sc'+'ript><span class="field-validation-valid" data-valmsg-for="ShipTime" data-valmsg-replace="true"></span>',},
+{ field: "RegularOrder",title: "RegularOrder", sortable: false,filterable: false,hidden: true, editor:'<input class="check-box" data-val="true" data-val-required="The הזמנות רגילות field is required." id="RegularOrder" name="RegularOrder" type="checkbox" value="true" /><input name="RegularOrder" type="hidden" value="false" /><span class="field-validation-valid" data-valmsg-for="RegularOrder" data-valmsg-replace="true"></span>', },
+{ field: "RegularInterval",title: "RegularInterval", sortable: false,filterable: false,hidden: true, editor:' \
+ \
+<input data-val="true" data-val-required="The הזמנות קבועות field is required." id="RegularInterval" name="RegularInterval" type="text" value="0" /><script> \
+	jQuery(function(){jQuery("#RegularInterval").kendoDropDownList({"dataSource":[{"Text":"-","Value":"0"},{"Text":"משלוח חד פעמי","Value":"1"},{"Text":"כל יום","Value":"2"},{"Text":"כל שבוע","Value":"3"},{"Text":"כל שבועיים","Value":"4"},{"Text":"כל חודש","Value":"5"},{"Text":"כל 3 חודשים","Value":"6"}],"dataTextField":"Text","dataValueField":"Value"});}); \
+</sc'+'ript><span class="field-validation-valid" data-valmsg-for="RegularInterval" data-valmsg-replace="true"></span>',template:"# if (RegularIntervalEnums[RegularInterval]) { # #: RegularIntervalEnums[RegularInterval] # # } #",  },
+{ field: "RegularIntervalStr",title: "RegularIntervalStr", sortable: false,filterable: false,hidden: true, editor:'<input class="k-textbox" id="RegularIntervalStr" name="RegularIntervalStr" type="text" value="" /><span class="field-validation-valid" data-valmsg-for="RegularIntervalStr" data-valmsg-replace="true"></span>', },
+{ field: "OrderStatusStr",title: "OrderStatusStr", sortable: false,filterable: false,hidden: true, editor:'<input class="k-textbox" id="OrderStatusStr" name="OrderStatusStr" type="text" value="" /><span class="field-validation-valid" data-valmsg-for="OrderStatusStr" data-valmsg-replace="true"></span>', },
+{ field: "Active",title: "Active", sortable: false,filterable: false,hidden: true, editor:'<input class="check-box" data-val="true" data-val-required="The פעיל field is required." id="Active" name="Active" type="checkbox" value="true" /><input name="Active" type="hidden" value="false" /><span class="field-validation-valid" data-valmsg-for="Active" data-valmsg-replace="true"></span>', },
+{ field: "Questioned",title: "Questioned", sortable: false,filterable: false,hidden: true, editor:'<input class="check-box" data-val="true" data-val-required="The נחקר field is required." id="Questioned" name="Questioned" type="checkbox" value="true" /><input name="Questioned" type="hidden" value="false" /><span class="field-validation-valid" data-valmsg-for="Questioned" data-valmsg-replace="true"></span>', },
+{ field: "NotSentMailed",title: "NotSentMailed", sortable: false,filterable: false,hidden: true, editor:'<input class="check-box" data-val="true" data-val-required="The לא נשלח field is required." id="NotSentMailed" name="NotSentMailed" type="checkbox" value="true" /><input name="NotSentMailed" type="hidden" value="false" /><span class="field-validation-valid" data-valmsg-for="NotSentMailed" data-valmsg-replace="true"></span>', },
+{ field: "ParentOrderID",title: "ParentOrderID", sortable: false,filterable: false,hidden: true, editor:'<input data-val="true" data-val-number="The field ParentOrderID must be a number." data-val-required="The ParentOrderID field is required." id="ParentOrderID" name="ParentOrderID" type="number" value="0" /><script> \
+	jQuery(function(){jQuery("#ParentOrderID").kendoNumericTextBox({"format":"n0","decimals":0});}); \
+</sc'+'ript> \
+<span class="field-validation-valid" data-valmsg-for="ParentOrderID" data-valmsg-replace="true"></span>', },
+{ field: "MessageToOwner",title: "MessageToOwner", sortable: false,filterable: false,hidden: true, editor:'<input class="k-textbox" id="MessageToOwner" name="MessageToOwner" type="text" value="" /><span class="field-validation-valid" data-valmsg-for="MessageToOwner" data-valmsg-replace="true"></span>', },
+{ field: "Email",title: "Email", sortable: false,filterable: false,hidden: true, editor:'<input class="k-textbox" id="Email" name="Email" type="text" value="" /><span class="field-validation-valid" data-valmsg-for="Email" data-valmsg-replace="true"></span>', },
+{ field: "PaymentMethod",title: "PaymentMethod", sortable: false,filterable: false,hidden: true, editor:' \
+ \
+<input data-val="true" data-val-required="The אמצעי תשלום field is required." id="PaymentMethod" name="PaymentMethod" type="text" value="0" /><script> \
+	jQuery(function(){jQuery("#PaymentMethod").kendoDropDownList({"dataSource":[{"Text":"-","Value":"0"},{"Text":"כרטיס אשראי","Value":"1"},{"Text":"מזומן","Value":"2"},{"Text":"טלפון","Value":"3"},{"Text":"אשראי לבעל חנות","Value":"4"}],"dataTextField":"Text","dataValueField":"Value"});}); \
+</sc'+'ript><span class="field-validation-valid" data-valmsg-for="PaymentMethod" data-valmsg-replace="true"></span>',template:"# if (PaymentMethodEnums[PaymentMethod]) { # #: PaymentMethodEnums[PaymentMethod] # # } #",  },
+{ field: "ShippingMethod",title: "ShippingMethod", sortable: false,filterable: false,hidden: true, editor:' \
+ \
+<input data-val="true" data-val-required="The סוג משלוח field is required." id="ShippingMethod" name="ShippingMethod" type="text" value="0" /><script> \
+	jQuery(function(){jQuery("#ShippingMethod").kendoDropDownList({"dataSource":[{"Text":"-","Value":"0"},{"Text":"שליח","Value":"1"},{"Text":"איסוף עצמי","Value":"2"}],"dataTextField":"Text","dataValueField":"Value"});}); \
+</sc'+'ript><span class="field-validation-valid" data-valmsg-for="ShippingMethod" data-valmsg-replace="true"></span>',template:"# if (ShippingMethodEnums[ShippingMethod]) { # #: ShippingMethodEnums[ShippingMethod] # # } #",  },
+{ field: "Note",title: "Note", sortable: false,filterable: false,hidden: true, editor:'<input class="k-textbox" id="Note" name="Note" type="text" value="" /><span class="field-validation-valid" data-valmsg-for="Note" data-valmsg-replace="true"></span>', },
+{ field: "CouponCode",title: "CouponCode", sortable: false,filterable: false,hidden: true, editor:'<input class="k-textbox" id="CouponCode" name="CouponCode" type="text" value="" /><span class="field-validation-valid" data-valmsg-for="CouponCode" data-valmsg-replace="true"></span>', },
+{ field: "UID",title: "UID", sortable: false,filterable: false,hidden: true, editor:'<input data-val="true" data-val-required="The UID field is required." id="UID" name="UID" type="hidden" value="00000000-0000-0000-0000-000000000000" /><span class="field-validation-valid" data-valmsg-for="UID" data-valmsg-replace="true"></span>', },
+{ field: "FirstName",title: "שם פרטי",  sortable: false, filterable: false,template:"# if (User && User.FirstName) { # #: User.FirstName # # } #", editor: function(tr,d){ $(tr).html(''); } },
+{ field: "LastName",title: "שם משפחה",  sortable: false, filterable: false,template:"# if (User && User.LastName) { # #: User.LastName # # } #", editor: function(tr,d){ $(tr).html(''); } },
+{ field: "UserID",title: "משתמש", sortable: false,filterable: false,template:"# if (User) { #  #: User.UserName # # } #",  editor: ' \
+ \
+ \
+<input id="UserID65257301" data-zero="false" name="UserID" value="00000000-0000-0000-0000-000000000000" /> \
+ \
+<script> \
+    $(\'#UserID65257301\') \
+                            .kendoComboBox( \
+    { \
+        placeholder: "Select ", \
+        dataTextField: "Name", \
+        dataValueField: "ID", \
+ \
+        filter: "contains", \
+        minLength: 1, \
+        "autoBind": true, \
+        dataSource: { \
+            schema: { \
+                data: "Data", \
+                total: "Total", \
+                errors: "Errors", \
+            }, \
+            type: "json", \
+            serverFiltering: true, \
+            filter: [], \
+            transport: { \
+                "prefix": "", \
+                read: { \
+                    url: "/Admin/Manage/User/_AjaxAutoComplete" \
+, \
+                    type: "POST", \
+                    data: function () { \
+                        var data = kendo.ui.ComboBox.requestData(\'#UserID65257301\'); \
+ \
+                        /** data["filter"] = "SpecificationAttributeID~eq~1"; \
+                        console.log(data); \
+                        **/ \
+                        return data; \
+                    }, \
+                } \
+            } \
+        } \
+    }); \
+ \
+</sc'+'ript> \
+ \
+', },
+{
+    field: "SubTotal", title: "סכום ללא משלוח", sortable: false, template: "#: SubTotalStr #", filterable: false, editor: '<input id="SubTotal" name="SubTotal" type="number" value="0" /><script> \
+	jQuery(function(){jQuery("#SubTotal").kendoNumericTextBox({"decimals":4});}); \
+</sc'+'ript> \
+ \
+<span class="field-validation-valid" data-valmsg-for="SubTotal" data-valmsg-replace="true"></span>', },
+{
+    field: "TotalCard", title: "סהכ אשראי", sortable: false, template: "#: TotalStr # ", filterable: false, editor: '<input id="TotalCard" name="TotalCard" type="number" value="0" /><script> \
+	jQuery(function(){jQuery("#TotalCard").kendoNumericTextBox({"decimals":4});}); \
+</sc'+'ript> \
+ \
+<span class="field-validation-valid" data-valmsg-for="TotalCard" data-valmsg-replace="true"></span>', },
+{ field: "TotalStr",title: "TotalStr", sortable: false,filterable: false,hidden: true, editor:'<input class="k-textbox" id="TotalStr" name="TotalStr" type="text" value="" /><span class="field-validation-valid" data-valmsg-for="TotalStr" data-valmsg-replace="true"></span>', },
+{
+    field: "TotalCash", title: "סהכ מזומן", sortable: false, filterable: false, hidden: true, editor: '<input id="TotalCash" name="TotalCash" type="number" value="0" /><script> \
+	jQuery(function(){jQuery("#TotalCash").kendoNumericTextBox({"decimals":4});}); \
+</sc'+'ript> \
+ \
+<span class="field-validation-valid" data-valmsg-for="TotalCash" data-valmsg-replace="true"></span>', },
+{
+    field: "TotalDiscountAmount", title: " סכום הנחה", sortable: false, template: "#: TotalDiscountAmountStr #", filterable: false, editor: '<input id="TotalDiscountAmount" name="TotalDiscountAmount" type="number" value="0" /><script> \
+	jQuery(function(){jQuery("#TotalDiscountAmount").kendoNumericTextBox({"decimals":4});}); \
+</sc'+'ript> \
+ \
+<span class="field-validation-valid" data-valmsg-for="TotalDiscountAmount" data-valmsg-replace="true"></span>', },
+{ field: "TotalDiscountDescription",title: "החנות", sortable: false,filterable: false,editor:'<input class="k-textbox" id="TotalDiscountDescription" name="TotalDiscountDescription" type="text" value="" /><span class="field-validation-valid" data-valmsg-for="TotalDiscountDescription" data-valmsg-replace="true"></span>', },
+{ field: "ShipAddress",title: "כתובת המשלוח", sortable: false,filterable: false,editor:'<input class="k-textbox" id="ShipAddress" name="ShipAddress" type="text" value="" /><span class="field-validation-valid" data-valmsg-for="ShipAddress" data-valmsg-replace="true"></span>', },
+{ field: "CreateOn",title: "תאריך יצירה" ,format: "{0: dd/MM/yyyy HH:mm}", sortable: false,filterable: false,editor:'<input data-val="true" data-val-date="The field תאריך יצירה must be a date." data-val-required="The תאריך יצירה field is required." id="CreateOn" name="CreateOn" type="datetime" value="1/1/0001 00:00" /><script> \
+	jQuery(function(){jQuery("#CreateOn").kendoDateTimePicker({"format":"d/M/yyyy HH:mm","timeFormat":"HH:mm","min":new Date(1900,0,1,0,0,0,0),"max":new Date(2099,11,31,0,0,0,0),"interval":30});}); \
+</sc'+'ript><span class="field-validation-valid" data-valmsg-for="CreateOn" data-valmsg-replace="true"></span>',},
+{ field: "ApprovedGuid",title: "ApprovedGuid", sortable: false,filterable: false,hidden: true, editor:'<input class="k-textbox" id="ApprovedGuid" name="ApprovedGuid" type="text" value="" /><span class="field-validation-valid" data-valmsg-for="ApprovedGuid" data-valmsg-replace="true"></span>', },
+{ field: "ApprovedToken",title: "ApprovedToken", sortable: false,filterable: false,hidden: true, editor:'<input class="k-textbox" id="ApprovedToken" name="ApprovedToken" type="text" value="" /><span class="field-validation-valid" data-valmsg-for="ApprovedToken" data-valmsg-replace="true"></span>', },
+{ field: "ApprovedDate",title: "ApprovedDate" ,format: "{0: dd/MM/yyyy HH:mm}", sortable: false,filterable: false,hidden: true, editor:'<input data-val="true" data-val-date="The field תאריך אישור must be a date." id="ApprovedDate" name="ApprovedDate" type="datetime" /><script> \
+	jQuery(function(){jQuery("#ApprovedDate").kendoDateTimePicker({"format":"d/M/yyyy HH:mm","timeFormat":"HH:mm","min":new Date(1900,0,1,0,0,0,0),"max":new Date(2099,11,31,0,0,0,0),"interval":30});}); \
+</sc'+'ript><span class="field-validation-valid" data-valmsg-for="ApprovedDate" data-valmsg-replace="true"></span>',},
+{ field: "OrderStatus",title: "סטטוס ההזמנה", sortable: false,filterable: false,editor:' \
+ \
+<input data-val="true" data-val-required="The סטטוס ההזמנה field is required." id="OrderStatus" name="OrderStatus" type="text" value="0" /><script> \
+	jQuery(function(){jQuery("#OrderStatus").kendoDropDownList({"dataSource":[{"Text":"-","Value":"0"},{"Text":"חדש","Value":"1"},{"Text":"שולמה","Value":"2"},{"Text":"אושרה","Value":"3"},{"Text":"נשלחה","Value":"4"},{"Text":"התקבלה","Value":"5"},{"Text":"נדחתה","Value":"6"},{"Text":"בוטלה","Value":"7"},{"Text":"הושלמה","Value":"10"}],"dataTextField":"Text","dataValueField":"Value"});}); \
+</sc'+'ript><span class="field-validation-valid" data-valmsg-for="OrderStatus" data-valmsg-replace="true"></span>',template:"# if (OrderStatusEnums[OrderStatus]) { # #: OrderStatusEnums[OrderStatus] # # } #",  },
+
+
+
+
+{
+    "width": "100px",
+    "template": "<a class=\"k-button\" href=\"/Admin/Manage/Order/Edit/#= ID #\">עריכה</a>"
+},
+
+
+{
+    "width": "100px",
+    "buttonType": "Image",
+    "command": [
+
+{
+    "name": "destroy",
+    "buttonType": "Image",
+    "text": "מחיקה"
+},
+
+    ]
+},
+
+            ],
+            //   height: 600,
+            "scrollable": false,
+            filterable:true,
+            sortable: true,
+            "editable": {
+                "confirmation": "האם אתה בטוח?",
+                "confirmDelete": "מחיקה",
+                "cancelDelete": "בטל",
+                "mode": "inline",
+                "create": true,
+                "update": true,
+                "destroy": true
+            },
+
+
+
+        });
+        var Ordergrid = $("#Ordergrid").data('kendoGrid');
+        Ordergrid.dataSource.transport.parameterMap = function(data,type){
+
+            // console.log(type);
+            if(type != "read")
+            {
+                for(var i in data)
+                {
+                    //console.log(Object.prototype.toString.call( data[i] ));
+                    if( Object.prototype.toString.call( data[i] ) === '[object Object]' ) {
+                        delete data[i];
+                    }
+                    if( Object.prototype.toString.call( data[i] ) === '[object Array]' ) {
+                        delete data[i];
+                    }
+                    if( Object.prototype.toString.call( data[i] ) === '[object Date]' ) {
+                        data[i] = kendo.toString(kendo.parseDate(data[i]), "G");// Date.parse(data[i]);
+                    }
+                    //if(i == 'UserID' && !data[i]){
+                    //    data[i]=
+                    // }
+                    //@ViewBag.AdditionalFilterField", operator: "eq", value: ''
+                }
+            }
+
+            kendo.data.transports["aspnetmvc-ajax"](data);
+            data = new kendo.data.transports["aspnetmvc-ajax"]({ prefix: "" }).parameterMap(data, type);
+            //  console.log(data);
+            return data;
+        }
+
+        function error_handler(e) {
+
+            if (e.errors) {
+                e.preventDefault();   // cancel grid rebind if error occurs
+                var message = "Errors:\n";
+                $.each(e.errors, function (key, value) {
+                    if ('errors' in value) {
+                        $.each(value.errors, function () {
+                            message += this + "\n";
+                        });
+                    }
+                });
+                alert(message);
+            }
+        }
+        function detailInit(e) {
+            var detailRow = e.detailRow;
+            console.log(e);
+
+
+        }
+
+    });
+
+</script>

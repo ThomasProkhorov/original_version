@@ -1,0 +1,67 @@
+﻿@using System.Configuration;
+@using System.Web.Configuration;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutNoTree.cshtml";
+
+    CompilationSection configSection = (CompilationSection)ConfigurationManager.GetSection("system.web/compilation");
+    HealthMonitoringSection healthMonitoring = (HealthMonitoringSection)ConfigurationManager.GetSection("system.web/healthMonitoring");
+    MembershipSection membership = (MembershipSection)ConfigurationManager.GetSection("system.web/membership");
+    CustomErrorsSection customErrors = (CustomErrorsSection)ConfigurationManager.GetSection("system.web/customErrors");
+    GlobalizationSection globalization = (GlobalizationSection)ConfigurationManager.GetSection("system.web/globalization");
+    System.Net.Configuration.SmtpSection smtp = (System.Net.Configuration.SmtpSection)ConfigurationManager.GetSection("system.net/mailSettings/smtp");
+}
+<div class="k-ltr">
+<h2>System Info</h2>
+<table dir="ltr" class="k-ltr valign_top">
+    <tr><td>Server:</td><td>@Request.ServerVariables["SERVER_SOFTWARE"]</td></tr>
+    <tr><td>Framework:</td><td>@configSection.TargetFramework</td></tr>
+    <tr><td>Path:</td><td>@Request.ServerVariables["APPL_PHYSICAL_PATH"]</td></tr>
+    <tr><td>IP:</td><td>@Request.ServerVariables["LOCAL_ADDR"]</td></tr>
+    <tr><td>Domain:</td><td>@Request.ServerVariables["HTTP_HOST"]</td></tr>
+    <tr><td>Port:</td><td>@Request.ServerVariables["SERVER_PORT"]</td></tr>
+    <tr><td>Encoding:</td><td>@Request.ServerVariables["HTTP_ACCEPT_ENCODING"]</td></tr>
+    <tr><td>ClientValidationEnabled:</td><td>@System.Configuration.ConfigurationManager.AppSettings["ClientValidationEnabled"]</td></tr>
+    <tr><td>UnobtrusiveJavaScriptEnabled:</td><td>@System.Configuration.ConfigurationManager.AppSettings["UnobtrusiveJavaScriptEnabled"]</td></tr>
+    <tr@(System.Configuration.ConfigurationManager.AppSettings["LogToSql"].ToString() == "false" ? " class=red" : "")><td>LogToSql:</td><td>@System.Configuration.ConfigurationManager.AppSettings["LogToSql"]</td></tr>
+    <tr@(System.Configuration.ConfigurationManager.AppSettings["LogToEmail"].ToString() == "false" ? " class=red" : "")><td>LogToEmail:</td><td>@System.Configuration.ConfigurationManager.AppSettings["LogToEmail"]</td></tr>
+    <tr><td>LogToEmailName:</td><td>@System.Configuration.ConfigurationManager.AppSettings["LogToEmailName"]</td></tr>
+    <tr@(System.Configuration.ConfigurationManager.AppSettings["DbMigrations"].ToString() == "true" ? " class=red" : "")><td>DbMigrations:</td><td>@System.Configuration.ConfigurationManager.AppSettings["DbMigrations"]</td></tr>
+    <tr><td>ConectionString:</td><td>@System.Configuration.ConfigurationManager.ConnectionStrings["Db"]</td></tr>
+    <tr@(configSection.Debug == true ? " class=red" : "")><td>compilation debug:</td><td>@configSection.Debug</td></tr>
+    <tr><td>HealthMonitoring:</td><td>@healthMonitoring.Enabled</td></tr>
+    <tr><td>PasswordFormat:</td><td>@membership.Providers["UcoMembershipProvider"].Parameters["passwordFormat"]</td></tr>
+    <tr><td>HashAlgorithmType:</td><td>@membership.HashAlgorithmType</td></tr>
+    <tr@(customErrors.Mode != CustomErrorsMode.Off ? " class=red" : "")><td>customErrorsMode:</td><td>@customErrors.Mode</td></tr>
+    <tr@(!ViewBag.httpErrors.Contains("/Error/Error404") || !ViewBag.httpErrors.Contains("/Error.html") ? " class=red" : "")><td>HttpErrors:</td><td>
+        @ViewBag.httpErrors
+    </td></tr>
+    <tr><td>Globalization:</td><td>
+        culture: @globalization.Culture<br />
+        uiCulture: @globalization.UICulture
+    </td></tr>
+    <tr><td>Languages:</td><td>@System.Configuration.ConfigurationManager.AppSettings["Languages"]</td></tr>
+    <tr><td>Mail Settings:</td><td>
+        From system.net: @smtp.From<br />
+        From appSettings: @System.Configuration.ConfigurationManager.AppSettings["MailFrom"]<br />
+        defaultCredentials: @smtp.Network.DefaultCredentials<br />
+        EnableSsl: @smtp.Network.EnableSsl<br />
+        Host: @smtp.Network.Host<br />
+        Port: @smtp.Network.Port<br />
+        UserName: @smtp.Network.UserName<br />
+        Password: @smtp.Network.Password<br />
+    </td></tr>
+    <tr><td>Directory:</td><td>
+        ~/Content/UserFiles: @Html.Raw(!Directory.Exists(Server.MapPath("~/Content/UserFiles")) ? "<span class='red'>Not Exist</span>" : "exist") @Html.Raw(!ViewBag.HaveWriteAccessUserFiles ? " <span class='red'> No Write Access</span>" : ", have write access")<br />
+        ~/App_Data/cache/images: @Html.Raw(!Directory.Exists(Server.MapPath("~/App_Data/cache/images")) ? "<span class='red'>Not Exist</span>" : "exist") @Html.Raw(!ViewBag.HaveWriteAccessImages ? " <span class='red'> No Write Access</span>" : ", have write access")<br />
+    </td></tr>
+    <tr@(ViewBag.GacNum < 3 ? " class=red" : "")><td>Using GAC dll?:</td><td>@ViewBag.GacNum Assemblies in GAC</td></tr>
+    <tr@(ViewBag.LogIsFull == true ? " class=red" : "")><td>SQL Log Full:</td><td>@ViewBag.LogIsFull</td></tr>
+    <tr@(System.Configuration.ConfigurationManager.AppSettings["Profiler"].ToString() == "true" ? " class=red" : "")><td>Profiler:</td><td>@System.Configuration.ConfigurationManager.AppSettings["Profiler"]</td></tr>
+    <tr><td>Roles:</td><td>@System.Configuration.ConfigurationManager.AppSettings["Roles"]</td></tr>
+    <tr><td>HasDebuggableAttribute:</td><td>@ViewBag.HasDebuggableAttribute</td></tr>
+    <tr@(ViewBag.IsJITOptimized == false ? " class=red" : "")><td>IsJITOptimized:</td><td>@ViewBag.IsJITOptimized</td></tr>
+    <tr@(ViewBag.BuildType != "Release" ? " class=red" : "")><td>BuildType:</td><td>@ViewBag.BuildType</td></tr>
+    <tr><td>DebugOutput:</td><td>@ViewBag.DebugOutput</td></tr>
+</table>
+</div>

@@ -1,0 +1,84 @@
+﻿@using Uco.Models.Overview
+
+@model UserModel
+@{
+    ViewBag.Title = RP.T("Views.Profile.Settings.ViewBagTitle");
+    Layout = "~/Themes/Supertlv/Views/Shared/_LayoutShop.cshtml";
+    ViewBag.Url = "~/Profile/Orders/";
+}
+@*rewrite shopping cart footer*@
+@*@section FooterZone{
+
+    }*@
+@section topmenu{
+    @Html.Action("_TopStatus", "Profile")
+}
+<div class="midd_section">
+    <div class="center_div">
+        <div class="container one">
+            <div class="profile_left_container">
+                <div class="right_sec">
+
+                    <h1 class="main_heading_h1_profile main_heading_h1_profile_br">@RP.T("Views.Profile.Menu.Setting")</h1>
+                    @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "form3", style = "width:400px;" }))
+                    {
+                        if (TempData["SuccessMessage"] != null)
+                        {
+                            <div class="success">
+                                <p> @TempData["SuccessMessage"] </p>
+                            </div>
+                        }
+                        <div class="row">
+                            @Html.LabelFor(m => m.FirstName)
+                            <b>*</b>
+                            @Html.EditorFor(m => m.FirstName, new { @class = "k-input" })
+                            @Html.ValidationMessageFor(m => m.FirstName)
+                        </div>
+
+                        <div class="row">
+                            @Html.LabelFor(m => m.LastName)
+                            <b>*</b>
+                            @Html.EditorFor(m => m.LastName, new { @class = "k-input" })
+                            @Html.ValidationMessageFor(m => m.LastName)
+                        </div>
+
+                        <div class="row">
+                            @Html.LabelFor(m => m.Email)
+                            <b>*</b>
+                            @Html.EditorFor(m => m.Email, new { @class = "k-input" })
+                            @Html.ValidationMessageFor(m => m.Email)
+                        </div>
+
+                        <div class="row">
+                            @Html.LabelFor(m => m.Phone)
+                            <b>*</b>
+                            @Html.EditorFor(m => m.Phone, new { @class = "k-input" })
+                            @Html.ValidationMessageFor(m => m.Phone)
+                        </div>
+
+                        <div class="row">
+                            @Html.LabelFor(m => m.CompanyName)
+
+                            @Html.EditorFor(m => m.CompanyName, new { @class = "k-input" })
+                            @Html.ValidationMessageFor(m => m.CompanyName)
+                        </div>                      
+
+                        <div class="buttons-wrap">
+                            <input type="submit" value="@RP.T("Views.Profile.Settings.Save")" class="k-button" />
+                        </div>
+                    }
+
+
+
+
+
+                </div>
+            </div>
+
+
+            @* Menu *@
+            @Html.Partial("_Menu")
+        </div>
+        <div class="clear"></div>
+    </div>
+</div>

@@ -1,0 +1,11 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutShop.cshtml";
+    ViewBag.Title = "Mobile app";
+    ViewBag.Url = "~/Shop/Index/";//+ Model.ID;
+}
+
+<div data-role="view" id="test" data-layout="mobile-layout" class="k-rtl">
+    <ul data-role="listview" data-style="inset" id="testList">
+        @Html.Partial("_LoginSignupPopup")
+    </ul>
+</div>

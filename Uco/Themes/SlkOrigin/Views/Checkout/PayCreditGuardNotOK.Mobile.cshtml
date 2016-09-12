@@ -1,0 +1,29 @@
+﻿@model Uco.Models.Order
+@using Uco.Models
+@*@{
+    ViewBag.Title = RP.T("Views.Checkout.Pay.ViewBagTitle");
+    Layout = "~/Themes/SlkOrigin/Views/Shared/_LayoutShop.cshtml";
+    ViewBag.Url = "~/Checkout/Index/";
+}*@
+
+<div class="midd_section2">
+    <div class="center_div">
+        <div class="profile_page_right_sec">
+            <h1 class="main_heading_h1_profile">@RP.T("Views.Checkout.PayNotOK.Title")</h1>
+            <div class="paymnt_style_in">
+                <div class="payment_row2">
+
+                </div>
+            </div>
+            @*  @Html.Partial("_Summary", Model.Cart)*@
+            <div class="clear"></div>
+        </div>
+        <div class="prfl_left_sec">
+            @Html.Partial("_AboutSSLProtocol")
+            @Html.Action("_QuestionAnswer", "PagePart")
+        </div>
+        <div class="clear"></div>
+    </div>
+</div>
+
+<div class="dn" id="SMSPopup"></div>

@@ -1,0 +1,116 @@
+﻿@model Product
+@using Uco.Models
+@using Uco.Infrastructure.Livecycle
+@{
+  int month = LS.GetRandom();
+  string FieldID = ViewData.TemplateInfo.HtmlFieldPrefix.Replace(".", "_");
+}
+
+@if(Model.ID > 0)
+{
+    var p = LS.CurrentEntityContext.Products.FirstOrDefault(x=>x.ID == Model.ID);
+    if(p!=null)
+    {
+        <span>@p.Name @p.SKU </span>
+    }
+}
+else { 
+<input id="@FieldID@(month)" data-zero="false" name="@ViewData.TemplateInfo.HtmlFieldPrefix.Replace("_",".")" value="@Model.ID" />
+
+<script>
+    $('#@FieldID@(month)')
+                            .kendoComboBox(
+    {
+        placeholder: "Select ",
+        dataTextField: "Name",
+        dataValueField: "ID",
+
+        filter: "contains",
+        minLength: 1,
+        "autoBind": true,
+        dataSource: {
+            schema: {
+                data: "Data",
+                total: "Total",
+                errors: "Errors",
+            },
+            type: "json",
+            serverFiltering: true,
+            filter: [],
+            transport: {
+                "prefix": "",
+                read: {
+                    url: "@Url.Action("_AjaxAutoComplete", "Generic", new {model = Model.GetType().Name })"
+,
+                    type: "POST",
+                    data: function () {
+                        var data = kendo.ui.ComboBox.requestData('#@FieldID@(month)');
+                        @if(TempData["FilterShopID"] != null) {
+                             <text>
+                        data["filter"] = "ShopID~eq~@TempData["FilterShopID"]";
+                        
+                        </text>}
+                        /** data["filter"] = "SpecificationAttributeID~eq~1";
+                        console.log(data);
+                        **/
+                        
+                        return data;
+                    },
+                }
+            }
+        }
+    });
+    var @FieldID@(month) = $("#@FieldID@(month)").data('kendoComboBox');
+    @FieldID@(month).dataSource.transport.parameterMap = function(data,type){
+
+        if(type != "read")
+        {
+            for(var i in data)
+            {
+               if( Object.prototype.toString.call( data[i] ) === '[object Object]' ) {
+                    delete data[i];
+                }
+                if( Object.prototype.toString.call( data[i] ) === '[object Array]' ) {
+                    delete data[i];
+                }
+                if( Object.prototype.toString.call( data[i] ) === '[object Date]' ) {
+                    data[i] = kendo.toString(kendo.parseDate(data[i]), "G");
+                }
+               
+                @if(ViewBag.AdditionalFilterField!=null){
+                        <text>
+                if(i == '@ViewBag.AdditionalFilterField')
+                {
+                    data[i] = '@ViewBag.AdditionalFilterID' ;
+                }
+                if(i in @FieldID@(month).dataSource.options.schema.model.fields)
+                {
+                    var model = @FieldID@(month).dataSource.options.schema.model.fields[i];
+                    if(!data[i] && 'defaultValue' in model)
+                    {
+
+                        data[i] = model.defaultValue;
+                    }
+                }
+                </text>
+                    }
+            }
+        }
+        if(type == "read")
+        {
+            console.log(data);
+            @if(TempData["FilterShopID"] != null) {
+            <text>
+            data["filter"]["filters"].push({field:"ShopID",value: @TempData["FilterShopID"], operator: "eq"});
+                        
+            </text>}
+            console.log(data["filter"]);
+        }
+        kendo.data.transports["aspnetmvc-ajax"](data);
+        data = new kendo.data.transports["aspnetmvc-ajax"]({ prefix: "" }).parameterMap(data, type);
+          console.log(data);
+        return data;
+    }
+</script>
+
+}

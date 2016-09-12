@@ -1,0 +1,329 @@
+﻿@{
+    bool RTL = SF.AdminIsRTL();
+}
+<div id="AjaxTreeView"></div>
+<script>
+    $(document).ready(function () {
+
+        var notification = $("#layout_notification").kendoNotification({
+            position: {
+                pinned: true,
+                top: 30,
+                left: 30
+            },
+            autoHideAfter: 3000,
+            stacking: "down",
+            templates: [{
+                type: "info",
+                template: $("#infoTemplate").html()
+            }, {
+                type: "error",
+                template: $("#errorTemplate").html()
+            }, {
+                type: "success",
+                template: $("#successTemplate").html()
+            }]
+
+        }).data("kendoNotification");
+
+        ajaxTreeViewDataSource = new kendo.data.HierarchicalDataSource({
+            transport: {
+                read: {
+                    url: "/Admin/Main/_TreeViewLoading",
+                    dataType: "jsonp"
+                }
+            },
+            schema: {
+                model: {
+                    id: "ID",
+                    hasChildren: "hasChildren"
+                }
+            }
+        });
+
+        $("#AjaxTreeView").kendoTreeView({
+            dragAndDrop: true,
+            dataSource: ajaxTreeViewDataSource,
+            dataTextField: "Text",
+            dataUrlField: "Url",
+            drop: OnNodeDrop
+        });
+
+
+        $('#AjaxTreeView').on('click', '.k-in', function (e) {
+            if (!endsWith($(this).attr("href"), "#")) $("#indexViewIframe").attr("src", $(this).attr("href"));
+            e.preventDefault()
+        });
+
+        function OnNodeDrop(e) {
+
+            var treeView = this,
+                sourceItem = treeView.dataItem(e.sourceNode),
+                destinationItem = treeView.dataItem(e.destinationNode),
+                parent = destinationItem;
+
+            var data = {};
+            data.item = sourceItem.id;
+            data.destinationitem = parent ? parent.id : null;
+            data.position = e.dropPosition;
+
+            $.ajax({
+                cache: false,
+                async: false,
+                url: "@Url.Action("_TreeDrop","Main")",
+                data: data,
+                type: "POST",
+                success: function (msg) {
+                    if (msg == "true") {
+                        return true;
+                    }
+                    else {
+                        alert("Not valid parent");
+                        e.setValid(false);
+                    }
+                }
+            });
+
+        }
+
+        onLoad();
+
+        function onLoad() {
+            // subscribe to the contextmenu event to show a contet menu
+
+            $('#AjaxTreeView').on('contextmenu', '.k-in', function (e) {
+                // prevent the browser context menu from opening
+                e.preventDefault();
+
+                // the node for which the 'contextmenu' event has fired
+                var $node = $(this).closest('.k-item');
+
+
+                // context menu definition - markup and event handling
+                var $contextMenu =
+                    $('<div class="k-animation-container" id="contextMenu">' +
+                        '<ul class="k-widget k-group k-menu k-menu-vertical" style="display:none">' +
+                        '<li class="k-item" data-action="new"><a href="#" class="k-link">@Html.R(VirtualPath, "New")</a></li>' +
+                        '<li class="k-item" data-action="edit"><a href="#" class="k-link">@Html.R(VirtualPath, "Edit")</a></li>' +
+                        '<li class="k-item" data-action="delete"><a href="#" class="k-link">@Html.R(VirtualPath, "Delete")</a></li>' +
+                        '<li class="k-item" data-action="copy"><a href="#" class="k-link">@Html.R(VirtualPath, "Copy")</a></li>' +
+                        '<li class="k-item" data-action="paste"><a href="#" class="k-link">@Html.R(VirtualPath, "Paste")</a></li>' +
+                    '</ul>' +
+                '</div>')
+                .css( //positioning of the menu
+                {
+                    position: 'absolute',
+                    left: e.pageX @(RTL ? "- 80" : "+ 0"), // x coordinate of the mouse
+                    top: e.pageY   // y coordinate of the mouse
+                })
+                .appendTo(document.body)
+                .find('.k-item') // select the menu items
+                .mouseenter(function () {
+                    // hover effect
+                    $(this).addClass('k-state-hover');
+                })
+                .mouseleave(function () {
+                    // remove the hover effect
+                    $(this).removeClass('k-state-hover');
+                })
+                .click(function (e) {
+                    e.preventDefault();
+                    // dispatch the click
+                    onItemClick($(this), $node);
+                })
+                .end();
+
+                // show the menu with animation
+                $contextMenu.find('.k-group').slideDown("fast");
+
+
+                // handle globally the click event in order to hide the context menu
+                $(document).click(function (e) {
+
+                    // if clicked inside the editing textbox - discard
+                    if ($(e.target).is('#AjaxTreeView :text'))
+                        return;
+
+                    // remove any textboxes from the treeview and update the node if needed
+                    $('#AjaxTreeView :text').each(function () {
+                        var $textBox = $(this);
+                        var newText = $textBox.val();
+                        var oldText = $textBox.data('text');
+
+                        // the node to which the textbox belongs to
+                        var $node = $textBox.closest('.k-item');
+
+                        // remove the textbox from the node
+                        $textBox.replaceWith($('<span class="k-in" />').html(newText));
+
+                        // if the text changed update the node
+                        if (newText != oldText) {
+                            onEdit($node);
+                        }
+                    });
+
+                    $contextMenu.find('.k-group').slideUp("fast", function () {
+                        $contextMenu.remove();
+                    });
+
+                });
+            });
+        }
+
+
+
+        function onItemClick($item, $node) {
+            var action = $item.attr("data-action");
+
+            if (action == "new") {
+                onNew($node);
+            }
+            else if (action == "edit") {
+                onEdit($node);
+            }
+            else if (action == "delete") {
+                onDelete($node);
+            }
+            else if (action == "copy") {
+                onCopy($node);
+            }
+            else if (action == "paste") {
+                onPaste($node);
+            }
+        }
+
+        function onNew($node) {
+            var treeView = $('#AjaxTreeView').data('kendoTreeView');
+            var destinationItem = treeView.dataItem($node);
+            var vid = destinationItem.id;
+            $node.addClass("lastCreate");
+            $("#indexViewIframe").attr("src", "@Url.Action("CreateList", "Main")/" + vid);
+            return true;
+
+        }
+
+        function onEdit($node) {
+            var treeView = $('#AjaxTreeView').data('kendoTreeView');
+            var destinationItem = treeView.dataItem($node);
+            var vid = destinationItem.id;
+            $node.addClass("lastEdit");
+            $("#indexViewIframe").attr("src", "@Url.Action("Edit", "Main")/" + vid);
+        }
+
+        function onDelete($node) {
+            var treeView = $('#AjaxTreeView').data('kendoTreeView');
+            var destinationItem = treeView.dataItem($node);
+            var vid = destinationItem.id;
+            $node.addClass("lastEdit");
+            $("#indexViewIframe").attr("src", "@Url.Action("Delete", "Main")/" + vid);
+        }
+
+        function onCopy($node) {
+            var treeView = $('#AjaxTreeView').data('kendoTreeView');
+            var destinationItem = treeView.dataItem($node);
+            var vid = destinationItem.id;
+            $node.addClass("lastCopy");
+
+            notification.show({ message: "@Html.R(VirtualPath, "Done")" }, "success");
+        }
+
+        function onPaste($node) {
+            var treeView = $('#AjaxTreeView').data('kendoTreeView');
+
+            var sourceItem = treeView.dataItem($(".lastCopy"));
+            var destinationItem = treeView.dataItem($node);
+
+            if (typeof sourceItem == 'undefined') {
+
+                notification.show({
+                    title: "@Html.R(VirtualPath, "Error")",
+                    message: "@Html.R(VirtualPath, "ErrorCopyPageFirst")"
+                }, "error");
+
+                return;
+            }
+
+            if (typeof destinationItem == 'undefined') {
+
+                notification.show({
+                    title: "@Html.R(VirtualPath, "Error")",
+                    message: "@Html.R(VirtualPath, "ErrorCopyPageFirst")"
+                }, "error");
+
+                return;
+            }
+
+            var data = {};
+            data.item = sourceItem.id;
+            data.destinationitem = destinationItem.id;
+
+            $.ajax({
+                cache: false,
+                async: false,
+                url: "@Url.Action("_TreeCopy","Main")",
+                data: data,
+                type: "POST",
+                success: function (msg) {
+                    if (msg == "true") {
+                        $tempItem = $(".lastCopy");
+                        $tempItem.addClass("lastEdit");
+                        $tempItem.removeClass("lastCopy");
+                        refreshTreeView();
+
+                        notification.show({ message: "@Html.R(VirtualPath, "Done")" }, "success");
+
+                        return;
+                    }
+                    else {
+                        notification.show({
+                            title: "@Html.R(VirtualPath, "Error")",
+                            message: msg
+                        }, "error");
+                    }
+                }
+            });
+        }
+    });
+
+
+    function refreshTreeView() {
+        var treeView = $("#AjaxTreeView").data("kendoTreeView");
+        if ($("#AjaxTreeView li.lastEdit").length != 0) {
+            var lastEdit = $("#AjaxTreeView li.lastEdit");
+            var lastEditGP = lastEdit.parent().parent();
+
+            var dataItem = treeView.dataItem(lastEditGP);
+
+            if (typeof dataItem != 'undefined') {
+                treeView.expand(lastEditGP);
+                dataItem.children.read();
+            }
+            else {
+                treeView.dataSource.read();
+                treeView.refresh();
+                treeView.expand(lastEdit);
+            }
+
+            $("#AjaxTreeView li.lastEdit").removeClass("lastEdit");
+        }
+        else if ($("#AjaxTreeView li.lastCreate").length != 0) {
+            var lastCreate = $("#AjaxTreeView li.lastCreate");
+
+            var dataItem = treeView.dataItem(lastCreate);
+            if (dataItem.hasChildren) {
+                dataItem.children.read();
+                treeView.expand(lastCreate);
+            }
+            else {
+                dataItem.hasChildren = true;
+                dataItem.load();
+
+                setTimeout(function () {
+                    treeView.expand(lastCreate);
+                }, 2000);
+            }
+
+            $("#AjaxTreeView li.lastEdit").removeClass("lastCreate");
+        }
+    }
+</script>

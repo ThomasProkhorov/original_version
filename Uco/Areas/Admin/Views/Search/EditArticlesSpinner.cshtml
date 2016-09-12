@@ -1,0 +1,19 @@
+﻿@model Uco.Models.ArticlesSpinner
+@{
+    ViewBag.Title = "ArticlesSpinner";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutNoTree.cshtml";
+}
+
+@using (Html.BeginForm()) {
+    @Html.ValidationSummary(true)
+
+    @Html.EditorForModel()
+    <br />
+    <p>
+        <input type="submit" value="שמור" class="t-button t-state-default" />
+    </p>
+}
+<br />
+<div>
+    @Html.ActionLink("חזרה לרשימה", "IndexArticlesSpinner")
+</div>

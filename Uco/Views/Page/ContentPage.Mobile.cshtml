@@ -1,0 +1,23 @@
+﻿@model Uco.Models.ContentPage
+@{
+    Layout = ViewBag.Layout;
+    Layout = "~/Views/Shared/_LayoutShop.cshtml";
+}
+
+<div data-role="view" id="tabstrip-contentPage" data-init="mobileListViewEndlessScrolling" data-title="@Model.Title" data-layout="mobile-layout" class="k-rtl">
+    <div data-role="listview" data-style="inset" data-type="group" style="line-height:200%">
+        <p>@ViewBag.H1</p>
+        <div class="content_page">
+            <div class="editor_html">
+                @Html.Raw(Model.Text)
+            </div>
+            <div class="clear"></div>
+        </div>
+    </div>
+</div>
+
+@if (Session["ShopID"] != null)
+{
+    @Html.Partial("_StaticViews.Mobile", (int)Session["ShopID"])
+}
+<input type="hidden" name="passwordViewsInit" />

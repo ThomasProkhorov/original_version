@@ -1,0 +1,93 @@
+﻿@model List<JsonKeyObject>
+@using System.Reflection
+@using System.Collections.Generic
+@using System.Linq
+@using System.ComponentModel.DataAnnotations
+@using Uco.Models
+@{
+    System.Type t = Model.GetType();
+    var ModelName = t.Name;
+
+    ViewBag.HideButtons = true;
+    int i = 0;
+}
+
+@foreach(var rule in Model)
+{
+    i++;
+    <div class="editrulewrap" style="margin-top:6px; padding-top:10px; border-top:1px solid #f3f3f3">
+        <strong>
+            @RP.T("Discount.Name." + rule.Name)
+        :
+    </strong>
+       
+        <div>
+            @{
+                var prefix = "template"+LS.GetRandom();
+                ViewData.TemplateInfo.HtmlFieldPrefix = prefix;
+                }
+            @Html.Partial("_EditOrCreate", rule.Object)
+            @{
+    ViewData.TemplateInfo.HtmlFieldPrefix = "";
+            }
+            <input type="hidden" name="prefix" value="@prefix" />
+            <input type="hidden" name="numposition" value="@i" />
+            <input type="hidden" name="systemName" value="@rule.Name" />
+        </div>
+        <button class="k-button updateruletodiscount">@RP.T("Admin.Common.Update")</button>
+        <button class="k-button ruleremove">@RP.T("Admin.Common.Remove")</button>
+        <div class="status"></div>
+    </div>
+}
+
+<script>
+    $('.ruleremove').click(function () {
+        var parent = $(this).parents('.editrulewrap:eq(0)');
+       
+        var data = $('form', parent).serialize();
+        var prefix = $('input[name="prefix"]', parent).val();
+        var numposition = $('input[name="numposition"]', parent).val();
+        var systemName = $('input[name="systemName"]', parent).val();
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "/Admin/Discount/RemoveRule/" + $('#ID').val()
+                + "?prefix=" + prefix
+                 + "&systemName=" + systemName
+            + "&Num=" + numposition,
+            data: data,
+            cache: false,
+            error: function () { }
+        }).done(function (data) {
+            parent.remove();
+            refreshList();
+        });
+      
+    });
+
+    $('.updateruletodiscount').click(function () {
+        var parent = $(this).parents('.editrulewrap:eq(0)');
+
+        var data = $('form', parent).serialize();
+        var prefix = $('input[name="prefix"]', parent).val();
+        var numposition = $('input[name="numposition"]', parent).val();
+        var systemName = $('input[name="systemName"]', parent).val();
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "/Admin/Discount/UpdateRule/" + $('#ID').val()
+                   + "?prefix=" + prefix
+                 + "&systemName=" + systemName
+            + "&Num=" + numposition,
+            data: data,
+            cache: false,
+            error: function () { }
+        }).done(function (data) {
+          //  parent.remove();
+            // refreshList();
+            $('.status', parent).html('@RP.T("Admin.Common.UpdateSuccess")');
+        });
+
+    });
+</script>
+<div class="clear"></div>

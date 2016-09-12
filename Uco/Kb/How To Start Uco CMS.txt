@@ -1,0 +1,49 @@
+How To Start Uco CMS
+
+There are some steps which are mandatory to start for UCO CMS.
+Step 1. Set up Database.
+
+For this step you just need to change the server name in connection string provided in web.config file.You just need to replace server name with your server.
+
+<add name="Db" connectionString="Server=Your server Name;Database=uco23;Trusted_Connection=True;Persist Security Info=True" providerName="System.Data.SqlClient" />
+
+Step 2. Create Database.
+
+After making changes in to connection string you will able to run project. Just run project and then database named "uco23" will be created on your Sql server and there will be some default tables in database.
+Step 3. Configure migrations
+
+After creating database and successfully running project just stop project and make some optional changes in web.config file and those are:-
+
+<add key="DbMigrations" value="true" />
+<add key="DbDataLoss" value="true" />
+
+Make DBMigrations value true to false. By doing this program will not try to create database again. And Make DbDataLoss? value true to false, this is optional and this works as suppose you delete any table with data and if DbDataloss? is true then it is allow to do that and this can affect your database and program because each table is reference to other table and if it is false and then you delete table then it will create some exception in program and will not allow you to move further.
+Step 4. Changing model
+
+After making changes in web.config file you need to move further to model classes. There are 2 main classes named "SystemPageModels?.cs" and "PageModels?.cs" in model folder.
+Step 4.1. SystemPageModels?.cs
+
+For first one "SystemPageModel?.cs" ,this class has some default attributes for default pages provided by CMS such as Sitemap,Form,Gallery etc.For all these pages you will get all properties in SystemPageModel? class.In case if you want to add more attributes in default pages then you can add new properties to SystemPageModel? Class and that will be reflected to site. But you need to remember some important things and that is to make changes in Resources file. If you make any changes in property then you have to make changes in corresponding property in "SystemModels?.he-IL.resx" and "SystemModels?.resx" file .Or if you add new proprety in SystemPageModel? Class then you have to add new item in "SystemModels?.he-IL.resx" and "SystemModels?.resx" file.Both files are resides in Model/Resources? folder. Even if you make any changes in model then you have to make changes in these both files. For Example:- You have a new property named "ShowOnMainPage?" for ArticleListPage? which is not existing in current page then you can add that property "ShowOnMainPage?" as given below:-
+
+[Display(Name = "ShowOnMainPage", Order = 120, ResourceType = typeof(Uco.Models.Resources.SystemModels), Prompt = "TabContent")]
+public override bool ShowOnMainPage { get; set; }
+
+after adding this property you just need to update both resources file .
+Step 4.2. PageModels?.cs
+
+For second one class that is "PageModels?.cs" class. This class is also very much important for creating pages. This class is used when you have to add some new pages which are not provided by CMS.Suppose you want to add a new page named "Search" and it is not provided by default by CMS then you just need to create new properties in "PageModels?.cs" class according to need. There are also some default properties resides in "AbstractPage?" class in "SystemPageModel?.cs" file and you can take its reference too. But it also has same need as SystemPageModel? Does and that is to update in "SystemModels?.he-IL.resx" and "SystemModels?.resx" files whenever you create a new property. For Example:- You have a new page name "SearchPage?" and you want to add this in CMS then you just need to add SearchPage?’s properties in "PageModel?" class.Suppose "SearchPage?" has following properties --- Title ,Text Then there are two ways to create properties for this page Either you take reference from abstractPage class which contains both properties Or you can create new properties for this. As:
+
+[RestrictParents(new string[] { "DomainPage" })]
+[RouteUrl("h")]
+public class SearchPage : AbstractPage
+{
+	[Display(Name = "Title", Order = 110, ResourceType = typeof(Uco.Models.Resources.SystemModels), Prompt = "TabContent")]
+	 public string Title { get; set; }
+
+	[Display(Name = "Text", Order = 120, ResourceType = typeof(Uco.Models.Resources.SystemModels), Prompt = "TabContent")]
+	public override bool Text { get; set; }
+}
+
+after adding this property you just need to update both resources file .
+
+After making these changes you will run project and will hit ​http://localhost:someport/admin URL. Default username is admin and password is adminadmin. Then after login you will be able to add default pages and also new page(if you created) with properties which you added in model class.

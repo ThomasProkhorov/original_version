@@ -1,0 +1,211 @@
+﻿@using Uco.Models
+
+<div id="ShopWorkTimegrid" class="k-grid k-widget" style="width:540px;">
+
+    <table>
+        <colgroup>
+            <col style="width:240px">
+            <col style="width:150px">
+            <col style="width:150px">
+        </colgroup>
+        <tr><td class="k-header">@M("ShopWorkTime", "Day")</td>
+        <td class="k-header">@M("ShopWorkTime", "TimeFrom")</td>
+        <td class="k-header">@M("ShopWorkTime", "TimeTo")</td></tr>
+
+        @foreach (var en in Enum.GetValues(typeof(DayOfWeek)))
+        {
+            string startTime = "480";
+            string endTime = "1200";
+            if ((int)en == 0)
+            {
+                startTime = "480";
+                endTime = "840";
+            }
+            if ((int)en == 6)
+            {
+                startTime = "1140";
+                endTime = "1440";
+            }
+            <tr data-dayofweek="@((int)en)">
+                <td>
+                    <label>
+                        <input class="check-box activeboxev" name="Active" type="checkbox" value="true">
+                        <input name="Active" type="hidden" value="false" />
+                        @RP.T("Enums."+en.ToString())
+                    </label>
+                </td>
+                <td>
+                    <input type="hidden" class="workmonday" name="TimeFrom" value="@startTime" />
+                    <input class="workmonday_str" name="TimeFrom_str" value="12:00" />
+                </td>
+                <td>
+                    <input type="hidden" class="workmonday" name="TimeTo" value="@endTime" />
+                    <input class="workmonday_str" name="TimeTo_str" value="12:00" />
+                </td>
+            </tr>
+        }
+
+    </table>
+
+</div>
+
+
+<script>
+    var mainworkContainer = $('#ShopWorkTimegrid');
+    $(".workmonday_str",mainworkContainer).kendoTimePicker({ format: "HH:mm"});
+    $(".workmonday_str",mainworkContainer).change(
+function () {
+
+    var container = $(this).parents('td:eq(0)');
+    var intTime = TimeToInt($(this).val());
+    var val =  $(".workmonday", container).val();
+    $(".workmonday", container).val(intTime);
+    if(val != intTime)
+    {
+        $(".workmonday", container).trigger("change");
+    }
+}
+);
+
+    var updateall = true;
+    $(".workmonday",mainworkContainer).change(function () {
+        var container = $(this).parents('td:eq(0)');
+        var strtime = IntToTime($(this).val());
+        $(".workmonday_str", container).val(strtime);
+
+        //send data
+        if(updateall)
+        {
+            SaveChanges($(this));
+        }
+    });
+    $('.activeboxev',mainworkContainer).change(function(){
+        SaveChanges($(this));
+    });
+    function SaveChanges(el)
+    {
+        var data = {};
+        var tr = el.parents('tr:eq(0)');
+        data = $('<form>').append(tr.clone()).serialize();
+        data+='&ShopID='+ @Model.ID;
+        data+='&Day='+ tr.attr('data-dayofweek');
+        //
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            async: false,
+            url: "/Admin/Main/WorkTimeChange",
+            data: data,
+            error: function () { alert('Server error'); }
+        }).done(function (data) {
+
+        });
+    };
+    function TimeToInt(strtime) {
+
+        var arr = strtime.split(":");
+        var intTime = parseInt(arr[0]) * 60;
+        var mnp = arr[1].split(" ");
+        var mn = parseInt(mnp[0]);
+        if (mnp[1] && mnp[1] == "AM") {
+            if (intTime >= 720) { intTime -= 720; }
+        }
+        if (mnp[1] && mnp[1] == "PM" && intTime < 720) {
+
+            intTime += 12 * 60;
+        }
+        intTime += mn;
+        return intTime;
+    }
+    function IntToTime(i) {
+        var hr = Math.floor(i / 60);
+        var mn = i % 60 ; if(mn<10){mn='0'+mn;}
+        //var part = "AM";
+       // if (hr > 12) {
+       //     hr -= 12;
+       //     part = "PM";
+       // }
+       // if (hr == 0) { hr = 12; }
+        var time = hr + ":" + mn;// + " " + part;
+        return time;
+    }
+    setTimeout(function () {
+        //   var container = $(this).parents('td:eq(0)');
+        $(".workmonday",mainworkContainer).each(function (i, e) {
+            var container = $(e).parents('td:eq(0)');
+            if ($(e).val() > 0) {
+
+                var strtime = IntToTime($(e).val());
+                $(".workmonday_str", container).val(strtime);
+            }
+        });
+
+    }, 200);
+
+
+    var DayOfWeekEnums = {
+        0:'@RP.T("Enums.Sunday")',
+        1:'@RP.T("Enums.Monday")',
+        2:'@RP.T("Enums.Tuesday")',
+        3:'@RP.T("Enums.Wednesday")',
+        4:'@RP.T("Enums.Thursday")',
+        5:'@RP.T("Enums.Friday")',
+        6:'@RP.T("Enums.Saturday")',
+
+    };
+
+    $(document).ready(function () {
+        /*
+        Docs
+        http://docs.telerik.com/kendo-ui/api/javascript/ui/grid
+        */
+
+        //ReadWorkTimes
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            async: true,
+            data:{'ShopID':@Model.ID},
+            url: "/Admin/Main/ReadWorkTimes",
+            error: function () { alert('Server error'); }
+        }).done(function (data) {
+            updateall = false;
+            for(var t in data.data)
+            {
+                var wrap = $('#ShopWorkTimegrid table tr:eq('+(1+data.data[t]['Day'])+')');
+                if(data.data[t]['Active'])
+                {
+                    $('input[name="Active"]',wrap).attr('checked', true);
+                }
+                $('input[name="TimeFrom"]',wrap).val(data.data[t]['TimeFrom']).trigger("change");
+                $('input[name="TimeTo"]',wrap).val(data.data[t]['TimeTo']).trigger("change");
+
+                //  var strtime = IntToTime(data.data[t]['TimeFrom']);
+                // $('input[name="TimeFrom_str"]',wrap).val(strtime).trigger("change");
+                //  strtime = IntToTime(data.data[t]['TimeTo']);
+                // $('input[name="TimeTo_str"]',wrap).val(strtime).trigger("change");
+            }
+            updateall=true;
+        });
+
+
+        function error_handler(e) {
+
+            if (e.errors) {
+                e.preventDefault();   // cancel grid rebind if error occurs
+                var message = "Errors:\n";
+                $.each(e.errors, function (key, value) {
+                    if ('errors' in value) {
+                        $.each(value.errors, function () {
+                            message += this + "\n";
+                        });
+                    }
+                });
+                alert(message);
+            }
+        }
+
+
+    });
+
+</script>

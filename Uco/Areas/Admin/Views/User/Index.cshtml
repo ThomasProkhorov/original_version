@@ -1,0 +1,89 @@
+﻿@{
+    ViewBag.Title = RP.T("Admin.Views.User.Index.Title");
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutNoTree.cshtml";
+}
+
+<h2>@RP.T("Admin.Views.User.Index.Title")</h2>
+<div id="filterbox">
+    <div class="editor-label"><label for="Email">@M("User", "Email")</label></div>
+    <div class="editor-field"><input id="Email" type="text" name="Email" class="k-textbox" /></div>
+
+    <div class="editor-label"><label for="Phone">@M("User", "Phone")</label></div>
+    <div class="editor-field"><input id="Phone" type="text" name="Phone" class="k-textbox" /></div>
+
+    <div class="editor-label"><label for="FirstName">@M("User", "FirstName")</label></div>
+    <div class="editor-field"><input id="FirstName" type="text" name="FirstName" class="k-textbox" /></div>
+
+    <div class="editor-label"><label for="LastName">@M("User", "LastName")</label></div>
+    <div class="editor-field"><input id="LastName" type="text" name="LastName" class="k-textbox" /></div>
+    <div class="button-wrap">
+        <button class="k-button" onclick="userFiltering.filter('filterbox');">Search</button>
+        <button class="k-button" onclick="userFiltering.clear();">Clear</button>
+    </div>
+
+</div>
+
+<script>
+
+    var userFiltering = {
+        filter: function (id) {
+            var data = { logic: "and", filters: [] };
+            //{ field: "name", operator: "startswith", value: "Jane" }
+            $('#' + id + ' input').each(function (i, e) {
+                if ($(e).attr('name') && $(e).val())
+                {
+
+                    data.filters.push({ field: $(e).attr('name'), operator: "startswith", value: $(e).val() });
+
+                }
+            });
+            var grid = $("#Grid").data('kendoGrid');
+            grid.dataSource.filter(data);
+        },
+        clear: function () {
+            var grid = $("#Grid").data('kendoGrid');
+            grid.dataSource.filter({});
+        },
+        setFilter: function (name, value) {
+            var grid = $("#Grid").data('kendoGrid');
+            grid.dataSource.filter({ field: name, operator: "eq", value: value });
+            //grid.dataSource.page(1);
+            // alert(name + value);
+        },
+    };
+
+</script>
+@(Html.Kendo().Grid<Uco.Models.User>()
+        .Name("Grid")
+        .DataSource(dataSource => dataSource.Ajax()
+            .Model(model => { model.Id(item => item.ID); })
+                .Read(r => r.Action("_AjaxIndex", "User"))
+                .Destroy(r => r.Action("_AjaxDelete", "User"))
+        )
+        .Columns(columns =>
+        {
+            columns.Bound(r => r.CreationDate).Width(200).Format("{0:dd/MM/yyyy}");
+            //columns.Bound(r => r.UserName);
+            columns.Bound(r => r.Email);
+            columns.Bound(r => r.FirstName);
+            columns.Bound(r => r.LastName);
+            columns.Bound(r => r.Phone);
+            columns.Bound(r => r.Roles);
+            columns.Bound(r => r.Comment);
+            columns.Template(r => r.ID).ClientTemplate(
+               "<a class='k-button' href='" + Url.Action("Orders", "User") + "?ID=#= ID #'" + ">" + RP.T("Admin.Views.Command.Orders").ToString() + "</a>"
+           ).Width(100);
+            columns.Template(r => r.ID).ClientTemplate(
+                "<a class='k-button' href='" + Url.Action("Edit", "User") + "?ID=#= ID #'" + ">" + RP.T("Admin.Views.Command.Edit").ToString() + "</a>"
+            ).Width(100);
+            columns.Command(commands =>
+            {
+                commands.Destroy();
+            }).Width(100);
+        })
+        .Pageable()
+        .Sortable()
+        .Filterable()
+)
+<br />
+@Html.ActionLink(RP.T("Admin.Views.Command.Create").ToString(), "Create", null, new { @class = "k-button k-state-default" })

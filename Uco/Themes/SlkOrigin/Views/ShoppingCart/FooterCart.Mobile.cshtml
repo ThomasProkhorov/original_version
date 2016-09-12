@@ -1,0 +1,86 @@
+﻿@model Uco.Models.Overview.ShoppingCartOverviewModel
+
+@if (Model.Shop != null)
+{
+  
+       
+    
+    <input type="hidden" name="shopID" id="shopID" value="@Model.ShopID" />
+     @* Do NOT Delete this !!!*@
+    <div style="display:none;">
+     <span class="dn" style="display:none;" id="sh_carttotalmain">@Model.SubTotalStr</span>
+        </div>
+    @* Do NOT Delete this !!!*@
+    <script>
+        
+        setTimeout(function () {
+            $('.sh_cartsubtotal, .sh_carttotal').html('@Model.SubTotalStr');
+            $('.sh_cartcount').each(function(i,e){ $(e).html('@Model.Count')});
+        }, 100);
+        $(window).on('hashchange', function () {
+            setTimeout(function () {
+            $('.sh_cartcount').each(function (i, e) {
+                if(!$(e).text())
+                {
+                    $(e).text($('.sh_cartcount').not(':empty')[0].innerHTML);
+                }
+            });
+            }, 100);
+        });
+       
+       </script>
+    <div class="midd_section midd_section2">
+        <div class="center_div">
+            <div class="profile_page_right_sec">
+                <h1>
+                    <span class="shoping_cart2_haed">@RP.T("Views.ShoppingCart.Index.ShoppingCart")</span>
+                </h1>
+                <div class="profile_right_in">
+                    <div class="shpng_cart2_row1">
+                        <div class="right_img_part"><a href="#"><img src="@SF.GetImage(Model.Shop.Image, 98, 56 ,true, true)" alt=""></a></div>
+                        <div class="left_text_part">@Model.Shop.Name</div>
+                        <div class="clear"></div>
+                    </div>
+                    @Html.Partial("_ShoppingCartTable", Model)
+                </div>
+                <div class="cart2_right_bot">
+                    <div class="cart2_shipping">
+                        @if (Model.Total >= Model.Shop.FreeShipFrom)
+                        {
+                            <div class="shipfree shiping_text1">@RP.T("Views.ShoppingCart.Index.FreeShippingText")</div>
+                            <div class="shiping_text1 dn shipnotfree">@String.Format(RP.T("Views.ShoppingCart.Index.ShipCost").ToString(), ShoppingService.FormatPrice(Model.Shop.ShipCost))</div>
+                            <div class="shiping_text2 dn shipnotfree">@String.Format(RP.T("Views.ShoppingCart.Index.FreeShipFromWhatPrice").ToString(), ShoppingService.FormatPrice(Model.Shop.FreeShipFrom)) </div>
+                        }
+                        else
+                        {
+                            <div class="dn shipfree shiping_text1">@RP.T("Views.ShoppingCart.Index.FreeShippingText")</div>
+                            <div class="shiping_text1 shipnotfree">@String.Format(RP.T("Views.ShoppingCart.Index.ShipCost").ToString(), ShoppingService.FormatPrice(Model.Shop.ShipCost))</div>
+                            <div class="shiping_text2 shipnotfree">@String.Format(RP.T("Views.ShoppingCart.Index.FreeShipFromWhatPrice").ToString(), ShoppingService.FormatPrice(Model.Shop.FreeShipFrom)) </div>
+                        }
+                    </div>
+                    <div class="price_text">@RP.T("Views.ShoppingCart.Index.TotalAmount") <span class="sh_carttotal">@Model.SubTotalStr</span></div>
+                    <div class="cart2_btn2">
+                        <ul>
+                             @if (LS.isLogined())
+                                    {
+                                        <li class="orange"><a href="@Url.Action("Index", "Checkout", new {ID = Model.ShopID })">@RP.T("Views.ShoppingCart.Index.ContinuePayment")</a></li>
+
+                                    }
+                                    else
+                                    {
+                                       // /Account/LogOn
+                                        var returnUrl = Url.Action("Index", "Checkout", new {ID = Model.ShopID });
+                                        <li class="orange"><a href="#tabstrip-login">@RP.T("Views.ShoppingCart.Index.ContinuePayment")</a></li>
+
+
+                                    }
+                             <li class="green"><a href="@Url.Action("Index", "Shop", new { ID = Model.ShopID })">@RP.T("Views.ShoppingCart.Index.BackToTheStore")</a></li>
+                        </ul>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+            <div class="clear"></div>
+        </div>
+    </div>
+}

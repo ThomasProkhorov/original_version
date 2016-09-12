@@ -1,0 +1,78 @@
+﻿@model Uco.Models.Shop
+@{
+    Layout = "~/Themes/SlkOrigin/Views/Shared/_LayoutShop.cshtml";
+    ViewBag.Title = Model.Name;
+    ViewBag.Url = "~/Shop/Index/" + Model.ID;
+    ViewBag.ShopID = Model.ID;
+    if(!string.IsNullOrEmpty(Model.Logo))
+    {
+        ViewBag.Logo = Model.Logo;
+    }
+}
+@section topmenu{
+    @Html.Action("_TopMenu", new { shopID = Model.ID })
+}
+
+<input type="hidden" name="shopID" id="shopID" value="@Model.ID" />
+<input type="hidden" id="itemInCartText" value="@RP.T("Views.Shop._ProductGalleryItem.ItemInCartText")"/>
+<input type="hidden" id="itemInCartText2" value="@RP.T("Views.Shop._ProductGalleryItem.ItemInCartText2")" />
+@if (Session["OpenedFromHomePage" + Model.ID.ToString()] == null 
+    || ((DateTime)Session["OpenedFromHomePage" + Model.ID.ToString()]) < DateTime.UtcNow.AddHours(-2))
+{ 
+<script>
+    if (typeof (Storage) !== "undefined") {
+        localStorage.setItem("changeShopPopupButtonClick", false);
+    }
+    console.log('opened directly');
+</script>
+}
+<div class="midd_section">
+    <div class="center_div">
+        <div class="container one">
+            <div class="item">
+                <div class="right_sec">                    
+                    <div id="indexProductFilters"></div>
+                    @*<div class="main_heading">
+                        <h1 class="main_heading_h1">@RP.T("Views.Shop.Index.h1")</h1>
+                        <div class="product_view">
+                            <ul>
+                                <li id="listGallery" class="list_view_light">&nbsp;</li>
+                                <li id="tableGallery" class="grid_view_dark">&nbsp;</li>
+                            </ul>
+                            <div class="clear"></div>
+                        </div>
+                        <div class="clear"></div>
+                    </div>*@              
+                      
+                    <div id="productResultWrapper">
+                         <div class="products_part">
+      <ul class="lastProductNum"  data-type="gallery">
+                        @Html.Action("_GetProductByCategoryAndFilters", new { shopID = Model.ID, showFirstCategory = true })
+
+           </ul>
+                </div> 
+                    </div>
+                    <div id="back-top">
+                        <a href="#top"><span></span>@RP.T("Views.Shop.Index.ToTopBtnText")</a>
+                    </div>
+                </div>
+            </div>
+            @Html.Partial("_LeftMenu", Model)
+        </div>
+        <div class="clear"></div>
+    </div>
+</div>
+<div class="dn" id="shopPopup"></div>
+<div class="dn" id="changeShopPopup"></div>
+<div class="dn" id="SMSPopup"></div>
+<div class="dn" id="loginSignupPopup"></div>
+<div class="dn" id="productPopup"></div>
+
+<div id="noteWindow" class="dn left_sec_in_form1">
+    <div>
+        <textarea class="multi-line" name="productNoteText" id="productNoteText" required data-required-msg="@RP.T("Views.Shop.Index.NoteTextRequired")"></textarea>
+        <div id="addProductNote" class="product_green_btn3" data-productid="">
+            <a href="javascript:void(0)">@RP.T("Views.Shop.Index.Save")</a>
+        </div>
+    </div>
+</div>

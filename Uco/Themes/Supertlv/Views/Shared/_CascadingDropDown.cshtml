@@ -1,0 +1,60 @@
+﻿@model string
+
+@using Telerik.Web.Mvc.UI
+@using Telerik.Web.Mvc.UI.Fluent
+
+@{
+    string segment = Model;
+    string DivClass = ViewData["DivClass"] as string;
+    string[] PlaceholderName = (ViewData["PlaceholderName"] as string).Split(',');
+    string ComboBoxNumberString = ViewData["ComboBoxNumber"] as string;
+    string DDID = ViewData["DDID"] as string;
+    int ComboBoxNumber = int.Parse(ComboBoxNumberString);
+}
+
+
+@for (int i = 1; i <= ComboBoxNumber; i++)
+{
+    if (i == 1 && ComboBoxNumber == 1)
+    {
+        @(Html.Telerik().DropDownList()
+            .Name(DDID + segment + "_" + i)
+            .Placeholder(PlaceholderName[i - 1])
+            .SelectedIndex(0)
+            .DataBinding(binding => binding.Ajax().Select("_GetDropDownSearch", "PagePart", new { segment = segment, level = i, ddid = DDID }))
+            .HtmlAttributes(new { @class = DivClass + " " + DivClass + "_" + i })
+        )
+    }
+    else if (i == 1)
+    {
+        @(Html.Telerik().DropDownList()
+            .Name(DDID + segment + "_" + i)
+            .Placeholder(PlaceholderName[i - 1])
+            .SelectedIndex(0)
+            .CascadeTo(DDID + segment + "_" + (i + 1))
+            .DataBinding(binding => binding.Ajax().Select("_GetDropDownSearch", "PagePart", new { segment = segment, level = i, ddid = DDID }))
+            .HtmlAttributes(new { @class = DivClass + " " + DivClass + "_" + i })
+        )
+    }
+    else if (i == ComboBoxNumber)
+    {
+        @(Html.Telerik().DropDownList()
+            .Name(DDID + segment + "_" + i)
+            .Placeholder(PlaceholderName[i - 1])
+            .SelectedIndex(0)
+            .DataBinding(binding => binding.Ajax().Select("_GetDropDownSearch", "PagePart", new { segment = segment, level = i, ddid = DDID }))
+            .HtmlAttributes(new { @class = DivClass + " " + DivClass + "_" + i })
+        )
+    }
+    else
+    {
+        @(Html.Telerik().DropDownList()
+            .Name(DDID + segment + "_" + i)
+            .Placeholder(PlaceholderName[i - 1])
+            .SelectedIndex(0)
+            .CascadeTo(DDID + segment + "_" + (i + 1))
+            .DataBinding(binding => binding.Ajax().Select("_GetDropDownSearch", "PagePart", new { segment = segment, level = i, ddid = DDID }))
+            .HtmlAttributes(new { @class = DivClass + " " + DivClass + "_" + i })
+        )
+    }
+}

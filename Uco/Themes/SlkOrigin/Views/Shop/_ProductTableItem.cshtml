@@ -1,0 +1,134 @@
+﻿@model IEnumerable<Uco.Models.Overview.ProductOverviewModel>
+
+
+@foreach (var m in Model)
+{
+    var isProductInCart = m.isInShoppingCart;
+    var isUnitBuy = m.QuantityType == Uco.Models.QuantityType.ByUnit;
+    
+    //tested product: כתף בקר דק דק 7290000151182
+    bool haveMeansureQuantity = false;
+    bool haveUnitQuantity = true;
+    if (m.SoldByWeight && (m.MeasureUnit != null || m.MeasureUnitStep.HasValue))
+    {
+        haveMeansureQuantity = true;
+        haveUnitQuantity = false;
+    }
+    if (!m.SoldByWeight || m.PriceByUnit.HasValue)
+    {
+        haveUnitQuantity = true;
+    }
+    
+        <tr class="listing_tab lastProductNum sh_protidctItemWrap" data-last-item-num="@ViewBag.LastProductNum" data-type="tableItemPartial">
+
+            <td align="center" valign="middle" class="list_prdct_clm1 productPopupLink" data-productshopid="@m.ProductShopID"><img src="@SF.GetImage(m.Image, 45, 42, true, true)" alt=""></td>
+            <td align="center" valign="middle" class="list_prdct_clm2 productPopupLink" data-productshopid="@m.ProductShopID">@m.Name<input type="hidden" id="priceSource_@(m.ID)" value="@m.Price" class="sh_boxpriceunit"></td>
+            <td align="center" valign="middle" class="list_prdct_clm3">@m.Manufacturer</td>            
+            <td align="center" valign="middle" class="list_prdct_clm5 price_part sh_boxprice" id="priceSelector_@(m.ID)">
+                @ShoppingService.FormatPrice(m.Price)@(haveMeansureQuantity ? "/" + m.MeasureUnitStep + m.MeasureUnit : "")
+            
+        </td>
+            <td align="center" valign="middle" class="list_prdct_clm6">@m.ShortDescription</td>
+            <td align="center" valign="middle" class="list_prdct_clm7">
+                
+                 @if (haveUnitQuantity && haveMeansureQuantity)
+                {
+                     <div class="quantity-type-radio" style="text-align:left;">
+    <div class="quantity-type-radioitem" style="display:inline-block;">
+                 <label>@RP.T("View.ProductItem.QuntityType.Meansure")
+                     <input type="radio" name="quantityType" value="0" @(m.QuantityType== Uco.Models.QuantityType.Default ? "checked=\"checked\"" : "")  onclick="Shop.BoxChangeQuantityType(this,event, @m.ProductShopID, 0,@m.Price,@m.PriceByUnit.Value);" /></label></div>
+    <div class="quantity-type-radioitem" style="display:inline-block;">
+                        <label>@RP.T("View.ProductItem.QuntityType.Unit")
+                        <input type="radio" name="quantityType" value="1" @(m.QuantityType== Uco.Models.QuantityType.ByUnit ? "checked=\"checked\"" : "") onclick="Shop.BoxChangeQuantityType(this,event, @m.ProductShopID, 1,@m.Price,@m.PriceByUnit.Value);" /></label></div>
+</div>
+                }
+                @if (haveMeansureQuantity)
+                {
+                    haveMeansureQuantity = true;
+                    decimal qtobuy = 1;
+                    if (m.MeasureUnitStep.HasValue)
+                    {
+                        qtobuy = m.MeasureUnitStep.Value;
+                    }
+                    if (m.QuantityToBuy > 0 && m.QuantityToBuy != 1)
+                    {
+                        qtobuy = m.QuantityToBuy;
+                    }
+                    <div class="inputquantitymeansure" style="@(haveUnitQuantity && m.QuantityType == Uco.Models.QuantityType.ByUnit ? "display:none;" : "")">
+                        <input type="text" name="Quantity@(isUnitBuy ? "_hide" : "")"
+                               onkeypress="Shop.BuyKey(this,event,@m.ProductShopID);" id="quantityinput_@(m.ProductShopID)@(isUnitBuy ? "_hide" : "")" value="@qtobuy.ToString("0")">
+                        <script>
+                            $('#quantityinput_@(m.ProductShopID)@(isUnitBuy ? "_hide" : "")').ivupdown({
+        dimension: '@m.MeasureUnit',
+        @if (m.MeasureUnitStep.HasValue)
+                        {  <text>min: @m.MeasureUnitStep ,</text>}
+        @if (m.MeasureUnitStep.HasValue)
+                        {  <text>step: @m.MeasureUnitStep ,</text>}
+        price: @m.Price,
+        priceSelector: '#priceSelector_@(m.ID)',
+        // priceSource: '#priceSource_@(m.ID)',
+        onIncrease:function(val){
+            Shop.BoxIncreas($('#quantityinput_@(m.ProductShopID)').get(0),false, @m.ProductShopID, true, @if (m.MeasureUnitStep.HasValue)
+                                                                    {@m.MeasureUnitStep.Value}else{@("1")},val);
+        },
+        onDecrease:function(val){
+            Shop.BoxDecrease($('#quantityinput_@(m.ProductShopID)').get(0),false, @m.ProductShopID, true, @if (m.MeasureUnitStep.HasValue)
+                                                                     {@m.MeasureUnitStep.Value}else{@("1")},val);
+        },
+    });
+</script>
+                        </div>
+                        }
+                        @if (haveUnitQuantity)
+                {
+                            <div class="inputquantityunit" style="@(haveMeansureQuantity && m.QuantityType == Uco.Models.QuantityType.Default ? "display:none;" : "")">
+                                <div class="prdct_qty_minus"><a href="#" onclick="Shop.BoxDecrease(this, event, @m.ProductShopID, true @(haveMeansureQuantity ? ",null,null," + m.PriceByUnit.Value.ToString() : ""));"></a></div>
+                                <div class="prdct_qty_show"><input type="text" name="Quantity@(haveMeansureQuantity && !isUnitBuy ? "_hide" : "")" onkeypress="Shop.BuyKey(this,event,@m.ProductShopID);" id="quantityinput_@(m.ProductShopID)@(haveMeansureQuantity && !isUnitBuy ? "_hide" : "")" value="@m.QuantityToBuy.ToString("0")" class="single-line"></div>
+                                <div class="prdct_qty_plus" style="float: right;"><a href="#" onclick="Shop.BoxIncreas(this,event, @m.ProductShopID, true @(haveMeansureQuantity ? ",null,null," + m.PriceByUnit.Value.ToString() : ""));"></a></div>
+                            </div>
+                        }
+            </td>
+            <td align="center" valign="middle" class="list_prdct_clm8">
+            <input type="hidden" name="ProductShopID" value="@m.ProductShopID">
+            <input type="hidden" name="ShopID" value="@m.ShopID">
+              @if(m.Attributes.Count > 0)
+              {
+                <input type="hidden" name="ProductAttributeOptionID" value="0" />
+                <select name="ProductAttributeOptionID_box" class="drop_down" onchange="Shop.BoxChangeAttribute(this,event,@m.ID);">
+                    <option data-sku="@m.SKU"
+                            data-price="@ShoppingService.FormatPrice(m.Price)"
+                            data-priceunit="@m.Price"
+                            data-quantity="@m.Quantity" value="0">
+                        @RP.T("Views.Shop._ProductTableItem.Choose")
+                        </option>
+                    @foreach (var atr in m.Attributes)
+{
+    string selected = "";
+
+    <option data-sku="@(!string.IsNullOrEmpty(atr.OverridenSku) ? atr.OverridenSku : m.SKU)"
+            data-price="@(atr.OverridenPrice > 0 ? atr.OverridenPriceStr : ShoppingService.FormatPrice(m.Price))"
+            data-priceunit="@(atr.OverridenPrice > 0 ? atr.OverridenPrice : m.Price)"
+            data-quantity="@atr.Quantity" value="@atr.ID" @selected>
+        @atr.Name
+    </option>
+}
+                                </select>
+              }
+            </td>
+            <td align="center" valign="middle" class="list_prdct_clm9">
+                <a href="#" class="link1 showNoteWindow" data-productid="@m.ProductID">@RP.T("Views.Shop._ProductTableItem.WriteComment")</a>
+            </td>
+            <td align="center" valign="middle" class="list_prdct_clm10">
+                <a href="#" class="@(isProductInCart ? "btn1_brown" : "btn1")" onclick="Shop.Buy(this,event,@m.ProductShopID);">@(isProductInCart ? RP.T("Views.Shop._ProductGalleryItem.ItemInCartText") : RP.T("Views.Shop._ProductTableItem.AddToCart"))</a>
+            </td>
+            <td align="center" valign="middle" class="list_prdct_clm11">                
+                <a href="javascript:void(0)" class="parentcssTooltip" style="position: relative;" title="@RP.T("Views.Shop._ProductTableItem.TooltipText")">
+                    <span class="anchor-text" role="presentation">
+                        <img src="~/Content/DesignFiles/prdct_open_qstn_mark.png" alt="">
+                    </span>
+
+                </a>   
+                        
+            </td>
+        </tr>
+}

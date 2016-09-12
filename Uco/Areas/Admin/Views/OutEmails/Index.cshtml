@@ -1,0 +1,33 @@
+﻿@{
+    ViewBag.Title = Html.R("Title");
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutNoTree.cshtml";
+}
+
+<h2>@Html.R("Title")</h2>
+
+@(Html.Kendo().Grid<Uco.Models.OutEmail>()
+    .Name("Grid")
+    .DataSource(dataSource =>
+        dataSource.Ajax()
+            .Model(model => { model.Id(item => item.ID); })
+            .Read(r => r.Action("_AjaxIndex", "OutEmails"))
+            .Destroy(r => r.Action("_AjaxDelete", "OutEmails"))
+    )
+    .Columns(columns =>
+    {
+        columns.Bound(r => r.LastTry).Format("{0:dd/MM/yyyy}").Width(200);
+        columns.Bound(r => r.TimesSent);
+        columns.Bound(r => r.MailTo);
+        columns.Bound(r => r.Subject);
+        columns.Command(commands =>
+        {
+            commands.Destroy();
+        }).Width(100);
+    })
+    .Pageable()
+    .Sortable(sortable => sortable
+        .AllowUnsort(true)
+        .SortMode(GridSortMode.MultipleColumn))
+    .Filterable()
+    .Groupable()
+)

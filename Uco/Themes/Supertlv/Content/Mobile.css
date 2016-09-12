@@ -1,0 +1,43 @@
+ .k-menu-horizontal>.k-item {
+    float: none!important;
+    text-align:center;
+}
+    #header_logof {
+    position:relative;
+    text-align:right!important;
+        padding-right: 22px;
+    }
+    html{margin: 0 auto;}
+    html , body{
+    width:100%;
+    min-width:320px;
+    }
+ .k-input, input.k-textbox,input.k-input, textarea.k-textbox, input.k-textbox:hover, textarea.k-textbox:hover, .k-textbox > input, .k-multiselect-wrap
+ , .k-autocomplete, .k-combobox, .k-numerictextbox, .k-dropdown, .k-selectbox, .k-textbox{
+        max-width:240px!important;
+  }
+ .k-timepicker{
+        width:76px;
+ }
+ .k-pager-info.k-label {
+     display:none;
+ }
+ #menutoggle{
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    display: inline-block;
+    zoom: 150%;
+    cursor: pointer;
+ }
+ #header{
+     display:none;
+ }
+ .k-grid-delete {
+    width: 18px!important;
+    height: 28px;
+    overflow: hidden;
+    padding: 2px 8px;
+    display: inline-block;
+    min-width: 27px!important;
+}

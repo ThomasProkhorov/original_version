@@ -1,0 +1,156 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc;
+@{
+    bool RTL = SF.AdminIsRTL();
+
+    string Skin = System.Configuration.ConfigurationManager.AppSettings["SkinDefault"];
+    if (Session["SkinSelectList"] != null) { Skin = Session["SkinSelectList"] as string; }
+    
+    if (RTL)
+    {
+
+        Style.AddHead("~/Content/Kendo/2014.1.318/kendo.common.min.css");
+        Style.AddHead("~/Content/kendo/2014.1.318/kendo." + Skin + ".min.css");
+        Style.AddHead("~/Areas/Admin/Content/uco.css");
+        Style.AddHead("~/Content/Kendo/2014.1.318/kendo.rtl.min.css");
+        Style.AddHead("~/Areas/Admin/Content/uco.rtl.css");
+    }
+    else
+    {
+        Style.AddHead("~/Content/Kendo/2014.1.318/kendo.common.min.css");
+        Style.AddHead("~/Content/kendo/2014.1.318/kendo." + Skin + ".min.css");
+        Style.AddHead("~/Areas/Admin/Content/uco.css");
+    }
+    
+    Script.AddHead("~/Scripts/Kendo/2014.1.318/jquery.min.js");
+    Script.AddHead("~/Scripts/Kendo/2014.1.318/kendo.web.min.js");
+    Script.AddHead("~/Scripts/Kendo/2014.1.318/kendo.aspnetmvc.min.js");
+    Script.AddHead("~/Scripts/kendo/2014.1.318/cultures/kendo.culture." + SF.GetLangCodeThreading() + ".min.js");
+    Script.AddHead("~/Scripts/kendo/2014.1.318/gridlocal/kendo." + SF.GetLangCodeThreading() + ".js");
+    Script.AddHead("~/Areas/Admin/Content/admin.js");
+    Script.AddHead("~/Scripts/pstooltip.js");
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Uco Admin | @ViewBag.Title</title>
+    <meta charset="utf-8" />
+    @Style.RenderHead()
+    @Script.RenderHead()
+    <script type="text/javascript">
+        kendo.culture("@(SF.GetLangCodeThreading())");
+    </script>
+    @RenderSection("scripts", required: false)
+    <!--[if lt IE 9]><script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script><script src="http://css3-mediaqueries-js.googlecode.com/svn/trunk/css3-mediaqueries.js"></script><![endif]-->
+</head>
+<body>
+    <!--[if lt IE 8]><div class="ie67"><p style='font-weight:bold; font-size:20px; padding:0 10px; text-align:center; margin:20px 0 20px; color:red;'>Your using old and unsuported browser. Upgrade you browser!<br/><a href='http://www.microsoft.com/windows/internet-explorer/default.aspx'>Click here to upgrade.</a></p></div><![endif]-->
+    <div id="page">
+        @if (RTL)
+        {
+            Html.Kendo().Splitter().Name("sMain")
+                  .HtmlAttributes(new { style = "height: 100%; border: 0;" })
+                  .Orientation(SplitterOrientation.Vertical)
+                  .Panes(vPanes =>
+                  {
+                      vPanes.Add()
+                          .Size("26px")
+                          .Collapsible(false)
+                          .Scrollable(false)
+                          .Resizable(false)
+                          .HtmlAttributes(new { @class = "menuPanel" })
+                          .Content(@<div id="header" class="@(RTL ? "k-rtl" : "k-ltr")">@Html.Partial("_Menu")<div id="header_logof">@Html.Partial("_LogOnPartial")</div></div>);
+                      vPanes.Add()
+                          .Scrollable(false)
+                          .Content(Html.Kendo().Splitter().Name("sIn")
+                                .HtmlAttributes(new { style = "height: 100%; width: 100%; border: 0; overflow: hidden;" })
+                                .Orientation(SplitterOrientation.Horizontal)
+                                .Panes(panes =>
+                                {
+                                    panes.Add()
+                                        .Scrollable(true)
+                                        .HtmlAttributes(new { style = "overflow:hidden;", id = "content_wrap" })
+                                        .Content(@<div id="content" class="@(RTL ? "k-rtl" : "k-ltr")">@RenderBody()</div>);
+                                    panes.Add()
+                                        .Size("250px")
+                                        .MinSize("200px")
+                                        .MaxSize("350px")
+                                        .Collapsible(true)
+                                        .Scrollable(true)
+                                        .Resizable(true)
+                                        .Content(@<div id="right" class="@(RTL ? "k-rtl" : "k-ltr")">
+                                            @Html.Partial("_TreeView")
+                                        </div>);
+                                }).ToString());
+                  })
+                  .Render();
+
+        }
+        else
+        {
+            Html.Kendo().Splitter().Name("sMain")
+                  .HtmlAttributes(new { style = "height: 100%; border: 0;" })
+                  .Orientation(SplitterOrientation.Vertical)
+                  .Panes(vPanes =>
+                  {
+                      vPanes.Add()
+                          .Size("26px")
+                          .Collapsible(false)
+                          .Scrollable(false)
+                          .Resizable(false)
+                          .HtmlAttributes(new { @class = "menuPanel" })
+                          .Content(@<div id="header" class="@(RTL ? "k-rtl" : "k-ltr")">@Html.Partial("_Menu")<div id="header_logof">@Html.Partial("_LogOnPartial")</div></div>);
+                      vPanes.Add()
+                          .Scrollable(false)
+                          .Content(Html.Kendo().Splitter().Name("sIn")
+                                .HtmlAttributes(new { style = "height: 100%; width: 100%; border: 0; overflow: hidden;" })
+                                .Orientation(SplitterOrientation.Horizontal)
+                                .Panes(panes =>
+                                {
+                                    panes.Add()
+                                        .Size("250px")
+                                        .MinSize("200px")
+                                        .MaxSize("350px")
+                                        .Collapsible(true)
+                                        .Scrollable(true)
+                                        .Resizable(true)
+                                        .Content(@<div id="right" class="@(RTL ? "k-rtl" : "k-ltr")">
+                                            @Html.Partial("_TreeView")
+                                        </div>);
+                                    panes.Add()
+                                        .Scrollable(true)
+                                        .HtmlAttributes(new { style = "overflow:hidden;" })
+                                        .Content(@<div id="content" class="@(RTL ? "k-rtl" : "k-ltr")">@RenderBody()</div>);
+
+                                }).ToString());
+
+                  })
+                  .Render();
+
+        }
+    </div>
+    <span id="layout_notification" style="display:none;"></span>
+    <script id="infoTemplate" type="text/x-kendo-template">
+        <div class="u-notification-info">
+            <img src="/Areas/Admin/content/icons/envelope.png" />
+            <h3>#= title #</h3>
+            <p>#= message #</p>
+        </div>
+    </script>
+
+    <script id="errorTemplate" type="text/x-kendo-template">
+        <div class="u-notification-error">
+            <img src="/Areas/Admin/content/icons/error-icon.png" />
+            <h3>#= title #</h3>
+            <p>#= message #</p>
+        </div>
+    </script>
+
+    <script id="successTemplate" type="text/x-kendo-template">
+        <div class="u-notification-success">
+            <img src="/Areas/Admin/content/icons/success-icon.png" />
+            <h3>#= message #</h3>
+        </div>
+    </script>
+</body>
+</html>

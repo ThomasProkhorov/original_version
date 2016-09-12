@@ -1,0 +1,80 @@
+@model Uco.Models.Category
+@using Uco.Infrastructure
+@using System
+@using System.Web.Mvc
+@{
+   
+
+}
+<style>
+    #Productgridfilterbox{
+        display:none;
+    }
+</style>
+<script>
+    $(function () {
+        $('#moveproductbutton').click(function (e) {
+            e.preventDefault();
+            $('#messagemoving').html('');
+            
+            if(confirm("@RP.S("Admin.Views.Category.AreYouSureToMove")"))
+            {
+                var dest = $('[name="CategoryDestination"]').val();
+                var data = {from: @Model.ID, to: dest };
+                ShowLoading($('.movewrap'));
+                $.ajax({
+                    type: "POST",
+                    dataType: "json",
+                    url: "@Url.Action("MoveProducts","Category")",
+                    cache: false,
+                    data: data
+                }).done(function (data) {
+                    $('#messagemoving').html(data.message);
+                }).always(function () {
+                    HideLoading($('.movewrap'));
+                }).error(function(){
+                    $('#messagemoving').html('Server error (500)');
+                });
+               
+            }
+        });
+
+        function ShowLoading(container) {
+            if ($('.indicatorload', container).length == 0) {
+                if ($('td', container).length > 9) {
+                    $('td:eq(9)', container).css('position','relative').append('<div class="k-loading-mask indicatorload" style="width:100%;height:100%;top:0;"><span class="k-loading-text">Loading...</span><div class="k-loading-image"><div class="k-loading-color"></div></div></div>'
+
+                   );
+                } else {
+                    var checkpos = container.css('position');
+                    if (!checkpos || checkpos == 'static')
+                    {
+                        container.css('position','relative');
+                    }
+                    container.append('<div class="k-loading-mask indicatorload" style="width:100%;height:100%;top:0;"><span class="k-loading-text">Loading...</span><div class="k-loading-image"><div class="k-loading-color"></div></div></div>'
+
+                    );
+                }
+            }
+
+            $('.indicatorload', container).show();
+        }
+        function HideLoading(container) {
+       
+            $('.indicatorload', container).hide();
+        }
+    });
+</script>
+<div class="movewrap">
+    <div>
+         <br/>
+    @Html.EditorFor(model => model, "GenericDropDown", "CategoryDestination")
+        </div>
+    <div>
+        <br/>
+     <a id="moveproductbutton" class="k-button" href="#">@RP.T("Admin.Category.MoveProducts")</a>
+        </div>
+     <br/>
+    <div id="messagemoving"></div>
+    <br/>
+</div>

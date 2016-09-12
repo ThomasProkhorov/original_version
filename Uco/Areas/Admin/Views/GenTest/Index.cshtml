@@ -1,0 +1,19 @@
+﻿@{
+    ViewBag.Title = RP.T("Admin.Views.ShopType.Index.Title");
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutNoTree.cshtml";
+}
+@using Uco.Models
+<h2>@RP.T("Admin.Views.ShopType.Index.Title")</h2>
+
+This is Generic testing page
+<div style="border:2px solid red; padding:8px;">
+@(Html.UcoKendo().Grid<ProductShop>()
+        .Column(cols =>
+        {
+            cols.GetPropertyName(x => x.ID);
+            cols.GetPropertyName(x => x.Price);
+            cols.GetPropertyName(x => x.Product.Name);
+            cols.GetPropertyName(x => x.Shop.Name);
+        })
+)
+</div>

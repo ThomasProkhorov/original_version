@@ -1,0 +1,129 @@
+﻿@model object
+@using System.Reflection
+@using System.Collections.Generic
+@using System.Linq
+@using System.ComponentModel.DataAnnotations
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutNoTree.cshtml";
+}
+<h2>@RP.T("Admin.Views.Category.Index.Title")</h2>
+
+
+
+@(Html.Kendo().Grid<Uco.Models.Category>()
+    .Name("Grid")
+    .DataSource(dataSource =>
+        dataSource.Ajax()
+            .Model(model => { model.Id(item => item.ID); })
+            .Read(r => r.Action("_AjaxIndex", "Category"))
+            .Destroy(r => r.Action("_AjaxDelete", "Category"))
+    )
+    .Columns(columns =>
+    {
+        columns.Bound(r => r.ID).Width(20);
+        columns.Bound(r => r.Name);
+        columns.Bound(r => r.DisplayOrder).Width(80);
+        columns.Bound(r => r.ParentCategoryID)
+            .ClientTemplate("# if(ParentCategory) { # #: ParentCategory.Name # # } #")
+            .Filterable(false);
+        columns.Bound(r => r.ParentCategoryID)
+            .ClientTemplate("# if(ParentCategoryID > 0 ) { # "+RP.S("Model.Category.SubCategory")
+            + " # } else { # " + RP.S("Model.Category.TopCategory") + " # } #")
+            .Filterable(false).Sortable(false);
+        columns.Bound(r => r.CachedProductCount).Filterable(false).Sortable(false);
+        columns.Bound(r => r.Image)
+            .ClientTemplate("<img src='#= Image #' alt=\"\">")
+            .Width(200);
+
+        columns.Template(r => r.ID).ClientTemplate(
+            "<a class='k-button' href='" + Url.Action("Edit", "Generic", new { model="Category" }) + "/#= ID #'" + ">" + RP.T("Admin.Views.Command.Edit").ToString() + "</a>"
+        ).Width(100);
+        columns.Command(commands =>
+        {
+            commands.Destroy();
+        }).Width(100);
+    })
+    .Pageable()
+    .Sortable()
+    .Filterable()
+    .Groupable()
+)
+<br />
+
+
+ @Html.ActionLink(RP.T("Admin.Views.Command.Create").ToString(), "Create", "Generic", new  { model = "Category" }, new { @class = "k-button" })
+<br/>
+<br />
+@using (Html.BeginForm("Export","Category",FormMethod.Post, new { enctype="multipart/form-data"})) {
+
+<div class="k-notification-wrap k-header">
+
+<div  class="k-notification-wrap">
+@RP.T("Admin.Views.Category.Index.Export")
+
+</div>
+ <input class="k-button" type="submit" name="export" value="@RP.T("Admin.Views.Category.Index.DoExport")"  />
+</div>
+}
+<br/>
+
+
+<div class="import">
+    <div class="demo-section k-header">
+        @RP.T("Admin.Views.Category.Index.Import")
+    </div>
+    <div class="demo-section k-header" id="loadzone">
+
+        <input name="attachment" id="files" type="file" />
+    </div>
+    <div><a href="/Content/ImportExamples/Categories.xlsx">@RP.T("Admin.Common.ExampleImportFile")</a></div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        function onError(e) {
+            $('#loadzone .k-upload-status-total').html("Upload error (Server error: 500)");
+            // console.log("Error (" + e + ") :: " + getFileInfo(e));
+        }
+        function onSuccess(e) {
+            if (e.response["success"] == "ok") {
+                //success
+                $('#loadzone .k-upload-status-total').html(e.response["message"] + '<span class="k-icon k-i-tick"></span>');
+            } else {
+                //error
+                $('#loadzone .k-upload-status-total').html(e.response["message"]);
+            }
+        }
+        function getFileInfo(e) {
+            return $.map(e.files, function (file) {
+                var info = file.name;
+
+                // File size is not available in all browsers
+                if (file.size > 0) {
+                    info += " (" + Math.ceil(file.size / 1024) + " KB)";
+                }
+                return info;
+            }).join(", ");
+        }
+        $("#files").kendoUpload({
+            async: {
+                saveUrl: "/Admin/Category/Import",
+                //  removeUrl: "remove",
+                autoUpload: false
+            }
+, error: onError,
+            success: onSuccess,
+            upload: function (e) {
+                console.log(e);
+                e.data = {
+
+                    import: 'Import',
+
+
+                };
+            }
+, multiple: false
+        });
+    });
+</script>

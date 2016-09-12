@@ -1,0 +1,56 @@
+﻿@using Uco.Models
+@{
+    SelectList l = new SelectList(System.Configuration.ConfigurationManager.AppSettings["Languages"].Split(',').ToList(), SF.GetLangCodeThreading());
+
+    string SkinDefault = System.Configuration.ConfigurationManager.AppSettings["SkinDefault"];
+    if (Session["SkinSelectList"] != null) { SkinDefault = Session["SkinSelectList"] as string; }
+    SelectList Skin = new SelectList(System.Configuration.ConfigurationManager.AppSettings["Skin"].Split(',').ToList(), SkinDefault);
+
+    SelectList DomainList = new SelectList(RP.GetSettingsRepositoryList(), "ID", "Domain", RP.GetAdminCurrentSettingsRepository().ID);
+
+
+    var shops = LS.Get<Shop>().Where(x => x.UserID == LS.CurrentUser.ID)
+        .Select(x => new SelectListItem() { Text = x.Name, Value = x.ID.ToString(), Selected = x.ID == LS.CurrentShopID })
+        .ToList();
+    }
+@using (Html.BeginForm("ChangeShop", "Main"))
+{
+    <span class="ShopSelectList">
+        @(Html.Kendo().DropDownList()
+            .Name("ShopSelectList")
+            .Events(e => e.Change("ShopSelectListonSelectedIndexChanged"))
+            .BindTo(shops)
+           // .DataTextField("Text")
+           // .DataValueField("Value")
+           // .Value("0")
+        )
+    </span>
+}
+@Html.R(VirtualPath, "Welcome") @Uco.Infrastructure.Livecycle.LS.CurrentUser.FirstName
+@(Uco.Infrastructure.Livecycle.LS.CurrentShop != null ? Uco.Infrastructure.Livecycle.LS.CurrentShop.Name : "")
+ @Html.ActionLink(@Html.R(VirtualPath, "LogOut"), "LogOut", "Main")
+<a class="tosite_link" href="@Url.Content("~/")">@Html.R(VirtualPath, "ToSite")</a>
+<script type="text/javascript">
+    function ShopSelectListonSelectedIndexChanged(){
+        document.forms[0].submit();
+    }
+    function LangSelectListonSelectedIndexChanged() {
+        document.forms[0].submit();
+    }
+    function SkinSelectListonSelectedIndexChanged() {
+        document.forms[1].submit();
+    }
+    function DomainSelectListonSelectedIndexChanged() {
+        document.forms[2].submit();
+    }
+</script>
+@if (LS.CurrentUser.RolesList.Contains("Admin") && SF.UseMultiDomain())
+{
+	<script>
+
+		window.setTimeout(function () {
+			alert("Session of @(Session.Timeout) min end. You will be redirected to home page.");
+			window.location.href = '/Admin';
+		}, @(Session.Timeout) * 1000 * 60);
+	</script>
+}

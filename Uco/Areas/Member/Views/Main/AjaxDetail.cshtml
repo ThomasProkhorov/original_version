@@ -1,0 +1,112 @@
+﻿@using Uco.Models
+@model Order
+           @helper EditorBox(string field)
+{
+    if (Model.OrderStatus == OrderStatus.New || Model.OrderStatus == OrderStatus.Paid)
+    {
+        <a href="javascript:void(0);" onclick="$('#editor@(field)').toggle();">@T("Admin.Order.Edit" + field)</a>
+        <div id="editor@(field)" class="dn cellwrap">
+            @Html.Editor(field)
+
+            <div style="margin-left:149px; margin-right:149px;">
+                <label for="OrderNote">@M("Order", "OrderNote"):</label> <br />
+                @Html.TextArea("OrderNote", new { @class = "k-textbox", onkeyup = "this.style.borderColor=null;" })
+                <br />
+                <a href="javascript:void(0);" class="k-button" onclick="OrderCellEditor.update(event,this,'@(field)',@Model.ID);">@T("Admin.Edit.Save")</a>
+            </div>
+
+        </div>
+    }
+}
+
+
+<div id="errorwrap" class="message_green" style="display:none;"></div>
+
+
+
+<div class="editor-label"><label for="TotalCard">@M("Order", "FullName"):</label></div>
+<div class="editor-field">@Model.FullName </div>
+
+<div class="editor-label"><label for="TotalCard">@M("Order", "ShipAddress"):</label></div>
+<div class="editor-field">@Model.ShipAddress </div>
+
+<div class="editor-label"><label for="TotalCard">@M("Order", "Phone"):</label></div>
+<div class="editor-field">@Model.Phone </div>
+
+<div class="editor-label">
+    <label for="ShippingMethod">@M("Order", "ShippingMethod"):</label>
+</div>
+<div class="editor-field">
+    @Model.ShippingMethodHebrew
+
+</div>
+
+<div class="editor-label"><label for="TotalCard">@M("Order", "OrderStatus"):</label></div>
+<div class="editor-field">@RP.T("Enums." + Model.OrderStatus.ToString()) </div>
+
+<div class="editor-label"><label for="discount">@M("Order", "TotalDiscountAmount"):</label></div>
+<div class="editor-field" id="discount">
+    @ShoppingService.FormatPrice(Model.TotalDiscountAmount)
+    @EditorBox("TotalDiscountAmount")
+    @if (!string.IsNullOrEmpty(Model.TotalDiscountDescription))
+    {
+        <span>( @Html.Raw(Model.TotalDiscountDescription) )</span>
+    }
+</div>
+
+
+
+
+<div class="editor-label"><label for="TotalCard">@M("Order", "PaymentMethod"):</label></div>
+<div class="editor-field">@RP.T("Enums." + Model.PaymentMethod.ToString()) </div>
+
+@if (Model.PaymentMethod == PaymentMethod.Cash && Model.User != null)
+{
+    <div class="editor-label"><label for="TotalCard">@M("User", "ApprovedBySms"):</label></div>
+    <div class="editor-field">@RP.T("Model.User.ApprovedBySms." + Model.User.ApprovedBySms.ToString())</div>
+
+}
+
+
+
+<div class="editor-label"><label for="TotalCard">@M("Order", "TotalCard"):</label></div>
+<div class="editor-field" id="totalcard">
+    @ShoppingService.FormatPrice(Model.Total)
+@EditorBox("Total")
+</div>
+
+<div class="editor-label"><label for="shippingPrice">@M("Order", "ShippingPriceText"):</label></div>
+<div class="editor-field" id="shippingPrice">
+    @(Model.ShippingMethod == ShippingMethod.Courier ? ShoppingService.FormatPrice(Model.ShipCost) : ShoppingService.FormatPrice(0))
+@if (Model.ShippingMethod == ShippingMethod.Courier)
+{ 
+@EditorBox("ShipCost")
+}
+</div>
+
+
+    <div class="editor-label"><label for="shippingPrice">@M("Order", "ShipTime"):</label></div>
+    <div class="editor-field" id="shippingPrice">
+        @if (Model.ShippingMethod == ShippingMethod.Courier && Model.ShippOn)
+{
+       @Model.ShipTimeStr
+}
+        else if (Model.ShippingMethod == ShippingMethod.Manual)
+        {
+            @RP.T("Enums.Manual")
+        }
+        else
+        {
+            @RP.T("Admin.Views.Order.ShipImediatly")
+        }
+    </div>
+
+
+
+@if (Model.RefundAmount > 0)
+{
+    <div class="editor-label"><label for="TotalCard">@M("Order", "RefundAmount"):</label></div>
+    <div class="editor-field">@ShoppingService.FormatPrice(Model.RefundAmount) @EditorBox("RefundAmount")</div>
+}
+
+

@@ -1,0 +1,22 @@
+﻿@model Uco.Models.Settings
+
+@{
+    ViewBag.Title = RP.T("Admin.Views.Settings.Index.Title");
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutNoTree.cshtml";
+}
+
+<h2>@ViewBag.Title</h2>
+@using Kendo.Mvc.UI;
+@using Kendo.Mvc;
+@using Uco.Infrastructure;
+
+
+@using (Html.BeginForm())
+{
+    @Html.ValidationSummary(true)
+
+    @Html.EditorForModel()
+    <p>
+        <input type="submit" class="k-button" value="@RP.T("Admin.Views.Command.Save")" />
+    </p>
+}

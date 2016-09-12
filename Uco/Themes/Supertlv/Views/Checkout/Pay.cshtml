@@ -1,0 +1,80 @@
+﻿@model Uco.Models.Order
+@using Uco.Models
+@{
+    ViewBag.Title = RP.T("Views.Checkout.Pay.ViewBagTitle");
+    Layout = "~/Themes/Supertlv/Views/Shared/_LayoutShop.cshtml";
+    ViewBag.Url = "~/Checkout/Index/";
+}
+@section FooterZone{
+}
+<script>
+    ga('ecommerce:addTransaction', {
+        'id': '@Model.ID',                     // Transaction ID. Required.
+        'affiliation': '@Model.FullName',   // Affiliation or store name.
+        'revenue': '@Model.Total',               // Grand Total.
+        'shipping': '@Model.ShipCost',                  // Shipping.
+        'tax': '@Model.Fee'                     // Tax.
+    });
+    ga('ecommerce:send');
+</script>
+
+<div class="midd_section2">
+    <div class="center_div">
+        <div class="profile_page_right_sec">
+            <h1 class="main_heading_h1_profile">@RP.T("Views.Checkout.Pay.Title")</h1>
+            <div class="paymnt_style_in">
+                <div class="payment_row2">
+                    @if (Model.PaymentMethod == PaymentMethod.Credit || Model.PaymentMethod == PaymentMethod.CreditShopOwner)
+                    {
+                        @Html.Action("_PayCreditGuard", new { ID = Model.ID })
+                    }
+                    else if (
+                        Model.PaymentMethod == PaymentMethod.ByPhone)
+                    {
+                        <div>@RP.Text("Checkout.Pay.ByPhone")</div>
+                    }
+                    else if (Model.PaymentMethod == PaymentMethod.ClubCard)
+                    {
+                        @Html.Action("_PayClubCard", new { ID = Model.ID })
+                    }
+                    else if (
+                    Model.PaymentMethod == PaymentMethod.Cash)
+                    {
+
+
+                        if (!LS.CurrentUser.ApprovedBySms)
+                        {
+                            <script>
+                                Shop.OrderID = @Model.ID;
+                                Shop.ShowSMSWindow();
+                                setTimeout(function(){
+                                    $('#phone').val('@Model.Phone');
+                                },500);
+                                $(function(){
+                                    $('#phone').val('@Model.Phone');
+                                });
+                            
+                            </script>
+                          <div>@RP.Text("Checkout.Pay.Cash")</div> 
+                        }
+                        else
+                        {
+                            <div>@RP.Text("Checkout.Pay.CashSecondTime")</div>
+                             
+                        }
+                    }
+                </div>
+            </div>
+
+            @*  @Html.Partial("_Summary", Model.Cart)*@
+            <div class="clear"></div>
+        </div>
+        <div class="prfl_left_sec">
+            @Html.Partial("_AboutSSLProtocol")
+            @Html.Action("_QuestionAnswer", "PagePart")
+        </div>
+        <div class="clear"></div>
+    </div>
+</div>
+
+<div class="dn" id="SMSPopup"></div>

@@ -1,0 +1,70 @@
+﻿    <div class="header_top1">
+        <div class="center_div">
+            <div class="logo"><a href="@Url.Action("Index", "Shop")"><img style="height:100%;" src="@(ViewBag.Logo !=null ? ViewBag.Logo : "/Content/DesignFiles/logo.png")" alt="@RP.T("Views.Shared._Header.LogoAlt")"></a></div>
+          @if(ViewBag.HideTopSearch == null || !ViewBag.HideTopSearch)
+          {   <div class="header_search">
+                <div class="row">
+                    <div class="input_text">
+                        <input type="text" name="textfield" id="searchProducts" value="" class="single-line">
+                    </div>
+                    <div class="input_img" id="searchProductBtn">
+                        <input type="image" src="~/Content/DesignFiles/search_icon.png" width="28" height="28" alt="@RP.T("Views.Shared._Header.Search")">
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+          }
+            <div class="header_top_left">
+                <div class="phne_text_header">
+                    <div class="phonico"></div>
+                    <div class="text-hephwrap">
+                    <div class="phne_text1">@RP.T("Views.Shared._Header.CustumerService")</div>
+                    <div class="phne_text2">@RP.T("Views.Shared._Header.Phone")</div>
+                    </div>
+                     
+                </div>
+                @if (!LS.isLogined())
+                {
+                <a onclick="Shop.ShowLoginReg();" href="javascript:void(0)" > <div class="header_btn"> <div><div class="header_btn_proficoicwrap"><span class="header_btn_profico"></span></div>  @RP.T("Views.Shared._Header.Account")</div></div>  </a>
+               @*<!-- Trigger the modal with a button -->
+    <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target=".myModal">Open Modal</button>
+
+
+    <!-- Modal -->*@
+                     <div style="display:none;" class="list" id="list2">
+                    <div class="rou_b">
+                        <form action="/Account/LogOn" id="login_form" method="post" class="rou_b_inner">
+                            <a href="#" id="headerLogOnSubmit" class="b_t" onclick="Shop.DoLogin(this,event);">@RP.T("Views.Shared._Header.Login")</a>
+                            <input name="Password" id="headrePassword" type="password" tabindex="2" value="" placeholder="@RP.T("Views.Shared._Header.Password")" class="i_f">
+                            <input name="UserName" id="headerUserName" type="text" tabindex="1" autofocus="autofocus" value="" placeholder="@RP.T("Views.Shared._Header.User")" class="i_f">
+                            <input class="text-box single-line" data-val="true" data-val-remote="Validate Invisible Captcha" data-val-remote-additionalfields="*.InvisibleCaptchaValue" data-val-remote-url="/Captcha/ValidateInvisibleCaptcha" id="InvisibleCaptchaValue" name="InvisibleCaptchaValue" type="hidden" value="">
+                            <div class="links1">
+                                <a href="#" onclick="Shop.ShowForgotPass(this, event);">@RP.T("Views.Shop._LoginSignupPopup.RemeberPassword")</a>
+                            </div>   
+                        </form>
+                    </div>
+                </div>
+                }
+                else{
+                <div class="header_btn cm_wi">
+                
+                <div>
+                   <div class="header_btn_proficoicwrap"><span class="header_btn_profico"></span></div> 
+                    <a class="ligin_part_name" href="@Url.Action("Index","Profile")">@RP.T("Views.Shared._Header.Hello") @LS.CurrentUser.FirstName</a>
+                    <a class="login_separate" href="javascript:void(0)">|</a>
+                    <a href="~/Account/LogOff">@RP.T("Views.Shared._Header.Logout")</a>
+                </div></div>                
+<script>
+if(Shop)
+    Shop.isLogined = true;
+</script>              
+  }
+                @*<div class="facebook_like_part">
+                    <div class="fb-like" data-href="https://www.facebook.com/SLK.co.il" data-layout="button" data-action="like" data-show-faces="false" data-share="false"></div>
+                </div>*@
+                <div class="clear"></div>
+            </div>
+            <div class="clear"></div>
+        </div>
+    </div>
+

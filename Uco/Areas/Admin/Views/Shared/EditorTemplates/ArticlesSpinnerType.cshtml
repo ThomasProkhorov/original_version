@@ -1,0 +1,5 @@
+@model string
+@{
+    SelectList Languages = new SelectList(System.Configuration.ConfigurationManager.AppSettings["ArticlesSpinnerType"].Split(',').ToList(), Model);
+}
+@Html.DropDownListFor(model => model, Languages)

@@ -1,0 +1,244 @@
+﻿@model Uco.Models.Shop
+@{
+    Layout = "~/Views/Shared/_LayoutShop.cshtml";
+    ViewBag.Url = "~/Shop/Index/" + Model.ID;
+    ViewBag.ShopID = Model.ID;
+
+    if (!string.IsNullOrEmpty(Model.Logo))
+    {
+        ViewBag.Logo = Model.Logo;
+    }
+    if (!string.IsNullOrEmpty(Model.FavIcon))
+    {
+        ViewBag.FavIcon = Model.FavIcon;
+    }
+}
+<input type="hidden" name="shopID" id="shopID" value="@Model.ID" />
+<input type="hidden" id="itemInCartText" value="@RP.T("Views.Shop._ProductGalleryItem.ItemInCartText")"/>
+<input type="hidden" id="itemInCartText2" value="@RP.T("Views.Shop._ProductGalleryItem.ItemInCartText2")" />
+
+<div data-role="drawer" id="my-drawer" style="width: 250px" data-position="left"
+     data-views="['drawer-index', 'drawer-product-popup', 'tabstrip-shoppingCart', 'tabstrip-login', 'tabstrip-filters', 'tabstrip-changeStore', 'tabstrip-poll', 'tabstrip-contact', 'tabstrip-shopInfo', 'tabstrip-profile', 'note-modal-view', 'tabstrip-changePassword', 'tabstrip-settings', 'tabstrip-profileAddress', 'tabstrip-orders', 'tabstrip-regularOrders', 'tabstrip-orderDetail', 'tabstrip-noshop', 'tabstrip-formPage', 'tabstrip-contentPage']" class="k-rtl">
+    @Html.Action("_TopMenu", "Shop", new { shopID = Model.ID })
+</div>
+
+<div data-role="view" id="drawer-index" data-init="mobileListViewEndlessScrollingProducts" data-layout="mobile-layout2" data-title="@RP.T("Views.Shop.Index.Mobile.HomeViewTitleText")" class="k-rtl">
+    <div id="list" data-style="inset" data-type="group">
+        <div id="productResultWrapper" class="productResultWrapperClass">
+        </div>
+    </div>
+</div>
+<script type="text/x-kendo-tmpl" id="noresulthtml">
+      <table class="noresulttable" style="width:100%" border="0" cellspacing="0" cellpadding="0">
+     <tr><td>@RP.T("View.Index.Mobile.NoProducts")</td></tr>  
+    </table>
+</script>
+<script type="text/x-kendo-tmpl" id="endless-scrolling-template-products">
+    <table style="width:100%" border="0" cellspacing="0" cellpadding="0">
+        #=Value#
+    </table>
+</script>
+
+<div data-role="view" id="drawer-product-popup" data-title="@RP.T("Views.Shop.Index.Mobile.ProductPopupViewTitleText")" data-layout="mobile-layout" data-use-native-scrolling="true" class="k-rtl">
+    <ul data-role="listview" data-style="inset" data-type="group">
+        <li>
+            <div id="productPopupWrapper"></div>
+        </li>
+    </ul>
+</div>
+
+<div data-role="view" id="tabstrip-shoppingCart" data-title="@RP.T("Views.Shop.Index.Mobile.ShoppingCartViewTitleText")" data-layout="mobile-layout" data-use-native-scrolling="true" class="k-rtl">
+    <ul data-role="listview" data-style="inset" data-type="group">
+        <li>
+            @Html.Action("FooterCart", "ShoppingCart", new { ID = Model.ID })
+        </li>
+    </ul>
+</div>
+
+<div data-role="view" id="tabstrip-login" data-title="@RP.T("Views.Shop.Index.Mobile.LoginViewTitleText")" data-layout="mobile-layout" data-use-native-scrolling="true" class="k-rtl">
+    <ul data-role="listview" data-style="inset" data-type="group">
+        <li>
+            @Html.Partial("_LoginSignupPopup")
+        </li>
+    </ul>
+</div>
+
+<div data-role="view" id="tabstrip-filters" data-title="@RP.T("Views.Shop.Index.Mobile.FilterViewTitleText")" data-layout="mobile-layout" data-use-native-scrolling="true" class="k-rtl">
+    <ul data-role="listview" data-style="">
+        <li style="">
+           <div>
+            <a href="javascript:void(0)" onclick="scanBar();" class="km-widget km-button">@RP.T("Views.Shop.Index.Mobile.ScanBarCode")</a>
+                </div>
+  <div style="text-align:center;">
+            <div id="interactive" class="viewport wrapcamerascan"></div>
+      </div>
+            <script>
+                $('.km-header a, .km-listview a').click(function () {
+
+                    
+                    
+                });
+                $(window).on('hashchange', function() {
+                    try{
+                        Quagga.stop();
+                    }catch(exc){
+
+                    }
+                   
+                    $('#interactive').html('').removeClass('totop');
+                    if(location.hash.length >0 && location.hash.indexOf('bar=true') > 0)
+                    {
+                        scanBar();
+                    }
+                });
+                function scanBar() {
+                    $('#interactive').addClass('totop');
+                    Quagga.init({
+                        inputStream: {
+                            name: "Live",
+                            type: "LiveStream",
+                            constraints: {
+                                width: 640,
+                                height: 480,
+                                facing: "environment" // or user
+                            }
+                        },
+                        locator: {
+                            patchSize: "large",
+                            halfSample: true
+                        },
+                        numOfWorkers: 4,
+                        locate: true,
+                        decoder: {
+                            readers: ["ean_reader","upc_reader","upc_e_reader"]
+                        }
+                    }, function () {
+                        Quagga.start();
+                    });
+                    Quagga.onProcessed(function(result) {
+                        var drawingCtx = Quagga.canvas.ctx.overlay,
+                            drawingCanvas = Quagga.canvas.dom.overlay;
+
+                        if (result) {
+                            if (result.boxes) {
+                                drawingCtx.clearRect(0, 0, parseInt(drawingCanvas.getAttribute("width")), parseInt(drawingCanvas.getAttribute("height")));
+                                result.boxes.filter(function (box) {
+                                    return box !== result.box;
+                                }).forEach(function (box) {
+                                    Quagga.ImageDebug.drawPath(box, {x: 0, y: 1}, drawingCtx, {color: "green", lineWidth: 4});
+                                });
+                            }
+
+                            if (result.box) {
+                                Quagga.ImageDebug.drawPath(result.box, {x: 0, y: 1}, drawingCtx, {color: "#00F", lineWidth: 4});
+                            }
+
+                            if (result.codeResult && result.codeResult.code) {
+                                Quagga.ImageDebug.drawPath(result.line, {x: 'x', y: 'y'}, drawingCtx, {color: 'red', lineWidth: 4});
+                            }
+                        }
+                    });
+
+                    Quagga.onDetected(function (result) {
+                        setTimeout(function () {
+                            var code = result.codeResult.code;
+                            $("#shkeywords").val(code);
+                            
+                            $('#interactive').html('').removeClass('totop');
+                            Shop.TextSearch($("#shkeywords"),{preventDefault:function(){}},@Model.ID);
+                            try{
+                                Quagga.stop();
+                            }catch(exc){}
+                        }, 500);
+                       // Quagga.stop();
+
+                       
+                        
+                    });
+                   
+                }
+            </script>
+        </li>
+        <li>
+            <div id="shoping_list_box" class="list">
+                <div class="add_shoping_list">
+                    <div class="link2"><a href="javascript:void(0)">@RP.T("Views.Shop._LeftMenu.ShoppingListTitle")</a></div>
+                    <div class="txt2">@RP.T("Views.Shop._LeftMenu.ShoppingListText")</div>
+                    <div class="line_part">
+                        <textarea style="width:100%;" class="k-input" type="text" name="keywords" value=""
+                                  placeholder="@RP.T("Views.Shop._LeftMenu.TextSearchPlaceholder")"
+                                  onkeypress="Shop.TextSearchKeyPress(this,event,@Model.ID);" id="shkeywords"></textarea>
+                    </div>                    
+                    <div class="search_btn1"><input onclick="Shop.TextSearch(this,event,@Model.ID);" width="108" type="image" height="26" alt="Search" src="~/Content/DesignFiles/search_btn1.png"></div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+        </li>
+        
+    </ul>
+</div>
+ @if (Session["OpenedFromHomePage" + Model.ID.ToString()] != null 
+    && ((DateTime)Session["OpenedFromHomePage" + Model.ID.ToString()]) > DateTime.UtcNow.AddHours(-2))
+{ 
+
+<div data-role="view" id="tabstrip-changeStore" data-title="@RP.T("Views.Shop.Index.Mobile.ChangeShopViewTitleText")" data-layout="mobile-layout" class="k-rtl">
+    <ul data-role="listview" data-style="inset" data-type="group">
+        <li>
+            @Html.Action("_ChangeShopPopup", "Shop", new { shopID = Model.ID })
+        </li>
+    </ul>
+</div>
+ }
+<div data-role="view" id="tabstrip-poll" data-title="@RP.T("Views.Shop.Index.Mobile.PollViewTitleText")" data-layout="mobile-layout" class="k-rtl">
+    <ul data-role="listview" data-style="inset" data-type="group">
+        <li>
+              @if (!LS.isLogined())
+             {
+                  @RP.T("Views.Shop.Index.Mobile.YouMustLoginFirst")
+             }
+             else { 
+            @Html.Action("Index", "Poll")
+              }
+        </li>
+    </ul>
+</div>
+
+<div data-role="view" id="tabstrip-contact" data-title="@RP.T("Views.Shop.Index.Mobile.ContactViewTitleText")" data-layout="mobile-layout" class="k-rtl">
+    <ul data-role="listview" data-style="inset" data-type="group">
+        <li>
+            @Html.Action("Contact", "Shop", new { ID = Model.ID })
+        </li>
+    </ul>
+</div>
+
+<div data-role="view" id="tabstrip-shopInfo" data-title="@RP.T("Views.Shop.Index.Mobile.ShopInfoViewTitleText")" data-layout="mobile-layout" class="k-rtl">
+    <ul data-role="listview" data-style="inset" data-type="group">
+        <li>
+          
+            @Html.Action("_GetShopInfo", "Shop", new { shopID = Model.ID })
+        </li>
+    </ul>
+</div>
+
+<div data-role="modalview" id="note-modal-view" style="width: 90%;">
+    <div data-role="header">
+        <div data-role="navbar">
+            <span>@RP.T("Views.Shop.Index.Mobile.ModalViewTitleText")</span>            
+        </div>
+    </div>
+
+    <ul data-role="listview" data-style="inset">
+        <li>
+            <textarea id="productNoteText" style="resize: none; width:100%;"></textarea>
+        </li>
+    </ul>
+    <div data-role="footer">
+        <div data-role="navbar">
+            <a data-click="closeNoteModalView" id="addProductNote" data-productid="" type="button" data-role="button" data-align="right">@RP.T("Views.Shop.Index.Mobile.SaveBtnText")</a>
+            <a data-click="closeNoteModalView" data-role="button" data-align="right">@RP.T("Views.Shop.Index.Mobile.CancelBtnText")</a>
+        </div>
+    </div>
+</div>
+
+
+<input type="hidden" id="productSuccessfullyAdded" value="@RP.T("Views.Shop.Index.Mobile.ProductSuccessfullyAdded")" />

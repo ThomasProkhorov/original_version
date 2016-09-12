@@ -1,0 +1,30 @@
+﻿@model Uco.Models.MessageTemplate
+
+@{
+    ViewBag.Title = RP.T("Admin.Views.MessageTemplate.Index.Title");
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutNoTree.cshtml";
+}
+<h2>@RP.T("Admin.Views.MessageTemplate.Index.Title")</h2>
+@using (Html.BeginForm())
+{
+    @Html.ValidationSummary(true)
+    @Html.EditorForModel()
+
+
+    var tokens = SF.GetTokensByTemplateName(Model.SystemName);
+    if (tokens != null && tokens.Count > 0)
+    {
+        <h3>@RP.T("Admin.Views.MessageTemplate.Index.AvaliableTokens")</h3>
+    <div style=" padding:5px; height:200px; overflow-y:auto; border:1px solid #f7f7f7; border-radius:5px;">
+        @foreach (var token in tokens)
+        {
+            <span style="padding:2px; padding-right:4px; display: inline-block;">@token</span> <br/>
+        }
+
+    </div>
+}
+    <p class="clear">
+        <input type="submit" class="k-button" value="@RP.T("Admin.Views.Command.Save")" />
+ @Html.ActionLink(@RP.T("Admin.Views.Command.BackToList").ToString(), "Index")
+    </p>
+}

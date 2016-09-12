@@ -1,0 +1,276 @@
+﻿@model Uco.Models.Overview.CheckoutModel
+@using Uco.Models
+@{
+    ViewBag.Title = RP.T("Views.Checkout.Index.ViewBagTitle");
+    Layout = "~/Views/Shared/_LayoutShop.cshtml";
+    ViewBag.Url = "~/Checkout/Index/";
+    Model.ShipTime = DateTime.Now;
+    ViewBag.ShopID = Model.ShopID;
+}
+<script>
+            setTimeout(function () {
+                $('.sh_cartsubtotal, .sh_carttotal').html('@Model.Cart.TotalStr');
+                $('.sh_cartcount').each(function(i,e){ $(e).html('@Model.Cart.Count')});
+            }, 100);
+    $(window).on('hashchange', function () {
+        setTimeout(function () {
+            $('.sh_cartcount').each(function (i, e) {
+                if(!$(e).text())
+                {
+                    $(e).text($('.sh_cartcount').not(':empty')[0].innerHTML);
+                }
+            });
+        }, 100);
+    });
+        </script>
+<div data-role="view" id="tabstrip-shoppingCart" data-title="@RP.T("Views.Checkout.Index.Mobile.ShoppingCartViewTitleText")" data-layout="mobile-layout" class="k-rtl">
+    <div id="list" data-style="inset">
+        
+        <div class="midd_section2">
+            <div class="center_div">
+                <div class="profile_page_right_sec">
+                    <h1 style="font-size:20px">@String.Format(RP.T("Views.Checkout.Index.Title").ToString(), Model.Cart.Shop.Name)</h1>
+                    <div class="paymnt_style_in">
+                        <div class="payment_head_right">@RP.T("Views.Checkout.Index.TotalAmount")<span class="sh_carttotal">@ShoppingService.FormatPrice(Model.Cart.Total)</span></div>
+                        <div class="payment_row2">
+                            <div>
+                                <form id="checkoutform" name="form1" method="post" action="" class="form3">
+                                    @Html.ValidationSummary(true)
+                                    <input type="hidden" name="PaymentMethod" id="PaymentMethod" value="1" />
+                                    @{
+                                        var defaultShipMethod = (int)ShippingMethod.Courier;
+                                        //public bool IsShipEnabled { get; set; }
+                                        if (!Model.Cart.IsShipEnabled)
+                                        {
+                                            defaultShipMethod = (int)ShippingMethod.Manual;
+                                        }
+                                    }
+                                    <input type="hidden" name="ShippingMethod" id="ShippingMethod" value="@defaultShipMethod" />
+                                    <div class="row">
+                                        <input type="text" name="Address" id="Address" required data-required-msg="@RP.T("Views.Checkout.Index.AddressIsRequiredText")" value="@Model.Address" placeholder="@RP.T("Views.Checkout.Index.AddressPlaceholder")" class="single-line">
+                                        @Html.ValidationMessageFor(m => m.Address)
+                                    </div>
+                                    <div class="row">
+                                        <input type="text" name="FullName" id="FullName" required data-required-msg="@RP.T("Views.Checkout.Index.FullNameIsRequiredText")" value="@Model.FullName" placeholder="@RP.T("Views.Checkout.Index.FullNamePlaceholder")" class="single-line">
+                                        @Html.ValidationMessageFor(m => m.FullName)
+                                    </div>
+                                    <div class="row">
+                                        <input type="text" name="Phone" id="Phone" required data-required-msg="@RP.T("Views.Checkout.Index.PhoneIsRequiredText")" value="@Model.Phone" placeholder="@RP.T("Views.Checkout.Index.PhonePlaceholder")" class="single-line">
+                                        @Html.ValidationMessageFor(m => m.Phone)
+                                    </div>
+                                    @*<div class="row"><input type="text" name="CompanyName" id="CompanyName" value="@Model.CompanyName" placeholder="@RP.T("Views.Checkout.Index.CompanyNamePlaceholder")" class="single-line"></div>*@
+                                    @if (Model.Cart.IsShipEnabled)
+                                    {
+                                        <div class="row shipenable">
+                                            <select name="ShippOn" id="ShippOn" onchange="if(this.value == 'true')
+{
+    $('#siponrow').show();
+    $('#ShipTime').data('kendoDateTimePicker').open();
+}else{
+$('#siponrow').hide();
+}" class="drop_down">
+                                                <option value="false">@RP.T("Checkput.Index.ShipOn.Now")</option>
+                                                <option value="true">@RP.T("Checkput.Index.ShipOn.AtTime")</option>
+                                            </select>
+                                            @Html.ValidationMessageFor(m => m.ShipTime)
+                                        </div>
+                                        <div class="row" id="siponrow" style="display:none;">
+                                            <input type="text" name="ShipTime" id="ShipTime" value="@Model.ShipTime" />
+                                            <script>
+                                                jQuery(function () { jQuery("#ShipTime").kendoDateTimePicker({timeFormat: "HH:mm", "format": "d/M/yyyy HH:mm"
+                                                    , min: new Date(@DateTime.Now.Year , @DateTime.Now.Month , @DateTime.Now.Day , @DateTime.Now.Hour, @DateTime.Now.Minute )}); })
+                                            </script>
+
+                                        </div>
+                                    }
+                                    else
+                                    {
+
+                                        <input type="hidden" name="ShippOn" id="ShippOn" value="false" />
+                                        <input type="hidden" name="ShipTime" id="ShipTime" value="@DateTime.Now.AddHours(1)" />
+                                    }
+                                    @*<div class="row">
+                                        <select name="RegularInterval" id="RegularInterval" onchange="MM_jumpMenu('parent',this,0)" class="drop_down">
+                                            @foreach (var en in Enum.GetValues(typeof(RegularInterval)))
+                                            {
+                                                <option value="@((int)en)">@RP.T("Enums." + en.ToString())</option>
+                                            }
+
+                                        </select>
+                                    </div>*@
+                                    <div class="row">
+                                        <textarea name="Note" id="Note" cols="45" rows="5" class="multi-line" placeholder="@RP.T("Views.Checkout.Index.NotePlaceholder")">@Model.Note</textarea>
+                                    </div>
+                                    <div class="row2">
+                                        <div class="tag_icon applycode" onclick="Shop.ApplyCode(@Model.ShopID,'.sh_carttotal');"><img src="/Content/DesignFiles/payment_tag.png" alt=""></div>
+                                        <div class="tag_input"><input type="text" name="CouponCode" id="CouponCode" value="@Model.CouponCode" placeholder="@RP.T("Views.Checkout.Index.CouponCodePlaceholder")" class="single-line"></div>
+                                        <div class="clear"></div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="payment_right_in_left">
+                                <div class="paymnet_text1">@RP.T("Views.Checkout.Index.PaymentType")</div>
+                                <div class="payment_icons_row1" data-ids="@Model.Cart.Shop.PaymentMethodIDs">
+                                    <ul>
+
+                                        @if (Model.Cart.Shop == null || Model.Cart.Shop.PaymentMethodIDs == null
+                                                || Model.Cart.Shop.PaymentMethodIDs.Contains("," + ((int)PaymentMethod.Credit) + ","))
+                                        {
+                                            <li onclick="document.getElementById('PaymentMethod').value = '@((int)PaymentMethod.Credit)'; $('.picon').removeClass('current'); $('.picon',$(this)).addClass('current');">
+                                                <div class="payment_icons1 picon checkico current">
+                                                    <div class="prdct_check  ">
+                                                        <img src="/Content/DesignFiles/check.png">
+                                                    </div>
+                                                </div>
+                                                <div class="paymnet_ico_text">@RP.T("Views.Checkout.Index.PaymentMethodCredit")</div>
+                                            </li>
+                                        }
+                                       @if (Model.Cart.Shop == null || Model.Cart.Shop.PaymentMethodIDs == null
+                                             || Model.Cart.Shop.PaymentMethodIDs.Contains("," + ((int)PaymentMethod.Cash) + ","))
+                                        {
+                                            <li onclick="document.getElementById('PaymentMethod').value = '@((int)PaymentMethod.Cash)'; $('.picon').removeClass('current'); $('.picon',$(this)).addClass('current');">
+                                                <div class="payment_icons2 picon checkico">
+                                                    <div class="prdct_check  ">
+                                                        <img src="/Content/DesignFiles/check.png">
+                                                    </div>
+                                                </div>
+                                                <div class="paymnet_ico_text">@RP.T("Views.Checkout.Index.PaymentMethodCash")</div>
+                                            </li>
+
+                                        }
+                                        @if (Model.Cart.Shop == null || Model.Cart.Shop.PaymentMethodIDs == null
+                                              || Model.Cart.Shop.PaymentMethodIDs.Contains("," + ((int)PaymentMethod.ByPhone) + ","))
+                                        {
+                                            <li onclick="document.getElementById('PaymentMethod').value = '@((int)PaymentMethod.ByPhone)'; $('.picon').removeClass('current'); $('.picon',$(this)).addClass('current');" style="margin-left:0px;">
+                                                <div class="payment_icons3 picon checkico">
+                                                    <div class="prdct_check  ">
+                                                        <img src="/Content/DesignFiles/check.png">
+                                                    </div>
+                                                </div>
+                                                <div class="paymnet_ico_text">@RP.T("Views.Checkout.Index.PaymentMethodByPhone")</div>
+                                            </li>
+
+                                        }
+                                       @if (Model.Cart.Shop == null || Model.Cart.Shop.PaymentMethodIDs == null
+                                         || Model.Cart.Shop.PaymentMethodIDs.Contains("," + ((int)PaymentMethod.ClubCard) + ","))
+                                        {
+                                            <li onclick="document.getElementById('PaymentMethod').value = '@((int)PaymentMethod.ClubCard)'; $('.picon').removeClass('current'); $('.picon',$(this)).addClass('current');" style="margin-left:0px;">
+                                                <div class="payment_icons2 picon checkico">
+                                                    <div class="prdct_check  ">
+                                                        <img src="/Content/DesignFiles/check.png">
+                                                    </div>
+                                                </div>
+                                                <div class="paymnet_ico_text">@RP.T("Views.Checkout.Index.PaymentMethodByPhone")</div>
+                                            </li>
+
+                                        }
+
+
+                                        <div class="clear"></div>
+                                    </ul>
+                                </div>
+
+                                @if (Model.Cart.IsShipEnabled || Model.Cart.InStorePickUpEnabled)
+                                {
+                                    <div class="paymnet_text1">@RP.T("Views.Checkout.Index.ShippingType")</div>
+
+                                    string classCurierCurrent = "current";
+                                    string classManualCurrent = "";
+                                    string classCurierTable = "";
+                                    string classManualTable = "dn";
+                                    if (!Model.Cart.IsShipEnabled)
+                                    {
+                                        classCurierCurrent = "";
+                                        classManualCurrent = "current";
+                                        classCurierTable = "dn";
+                                        classManualTable = "";
+                                    }
+                                    if (!Model.Cart.InStorePickUpEnabled)
+                                    {
+                                        classManualTable = "dn";
+                                    }
+
+
+                                    <div class="payment_icons_row1 no_border">
+                                        <ul>
+                                            @if (Model.Cart.InStorePickUpEnabled)
+                                            {
+                                                <li onclick="Shop.ChangeFreeShip(this,@((int)ShippingMethod.Manual),'@Model.Cart.SubTotalStr');">
+                                                    <div class="shicon payment_icons4 checkico @classManualCurrent">
+                                                        <div class="prdct_check  ">
+                                                            <img src="/Content/DesignFiles/check.png">
+                                                        </div>
+                                                    </div>
+                                                    <div class="paymnet_ico_text">@RP.T("Views.Checkout.Index.ShippingTypeFirstType")</div>
+
+                                                </li>
+                                            }
+                                            @if (Model.Cart.IsShipEnabled)
+                                            {
+                                                <li onclick="Shop.ChangeCostShip(this,@((int)ShippingMethod.Courier),'@Model.Cart.TotalStr');">
+                                                    <div class="shicon payment_icons5 checkico @classCurierCurrent">
+                                                        <div class="prdct_check  ">
+                                                            <img src="/Content/DesignFiles/check.png">
+                                                        </div>
+                                                    </div>
+                                                    <div class="paymnet_ico_text">@RP.T("Views.Checkout.Index.ShippingTypeSecondType") @Model.Cart.ShippingCostStr</div>
+                                                </li>
+                                            }
+                                            <div class="clear"></div>
+                                        </ul>
+                                        <p class="deliveryManualDescription  @classManualTable">
+                                            @if (Model.Cart.Shop != null)
+                                            {
+                                                <span class="paymnet_ico_text">
+                                                    @String.Format(RP.T("Views.Checkout.Index.PickYourself").ToString(), Model.Cart.Shop.DeliveryManualDescription)
+                                                </span>
+                                            }
+                                        </p>
+                                        <div class="@classCurierTable">@RP.T("Views.Checkout.Index.ShipTime.Header")</div>
+                                        <table class="k-grid @classCurierTable" id="shshipttime" style="width:100%; margin-bottom:-85px;">
+                                            <tr class="k-header">
+                                                <td>@RP.T("Views.Checkout.Index.DayText")</td>
+                                                <td>@RP.T("Views.Checkout.Index.FromText")</td>
+                                                <td>@RP.T("Views.Checkout.Index.ToText")</td>
+                                            </tr>
+                                            @foreach (var st in Model.Cart.ShipTimes)
+                                            {
+                                                <tr><td>@st.DayStr</td><td>@st.TimeFromeStr</td><td>@st.TimeToStr</td></tr>
+                                            }
+                                        </table>
+                                        <div class="@classManualTable">@RP.T("Views.Checkout.Index.WorkTime.Header")</div>
+                                        <table class="k-grid @classManualTable" id="shworkttime" style="width:100%; margin-bottom:-85px;">
+                                            <tr class="k-header">
+                                                <td>@RP.T("Views.Checkout.Index.DayText")</td>
+                                                <td>@RP.T("Views.Checkout.Index.FromText")</td>
+                                                <td>@RP.T("Views.Checkout.Index.ToText")</td>
+                                            </tr>
+                                            @foreach (var st in Model.Cart.WorkTimes)
+                                            {
+                                                <tr><td>@st.DayStr</td><td>@st.TimeFromeStr</td><td>@st.TimeToStr</td></tr>
+                                            }
+                                        </table>
+                                    </div>
+                                }
+                                <div class="payment_btn">
+                                    <input id="checkoutFormSubmitBtn" type="image" src="/Content/DesignFiles/payment_btn.png" alt="">
+                                </div>
+                            </div>
+                            <div class="clear"></div>
+                        </div>
+                    </div>
+                    @* @Html.Partial("_Summary", Model.Cart)
+                        <div class="clear"></div>*@
+                    <div class="clear"></div>
+                </div>
+                @*<div class="prfl_left_sec">
+                        @Html.Partial("_AboutSSLProtocol")
+                        @Html.Action("_QuestionAnswer", "PagePart")
+                    </div>*@
+                <div class="clear"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Html.Partial("_StaticViews.Mobile", Model.ShopID)

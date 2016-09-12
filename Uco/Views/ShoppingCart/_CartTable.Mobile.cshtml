@@ -1,0 +1,83 @@
+﻿@model Uco.Models.Overview.ShoppingCartOverviewModel
+
+
+<div class="stripmain">
+    @if (Model.IsLogined)
+    {
+        <div class="strip">
+            @if (Model.Count > 0)
+            {
+                <table>
+                    <tr>
+                        <th>@RP.T("Views.ShoppingCart._CartTable.TableHeadFirst")</th>
+                        @*<th>@RP.T("Views.ShoppingCart._CartTable.TableHeadSecond")</th>*@
+                        <th>@RP.T("Views.ShoppingCart._CartTable.TableHeadThird")</th>
+                        <th>@RP.T("Views.ShoppingCart._CartTable.TableHeadFourth")</th>
+                        <th>@RP.T("Views.ShoppingCart._CartTable.TableHeadFifth")</th>
+                    </tr>
+
+                    @for (var i = 0; i < Model.Count; i++)
+                    {                        
+                        var item = Model.Items[i];
+                        <tr class="sh_cartitem cartTableRow">
+                            <td>@item.Name <br><i class="shAttributeDescription">@item.AttributeDescription</i></td>
+                            @*<td><strong class="shPrice">@ShoppingService.FormatPrice(item.Price)</strong></td>*@
+                            <td width="72px;">
+                                <div class="prdct_qty_part">
+                                    <div class="prdct_qty_minus"><a href="#" onclick="Shop.CartDecrease(this,event,@item.ID, @if(item.MeasureUnitStep.HasValue){@item.MeasureUnitStep.Value}else{@("1")});"></a></div>
+                                    <div class="prdct_qty_show"><input type="text" class="single-line" value="@item.Quantity.ToString("0")" id="textfield" name="Quantity"></div>
+                                    <div class="prdct_qty_plus">
+                                        <a href="#" onclick="Shop.CartIncreas(this,event,@item.ID, @if (item.MeasureUnitStep.HasValue)
+                                                                                                                           {@item.MeasureUnitStep.Value}
+                                                                                                                           else
+                                                                                                                           {@("1")});"></a>
+                                    </div>
+                                    <div class="clear"></div>
+                                </div>
+                            </td>
+                            <td><strong class="shUnitPrice">@ShoppingService.FormatPrice(item.UnitPrice)</strong></td>
+                            <td><img src="~/Content/DesignFiles/tabcross.png" alt="" onclick="Shop.CartDelete(this, event, @item.ID);" /></td>
+                        </tr>
+
+
+                    }
+
+                </table>
+            }
+            else
+            {
+                @RP.T("ShoppingCart._CartTable.NoItems")
+    <script>
+    Shop.emptycart = true;
+    </script>
+
+            }
+        </div>
+
+    }
+    else
+    {
+        @RP.T("ShoppingCart._CartTable.YouNotLogined")
+    }
+
+
+    <div class="footer_bott_left">
+        <div class="footer_price_total"><span>@RP.T("Views.ShoppingCart._CartTable.Total")</span> <span id="sh_carttotalmain" class="sh_carttotalmain">@Model.SubTotalStr<span></span></div><div class="clear"></div>
+        <div class="footer_cart_btn">
+            @if (!Model.IsLogined)
+            {
+                <a href="javascript:void(0);" onclick="Shop.ShowLoginReg();">@RP.T("Views.Shared._Footer.Cart")</a> }
+            else
+            {
+                <a href="@Url.Action("Index", "ShoppingCart", new { ID = Model.ShopID })#tabstrip-shoppingCart">@RP.T("Views.Shared._Footer.Cart")</a>
+                <a class="shoping_cart2_back_btn" href="#drawer-index">@RP.T("Views.Profile.OrderDetail.Mobile.BackBtn")</a>
+            }
+        </div>
+            <script type="text/javascript">
+                $(".footerCartBtn").kendoMobileButton();
+            </script>
+
+            <div class="clear"></div>
+        </div>
+
+</div>

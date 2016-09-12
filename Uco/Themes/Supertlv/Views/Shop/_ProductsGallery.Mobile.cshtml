@@ -1,0 +1,45 @@
+﻿@model Uco.Models.Overview.ProductsSpecificationModel
+@{
+    var last = -1;
+    var cur = 0;
+    var categoryName = new string[5];
+}
+@if (Model.Specifications != null) //&& (ViewBag.RefreshFilters != null && (bool)ViewBag.RefreshFilters))
+{
+    if (Model.Specifications.Count() == 0)
+    {
+        <div>@RP.T("Views.Shop._ProductsGallery.Mobile.NoFilters")</div>
+        return;
+    }
+
+            foreach (var item in Model.Specifications.OrderBy(x=> x. Attribute))
+            {
+                if (last != item.SpecificationAttributeID)
+                {
+                    if (cur < 5) 
+                    { 
+                        categoryName[cur] = item.Attribute;
+                        cur++;
+
+                    @:<li><b>[@item.Attribute]</b></li>
+                   
+                    last = item.SpecificationAttributeID;
+                    }
+                }
+                @:<li><label><input class="checkBoxFilter" type="checkbox" data-role="switch" checked="checked" value="@item.ID" />@item.Name</label></li>
+            }            
+            <li>
+                <a data-role="button" id="filterProductsByCategory" style="width:150px">@RP.T("Views.Shop._ProductsGallery.Mobile.SearchBtn")</a>
+            </li>
+
+
+            <script type="text/javascript">
+
+                $(document).ready(function () {
+                    initFiltersComponents();
+                    initKendoMobileBtn(".productBuyBtn");
+                });
+
+            </script>
+            <div class="clear"></div>
+}

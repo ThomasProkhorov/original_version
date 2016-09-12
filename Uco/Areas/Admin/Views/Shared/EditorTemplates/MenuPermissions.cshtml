@@ -1,0 +1,17 @@
+@model string
+@{
+    List<string> CurrentMenuPermissions = Uco.Infrastructure.SF.RolesStringToList(Model);
+    List<string> MenuPermissions = Uco.Infrastructure.SF.AdminControlersList().ToList();
+}
+<div class="roles">
+<ul style="list-style:none; margin:0; padding:0;">
+@foreach (string item in MenuPermissions)
+{
+    <li>
+        <input type="checkbox" name="@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))" id="@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))_@(item)" value="@item" @(CurrentMenuPermissions.Contains(item) ? "checked=checked" : "")> 
+        <label for="@(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))_@(item)">@item</label>
+    </li>
+}
+</ul>
+</div>
+<div class="clear"></div>

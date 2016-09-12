@@ -1,0 +1,68 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+</head>
+<body>
+    <script>
+
+   window.fbAsyncInit = function() {
+       FB.init({
+           appId      : '1626666457575757',
+           xfbml      : true,
+           version    : 'v2.3'
+       });
+       FB.getLoginStatus(function (response) {
+           alert(response);
+       });
+   };
+
+    (function(d, s, id){
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) {return;}
+        js = d.createElement(s); js.id = id;
+        js.src = "//connect.facebook.net/en_US/sdk.js";
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+
+    
+
+    function afterFacebookConnect() {
+        console.log('sad');
+        FB.getLoginStatus(function (response) {
+            console.log(response);
+            if (response.authResponse) {
+
+                // console.log(response);
+                Shop.DoFacebook(response.authResponse.accessToken);
+                //  window.location = "../Account/FacebookLogin?token=" + response.authResponse.accessToken;
+            } else {
+                // user clicked Cancel
+            }
+        });
+    };
+
+    function checkLoginState() {
+        alert('asd');
+        FB.getLoginStatus(function (response) {
+            statusChangeCallback(response);
+        });
+    }
+    </script>
+    @*<fb:login-button id="fb-login-button-id"
+                     perms="email,user_checkins"
+                     onlogin="afterFacebookConnect();"
+                     autologoutlink="false"
+                     size="xlarge"></fb:login-button>*@
+
+    <fb:login-button scope="public_profile,email"
+                     onlogin="checkLoginState();">
+    </fb:login-button>
+</body>
+
+</html>

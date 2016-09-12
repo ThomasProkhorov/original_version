@@ -1,0 +1,56 @@
+﻿@model Uco.Models.Overview.ShoppingCartOverviewModel
+@{
+    var half = (int)Math.Ceiling(((decimal)Model.Count / 2));
+
+    var totalPriceTag = new TagBuilder("span");
+    totalPriceTag.AddCssClass("sh_carttotalwithoutship");
+    totalPriceTag.SetInnerText(ShoppingService.FormatPrice(Model.TotalWithoutShip));
+    
+    var shoppingCartButton = new TagBuilder("a");
+    shoppingCartButton.Attributes.Add("id", "cart-button-container");
+    shoppingCartButton.AddCssClass("shopping-cart");
+    shoppingCartButton.InnerHtml = RP.T("Views.Shared._Footer.Cart").ToHtmlString() + totalPriceTag.ToString();
+    
+    if (Model.IsLogined)
+    {
+        shoppingCartButton.Attributes.Add("href", Url.Action("Index", "ShoppingCart", new { ID = Model.ShopID }));
+    }
+    else
+    {
+        shoppingCartButton.Attributes.Add("onclick", "Shop.ShowLoginReg();");
+        shoppingCartButton.Attributes.Add("href", "javascript:void(0);");
+    }
+}
+<div class="footer_bott_strip">
+    <div class="center_div">
+        <div class="footer_bott_left">
+            <div class="footer_cart_btn">
+                @if (!Model.IsLogined)
+                {
+                    <a href="javascript:void(0);" onclick="Shop.ShowLoginReg();">@RP.T("Views.Shared._Footer.Cart")</a>
+                }
+                else
+                {
+                    <a href="@Url.Action("Index", "ShoppingCart",new { ID = Model.ShopID })">@RP.T("Views.Shared._Footer.Cart")</a>
+                }
+            </div>
+            <div class="footer_price_total bottom_total"><span>@RP.T("Views.Shared._Footer.CartTotal")</span> <span class="sh_carttotalwithoutship">@ShoppingService.FormatPrice(Model.TotalWithoutShip)</span></div>
+            <div class="clear"></div>
+        </div>
+        <div class="clear"></div>
+    </div>
+</div>
+
+<a href="" class="shopping-cart"></a>
+
+@Html.Raw(shoppingCartButton.ToString())
+
+<div style="position:relative;">
+    <div class="center_div"> <div class="footer_bott_right fTab"><a href="javascript:void(0)"><span>@RP.T("Views.Shared._Footer.MyShoppingCart")</span></a></div> </div>
+    <footer>
+        <div id="footercart" class="center_div">
+            @Html.Partial("_CartTable", Model)
+
+        </div>
+    </footer>
+</div>

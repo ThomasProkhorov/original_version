@@ -1,0 +1,49 @@
+﻿@{
+    Uco.Models.ContactSmallForm csf = new Uco.Models.ContactSmallForm();
+}
+@using Telerik.Web.Mvc.UI
+@using Telerik.Web.Mvc.UI.Fluent
+@using (Ajax.BeginForm("_SmallFormAdd", "PagePart", new AjaxOptions
+{
+    UpdateTargetId = "smal_form_update",
+    InsertionMode = InsertionMode.Replace,
+    LoadingElementId = "smal_form_loading",
+    HttpMethod = "POST"
+    
+}))
+{
+
+    <div class="contact_top" id="smal_form_update">
+        <div class="row">
+            <div class="editor-label">
+                @Html.LabelFor(model => csf.ContactName):</div>
+            <div class="editor-field">
+                @Html.EditorFor(model => csf.ContactName)
+                @Html.ValidationMessageFor(model => c.ContactName)
+            </div>
+        </div>
+        <div class="row">
+            <div class="editor-label">
+                @Html.LabelFor(model => csf.ContactPhone):</div>
+            <div class="editor-field">
+                @Html.EditorFor(model => csf.ContactPhone)
+                @Html.ValidationMessageFor(model => csf.ContactPhone)
+            </div>
+        </div>
+        <div class="row">
+            <div class="editor-label">
+                @Html.LabelFor(model => csf.ContactEmail):</div>
+            <div class="editor-field">
+                @Html.EditorFor(model => csf.ContactEmail)
+                @Html.ValidationMessageFor(model => csf.ContactEmail)
+            </div>
+        </div>
+        <div class="contact_top_submit">
+            @Html.Partial("_InvisibleCaptcha", new Uco.Models.InvisibleCaptcha())
+            <input type="image" alt="" class="submit_ajax_button" disabled="disabled" src="@Url.Content("~/Content/DesignFiles/contact_top_submit.png")" />
+            <span id="smal_form_loading" class="dn">...Loading...</span>
+        </div>
+    </div>
+    
+  
+}

@@ -1,0 +1,15 @@
+﻿@{
+    ViewBag.Title = RP.T("Views.Checkout.PayNotDone.Title");
+    Layout = null;
+    ViewBag.Url = "~/Checkout/PayNotDone";
+}
+<div style="direction:rtl; text-align:center;">
+    @Html.Raw(Uco.Infrastructure.Repositories.RP.GetTextComponent("Checkout.PayNotDone"))
+
+
+    @if(  ViewBag.ErrorText!=  null &&
+            ViewBag.ErrorCode!=null)
+    {
+        @ViewBag.ErrorText <text>-</text> @ViewBag.ErrorCode
+    }
+</div>

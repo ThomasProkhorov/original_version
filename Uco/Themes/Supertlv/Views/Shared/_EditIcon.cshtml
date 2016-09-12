@@ -1,0 +1,6 @@
+﻿@{
+    if (Uco.Infrastructure.Livecycle.LS.CurrentUser.IsInRole("Admin") && ViewBag.ID != null && ViewBag.ID != 0)
+    {
+        <a style="display:block; position:fixed; right:10px; top:10px;" href="@Url.Action("Edit", "Main", new { @area = "admin", @id = ViewBag.ID, @red = true })" title="Edit this page"><img src="@Url.Content("~/Content/DesignFiles/System/page_edit.png")" alt="Edit this page"/></a>
+    }
+}

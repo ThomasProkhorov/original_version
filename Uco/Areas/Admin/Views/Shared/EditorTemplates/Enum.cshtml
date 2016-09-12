@@ -1,0 +1,14 @@
+﻿@model Enum
+@{
+    IList<SelectListItem> Items = EnumHelper.GetSelectList(ViewData.ModelMetadata, Model);
+    foreach (var item in Items)
+    {
+        item.Text = RP.T("Enums." + item.Text).ToString();
+    }
+}
+
+@(Html.Kendo().DropDownListFor(model => model)
+    .DataTextField("Text")
+    .DataValueField("Value")
+    .BindTo(Items)
+)

@@ -1,0 +1,16 @@
+﻿@{
+    ViewBag.Title = RP.T("Admin.Views.Main.Index.Title");
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+@if (SF.UseMultiDomain() && !LS.CurrentHttpContext.Request.IsLocal)
+{
+    <div id="indexViewDiv" style=" height:100%;">
+    <iframe src="http://@(RP.GetAdminCurrentSettingsRepository().Domain)/" id="indexViewIframe" width="100%" height="400px" scrolling="auto" frameborder="0" ></iframe>
+    </div>
+}
+else
+{
+<div id="indexViewDiv" style=" height:100%;">
+    <iframe src="/" id="indexViewIframe" width="100%" height="400px" scrolling="auto" frameborder="0"></iframe>
+</div>
+}

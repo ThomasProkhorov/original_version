@@ -1,0 +1,10 @@
+@model string
+@{
+    SelectList Items = new SelectList(System.Configuration.ConfigurationManager.AppSettings["Languages"].Split(',').ToList(),Model);
+}
+@(Html.Kendo().DropDownListFor(model => model)
+    .DataTextField("Text")
+    .DataValueField("Value")
+    .BindTo(Items)
+    .Value(Model)
+)

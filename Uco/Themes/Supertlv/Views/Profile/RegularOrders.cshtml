@@ -1,0 +1,200 @@
+﻿@using Uco.Models.Overview
+@using Uco.Models
+@model User
+@{
+    ViewBag.Title = RP.T("Views.Profile.RegularOrders.ViewBagTitle");
+    Layout = "~/Themes/Supertlv/Views/Shared/_LayoutShop.cshtml";
+    ViewBag.Url = "~/Profile/RegularOrders/";
+}
+@*rewrite shopping cart footer*@
+@*@section FooterZone{
+
+    }*@
+@section topmenu{
+    @Html.Action("_TopStatus", "Profile")
+}
+<div class="midd_section">
+    <div class="center_div">
+        <div class="container one">
+            <div class="profile_left_container">
+                <div class="right_sec">
+                    <h1 class="main_heading_h1_profile main_heading_h1_profile_br">@RP.T("Views.Profile.Menu.RegularOrders")</h1>
+                    <div id="Ordergrid"></div>
+                    <script>
+
+
+                        var gridFiltering = {
+                            setFilter: function (name, value) {
+                                var grid = $("#Ordergrid").data('kendoGrid');
+                                grid.dataSource.filter({ field: name, operator: "eq", value: value });
+                                //grid.dataSource.page(1);
+                                // alert(name + value);
+                            },
+                        };
+                        $(document).ready(function () {
+
+                            /*
+                            Docs
+                            http://docs.telerik.com/kendo-ui/api/javascript/ui/grid
+                            */
+
+                            $("#Ordergrid").kendoGrid({
+                                // "toolbar": [],
+                                dataSource: {
+
+                                    type: "json",
+                                    transport: {
+                                        "prefix": "",
+                                        read: {
+                                            url: '@Url.Action("OrderRegularAjax","Profile")',
+                                            type: "POST",
+                                            dataType: "json",
+                                            // data: { filter:'ID~eq~3'  }
+                                        },
+                                    },
+
+                                    schema: {
+                                        data: "Data",
+                                        total: "Total",
+                                        errors: "Errors",
+                                        model: {
+                                            "id": "ID",
+                                            fields: {
+                                                "ID": { "type": "number", editable: false, },
+                                                "User": { "type": "object", editable: false, nullable: true, },
+                                                "TotalCard": { "type": "number" },
+                                                "TotalCash": { "type": "number" },
+                                                "ShipAddress": { "type": "string" },
+                                                "CreateOn": { "type": "date" },
+                                                "OrderStatus": { "type": "number" },
+                                                //   "OrderStatus": { "type": "object", editable: false, nullable: true, },
+                                                // "ID": {"type":"number" ,editable: false}
+                                            }
+
+                                        }
+                                    },
+
+                                    pageSize: 20,
+                                    "error": error_handler,
+                                    "sync": function (e) { this.read(); },
+                                    "serverPaging": true,
+                                    "serverSorting": true,
+                                    "serverFiltering": true,
+                                    "serverGrouping": true,
+                                    "serverAggregates": true,
+                                    //filter: { field: 'OrderStatus', operator: "eq", value: 1 },
+                                    "type": "aspnetmvc-ajax",
+                                },
+                                refresh: true,
+                                //  detailTemplate: kendo.template($("#template").html()),
+                                // detailInit: detailInit,
+                                // dataBound: function () {
+                                //this.expandRow(this.tbody.find("tr.k-master-row").first());
+                                //   },
+                                pageable: {
+                                    refresh: true,
+                                    // pageSizes: [10, 20, 50],
+                                    pageSize: 10
+                                },
+
+                                columns: [
+                    { field: "ID", title: "@M("Order", "ID")", hidden: true, sortable: false, filterable: false, },
+                    { field: "FullName", title: "@M("Order", "FullName")", sortable: false, filterable: false, },
+
+                    { field: "TotalCard", title: "@RP.T("Views.Profile.OrderDetail.Total")", sortable: false, template: '#: TotalStr #', filterable: false, },
+
+                    { field: "ShipAddress", title: "@M("Order", "ShipAddress")", sortable: false, filterable: false, },
+                    { field: "CreateOn", title: "@M("Order", "CreateOn")", format: "{0: dd/MM/yyyy HH:mm}", sortable: false, filterable: false, },
+                    { field: "OrderStatus", title: "@M("Order", "OrderStatus")", sortable: false, filterable: false, template: "#: OrderStatusStr #", },
+
+
+                    {
+                        "width": "100px",
+                        "template": "<a class=\"k-button\" href=\"/Profile/OrderDetail/#= ID #\">@RP.T("Views.Profile.Orders.Details")</a>"
+                    },
+
+                                ],
+                                //   height: 600,
+                                "scrollable": false,
+                                filterable: true,
+                                sortable: true,
+                                "editable": {
+                                    "confirmation": "@RP.T("Views.Profile.OrderDetail.ConfirmationDeleteText")",
+                                    "confirmDelete": "@RP.T("Views.Profile.OrderDetail.ConfirmDeleteText")",
+                                    "cancelDelete": "@RP.T("Views.Profile.OrderDetail.CancelDeleteText")",
+                                    "mode": "inline",
+                                    "create": true,
+                                    "update": true,
+                                    "destroy": true
+                                },
+
+
+
+                            });
+                            var Ordergrid = $("#Ordergrid").data('kendoGrid');
+                            Ordergrid.dataSource.transport.parameterMap = function (data, type) {
+
+                                // console.log(type);
+                                if (type != "read") {
+                                    for (var i in data) {
+                                        //console.log(Object.prototype.toString.call( data[i] ));
+                                        if (Object.prototype.toString.call(data[i]) === '[object Object]') {
+                                            delete data[i];
+                                        }
+                                        if (Object.prototype.toString.call(data[i]) === '[object Array]') {
+                                            delete data[i];
+                                        }
+                                        if (Object.prototype.toString.call(data[i]) === '[object Date]') {
+                                            data[i] = kendo.toString(kendo.parseDate(data[i]), "G");// Date.parse(data[i]);
+                                        }
+                                        //if(i == 'UserID' && !data[i]){
+                                        //    data[i]=
+                                        // }
+                                        //@ViewBag.AdditionalFilterField", operator: "eq", value:
+                                    }
+                                }
+
+                                kendo.data.transports["aspnetmvc-ajax"](data);
+                                data = new kendo.data.transports["aspnetmvc-ajax"]({ prefix: "" }).parameterMap(data, type);
+                                //  console.log(data);
+                                return data;
+                            }
+
+                            function error_handler(e) {
+
+                                if (e.errors) {
+                                    e.preventDefault();   // cancel grid rebind if error occurs
+                                    var message = "Errors:\n";
+                                    $.each(e.errors, function (key, value) {
+                                        if ('errors' in value) {
+                                            $.each(value.errors, function () {
+                                                message += this + "\n";
+                                            });
+                                        }
+                                    });
+                                    alert(message);
+                                }
+                            }
+                            function detailInit(e) {
+                                var detailRow = e.detailRow;
+                                console.log(e);
+
+
+                            }
+
+                        });
+
+                    </script>
+
+
+
+
+
+                </div>
+            </div>
+            @* Menu *@
+            @Html.Partial("_Menu")
+        </div>
+        <div class="clear"></div>
+    </div>
+</div>

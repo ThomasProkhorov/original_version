@@ -1,0 +1,108 @@
+﻿@model IEnumerable<Uco.Models.Overview.ProductOverviewModel>
+
+<div class="list_prdct_page">
+    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr class="headings_tab">
+            <td align="center" valign="middle" class="list_prdct_clm1">&nbsp;</td>
+            <td align="center" valign="middle" class="list_prdct_clm2">@RP.T("Views.Shop._ProductsTable.TableTitleProduct")</td>
+            <td align="center" valign="middle" class="list_prdct_clm3">@RP.T("Views.Shop._ProductsTable.TableTitleManufacturer")</td>            
+            <td align="center" valign="middle" class="list_prdct_clm5">@RP.T("Views.Shop._ProductsTable.TableTitlePrice")</td>
+            <td align="center" valign="middle" class="list_prdct_clm6">&nbsp;</td>
+            <td align="center" valign="middle" class="list_prdct_clm7">@RP.T("Views.Shop._ProductsTable.TableTitleQuantity")</td>
+            <td align="center" valign="middle" class="list_prdct_clm8">&nbsp;</td>
+            <td align="center" valign="middle" class="list_prdct_clm9">&nbsp;</td>
+            <td align="center" valign="middle" class="list_prdct_clm10">&nbsp;</td>
+            <td align="center" valign="middle" class="list_prdct_clm11">&nbsp;</td>
+        </tr> 
+        
+            @Html.Partial("_ProductTableItem", Model)
+        
+    </table>
+</div>
+                      <script>
+                          $('.parentcssTooltip').poshytip({
+                              className: 'tip-green',
+                              offsetX: -7,
+                              offsetY: 16,
+                              alignX: 'inner-left',
+                              allowTipHover: true
+                          });
+                      </script>    
+@{
+    var last = -1;
+    var cur = 0;
+    var categoryName = new string[5];
+}
+
+@if (ViewBag.Specifications != null && (ViewBag.RefreshFilters != null && (bool)ViewBag.RefreshFilters))
+{
+    <div id="indexFiltersSource" class="all_search_part" style="display: none;">
+        <ul>
+            @foreach (var item in ((List<Uco.Models.Overview.SpecificationOptionModel>)ViewBag.Specifications).OrderBy(x=> x. Attribute))
+            {
+                if (last != item.SpecificationAttributeID)
+                {
+                    if (cur < 5) 
+                    { 
+                        categoryName[cur] = item.Attribute;
+                        cur++;
+
+                        if (last > 0)
+                        {
+                            @: </select></div></li>
+                        }
+                        var id = "ms";
+                        id = "ms" + cur.ToString();
+                        @:<li><div><select id="@id" multiple="multiple">
+                        last = item.SpecificationAttributeID;
+                    }
+                }
+                <option value="@item.ID">@item.Name</option>
+            }
+            @if (last > 0)
+            {
+                @: </select></div></li>
+            }
+
+            </ul>
+            <div class="clear"></div>
+            </div>
+
+            <script type="text/javascript">
+
+$("#indexProductFilters").empty();
+    @{int i = 0;}
+    @foreach(var m in categoryName)
+    { i++;
+
+        <text>
+        $("#ms" +@i).unbind().change(function () {
+
+            lazyLoadStop = false;
+            getCheckedFilterValue();
+            $.ajax({
+                type: "POST",
+                dataType: "html",
+                traditional: true,
+                url: "/Shop/_GetProductByCategoryAndFilters",
+                data: { shopID: SearchProductData.shopID, categoryID: SearchProductData.categoryID, filters: SearchProductData.filters, viewIn: SearchProductData.viewIn, refreshFilters : false },
+                cache: false,
+            }).done(function (html) {
+                $("#productResultWrapper").html(html);
+            });
+        }).multipleSelect({
+            width: '100%',
+            selectAllText: 'בחר הכל',
+            allSelected: 'כל נבחר',
+            placeholder: '@m'
+
+        });
+    </text>
+
+    }
+
+$("#indexProductFilters").append($("#indexFiltersSource"));
+$("#indexFiltersSource").show();
+            </script>
+            <div class="clear"></div>
+}

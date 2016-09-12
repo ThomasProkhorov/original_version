@@ -1,0 +1,96 @@
+﻿@model Uco.Models.LogOnModel
+@{
+    ViewBag.Title = Html.R("Title");
+    ViewBag.Url = Request.Url.PathAndQuery;
+    ViewBag.HideTopSearch = true;
+    Layout = "~/Views/Shared/_LayoutShop.cshtml";
+    
+    
+}
+
+<script>
+    $(function(){
+     @if(Request.QueryString["ReturnUrl"] !=null)
+     {
+         <text> Shop.RedirectOnly = true;
+         Shop.redirectUrl = '@Request.QueryString["ReturnUrl"]'; </text>
+     }
+        Shop.ShowLoginReg();
+    });
+</script>
+
+<div class="midd_section2">
+            <div class="center_div">
+ @Html.Action("ContentBySeo", "PagePart", new { SeoUrl = "whoarewe" })
+</div>
+    </div>
+
+@*<script>
+    window.fbAsyncInit = function () {
+        FB.init({
+            appId: '1626666457575757',
+            xfbml: true,
+            version: 'v2.3'
+        });
+    };
+
+    (function (d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) { return; }
+        js = d.createElement(s); js.id = id;
+        js.src = "//connect.facebook.net/en_US/sdk.js";
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+    function afterFacebookConnect() {
+        FB.getLoginStatus(function (response) {
+            if (response.authResponse) {
+
+                // console.log(response);
+                Shop.DoFacebook(response.authResponse.accessToken, "/Profile/Index/");
+                //  window.location = "../Account/FacebookLogin?token=" + response.authResponse.accessToken;
+            } else {
+                // user clicked Cancel
+            }
+        });
+    };
+</script>
+
+@Html.ValidationSummary(true, @Html.R("LogOnError"))
+@using (Html.BeginForm()) {
+    <div>
+        <div class="editor-label">
+            @Html.LabelFor(m => m.UserName, RP.S("View.Account.Email"))
+        </div>
+        <div class="editor-field">
+            @Html.TextBoxFor(m => m.UserName)
+            @Html.ValidationMessageFor(m => m.UserName)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(m => m.Password)
+        </div>
+        <div class="editor-field">
+            @Html.PasswordFor(m => m.Password)
+            @Html.ValidationMessageFor(m => m.Password)
+        </div>
+
+        <div class="editor-label">
+            @Html.CheckBoxFor(m => m.RememberMe)
+            @Html.LabelFor(m => m.RememberMe)
+        </div>
+
+        @Html.Hidden("returnUrl", ViewBag.ReturnUrl as string)
+
+        @Html.Partial("_InvisibleCaptcha", new Uco.Models.InvisibleCaptcha())
+
+        <p>
+            <input type="submit" class="loginb k-button" value="@Html.R("LogOn")" />
+        </p>
+        <fb:login-button perms="email,user_checkins" onlogin="afterFacebookConnect();"
+                         autologoutlink="false" size="xlarge"></fb:login-button>
+        <div id="fb-root" style="display:inline; margin-left:20px;"></div>
+        <p></p>
+        <div><a href ="@Url.Action("SendPassword")">@Html.R("BackToSendPassword")</a></div>
+        <div><a href ="@Url.Content("~/")">@Html.R("BackToSite")</a></div>
+    </div>
+}*@

@@ -1,0 +1,14 @@
+﻿@model Uco.Models.Error
+
+@{
+    ViewBag.Title = RP.T("Admin.Views.Error.Index.Title");
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutNoTree.cshtml";
+}
+
+<h2>@RP.T("Admin.Views.Error.Index.Title")</h2>
+
+@Html.DisplayForModel()
+
+<p>
+    @Html.ActionLink(@RP.T("Admin.Views.Command.BackToList").ToString(), "Index")
+</p>

@@ -1,0 +1,183 @@
+﻿@using Uco.Models;
+@helper RenderDesignStyle(ShopDesign config)
+{
+    <style>
+            .product_green_btn, .cart2_btn2 ul li.green, .product_green_btn3,.top_prod_zone .product_green_btn
+        ,.display-table .prdct_qty_plus, .display-table .prdct_qty_minus{
+            @if (!string.IsNullOrEmpty(config.BuyButtonBackground))
+            {
+            <text>background: @config.BuyButtonBackground;</text>
+            }
+               @if(!string.IsNullOrEmpty(config.BuyButtonBorderColor))
+            {
+            <text>border-color: @config.BuyButtonBorderColor;</text>
+            }
+            }
+        .product_green_btn a, .cart2_btn2 ul li.green a, .product_green_btn3 a,.top_prod_zone .product_green_btn a
+        ,.display-table .prdct_qty_plus a, .display-table .prdct_qty_minus a{
+          @if (!string.IsNullOrEmpty(config.BuyButtonTextColor))
+            {
+            <text>color: @config.BuyButtonTextColor;</text>
+            }
+        }
+        .product_green_btn:hover, .product_brown_btn,.top_prod_zone .product_green_btn:hover
+        ,.display-table .prdct_qty_plus:hover, .display-table .prdct_qty_minus:hover{
+          @if (!string.IsNullOrEmpty(config.BuyButtonHoverBackground))
+            {
+            <text>background: @config.BuyButtonHoverBackground;</text>
+            }
+               @if(!string.IsNullOrEmpty(config.BuyButtonHoverBorderColor))
+            {
+            <text>border-color:@config.BuyButtonHoverBorderColor;</text>
+            }
+        }
+        .product_green_btn:hover a,.product_brown_btn a,.top_prod_zone .product_green_btn:hover a
+        ,.display-table .prdct_qty_plus:hover a, .display-table .prdct_qty_minus:hover a{
+          @if (!string.IsNullOrEmpty(config.BuyButtonHoverTextColor))
+            {
+            <text>color: @config.BuyButtonHoverTextColor;</text>
+            }
+        }
+        .product_box_open_opacback{
+        @if (!string.IsNullOrEmpty(config.ProductBoxBackground))
+            {
+            <text>background: @config.ProductBoxBackground;</text>
+            }
+
+        }
+        .main_heading, .nav, .footer_bott_strip, footer, .main_heading_h1_profile{
+        @if (!string.IsNullOrEmpty(config.ProductBoxBackground))
+            {
+            <text>background: @config.ProductBoxBackground;</text>
+            }
+        }
+        .product_price, .car2_left_price span, .shoping_cart2_tab_listing td .price{
+         @if (!string.IsNullOrEmpty(config.ProductPriceColor))
+            {
+            <text>color: @config.ProductPriceColor;</text>
+            }
+        }
+        .nav1 ul li a:hover, .quntitytypespan , .header_btn div a, .orange-color, .nav ul li a:hover{
+         @if (!string.IsNullOrEmpty(config.HightLightColor))
+            {
+            <text>color: @config.HightLightColor !important;</text>
+            }
+        }
+        .footer_cart_btn, .cart2_btn2 ul li.orange, .cart2_left_heading, .header_search .row .input_img, .header_btn_proficoicwrap
+        ,.shopping-cart{
+          @if (!string.IsNullOrEmpty(config.HightLightColor))
+            {
+            <text>background: @config.HightLightColor!important;</text>
+             <text>border-color: @config.HightLightColor;</text>
+            }
+        }
+        .phonico{
+         @if (!string.IsNullOrEmpty(config.HightLightColor))
+            {
+            <text>background-color: @config.HightLightColor;</text>
+             <text>border-color: @config.HightLightColor;</text>
+            }
+        }
+             @if (!string.IsNullOrEmpty(config.PanelHeaderBackground))
+            {
+           <text>footer{
+         border-top: 5px solid @config.PanelHeaderBackground;
+        }
+        .footer_bott_strip{
+         border-bottom: 5px solid @config.PanelHeaderBackground;
+        }
+        .closefootercart{
+        display:none!important;
+        }
+        </text>
+             }
+        .left_part1_heading, .footer_bott_right, .payment_left_head
+        {
+        @if (!string.IsNullOrEmpty(config.PanelHeaderBackground))
+            {
+            <text>background: @config.PanelHeaderBackground;</text>
+             <text>border-color: @config.PanelHeaderBackground;</text>
+            }
+        }
+        .km-ios #my-drawer .km-content, .km-android #my-drawer .km-content, .km-blackberry #my-drawer .km-content
+        , .km-ios #my-drawer .km-list > li, .km-android #my-drawer .km-list > li, .km-blackberry #my-drawer .km-list > li
+        , .km-ios #my-drawer .km-listview-link > .km-icon, .km-android #my-drawer .km-listview-link > .km-icon
+        , .km-blackberry #my-drawer .km-listview-link > .km-icon, .km-ios #my-drawer .km-list li > .km-icon
+        , .km-android #my-drawer .km-list li > .km-icon, .km-blackberry #my-drawer .km-list li > .km-icon {
+
+         @if (!string.IsNullOrEmpty(config.MobileMenuBackground))
+            {
+            <text>background-color: @config.MobileMenuBackground;</text>
+            }
+             @if (!string.IsNullOrEmpty(config.MobileMenuColor))
+            {
+            <text>color: @config.MobileMenuColor;</text>
+            }
+}
+        .km-ios #my-drawer .km-group-title, .km-blackberry #my-drawer .km-group-title {
+    @if (!string.IsNullOrEmpty(config.MobileMenuBackground))
+            {
+            <text>background-color: @config.MobileMenuBackground;</text>
+            }
+             @if (!string.IsNullOrEmpty(config.MobileMenuColor))
+            {
+            <text>color: @config.MobileMenuColor;</text>
+            }
+            }
+            .km-ios .km-view .km-content .km-button {
+         @if (!string.IsNullOrEmpty(config.MobileBuyButton))
+            {
+            <text>background-color: @config.MobileBuyButton;</text>
+             <text>border-color: @config.MobileBuyButton;</text>
+            }
+        }
+         .km-ios .km-view .km-tabstrip .km-button ,.km-ios .km-view .km-tabstrip .km-button.km-state-active
+         {
+         @if (!string.IsNullOrEmpty(config.MobileHeaderBackground))
+            {
+            <text>background-color: @config.MobileHeaderBackground;</text>
+             <text>border-color: @config.MobileHeaderBackground;</text>
+            }
+        }
+        .km-ios .km-view .km-navbar .km-button {
+     @if (!string.IsNullOrEmpty(config.MobileSearchButton))
+            {
+            <text>background-color: @config.MobileSearchButton;</text>
+             <text>border-color: @config.MobileSearchButton;</text>
+            }
+}
+        .listing_tab td {
+         @if (!string.IsNullOrEmpty(config.MobileProductBoxText))
+            {
+            <text>color: @config.MobileProductBoxText;</text>
+            }
+        }
+         .header_top1 {
+         @if (!string.IsNullOrEmpty(config.TopHeaderBackground))
+            {
+            <text>background-color: @config.TopHeaderBackground;</text>
+             <text>border-color: @config.TopHeaderBackground;</text>
+            }
+        }
+
+    </style>
+}
+@if (ViewBag.ShopID != null)
+{
+    var sid = (int)ViewBag.ShopID;
+    var config = LS.Get<ShopDesign>().FirstOrDefault(x => x.ShopID == sid);
+    if (config != null && config.Active)
+    {
+
+        if (!string.IsNullOrEmpty(config.RenderedStyle))
+        {
+            @Html.Raw(config.RenderedStyle)
+        }
+        else
+        {
+            config.RenderedStyle = RenderDesignStyle(config).ToHtmlString();
+            @Html.Raw(config.RenderedStyle)
+        }
+
+    }
+}

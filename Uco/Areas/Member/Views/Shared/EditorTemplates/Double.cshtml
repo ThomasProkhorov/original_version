@@ -1,0 +1,7 @@
+@model System.Double
+@(Html.Kendo().NumericTextBox()
+    .Name(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))
+    .Value(Model)
+    .Decimals(4)   //always display 4 digits
+)
+

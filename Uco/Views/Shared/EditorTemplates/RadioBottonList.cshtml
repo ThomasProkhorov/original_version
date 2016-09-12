@@ -1,0 +1,15 @@
+@model string
+@{
+    string RequiredTitle = (string)ViewData["RequiredTitle"];
+    if (!string.IsNullOrEmpty(RequiredTitle))
+    {       
+        List<string> items_list = new List<string>(RequiredTitle.Split(',').ToList());
+        foreach(string item in items_list)
+        {
+            @Html.DisplayFor(model => item)
+            <input type="radio" name="@ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty)" value="@item" />
+        }
+    }
+
+}
+

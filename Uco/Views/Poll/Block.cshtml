@@ -1,0 +1,53 @@
+﻿@using Uco.Models.Overview
+@using Uco.Models
+@model Poll
+@{
+
+
+}
+@if(!Model.IsRating)
+{
+<div class="heading">@Model.Question</div>
+                    <ul>
+@foreach(var pv in Model.Variants)
+{
+                    	<li>
+                        	<div class="radio_btn"><input type="radio" name="poll@(Model.ID)" id="poll@(Model.ID)_@(pv.ID)" value="@pv.ID"></div>
+                            <div class="radio_text"><label for="poll@(Model.ID)_@(pv.ID)">@pv.Value</label></div>
+                            <div class="clear"></div>
+                        </li>
+}
+            
+                    </ul>
+
+}else{
+<div class="one">@Model.Question</div>
+                            <div class="two">
+                            	<div class="abslt_text1">כלל לא</div>
+                            	<div class="radio_btn"><input type="radio" name="poll@(Model.ID)" id="poll@(Model.ID)_1" value="1"></div>
+                                <div class="radio_text"><label for="poll@(Model.ID)_1">1</label></div>
+                                <div class="clear"></div>
+                            </div>
+                            <div class="two">
+                            	<div class="radio_btn"><input type="radio" name="poll@(Model.ID)" id="poll@(Model.ID)_2" value="2"></div>
+                                <div class="radio_text"><label for="poll@(Model.ID)_2">2</label></div>
+                                <div class="clear"></div>
+                            </div>
+                            <div class="two">
+                            	<div class="radio_btn"><input type="radio" name="poll@(Model.ID)" id="poll@(Model.ID)_3" value="3"></div>
+                                <div class="radio_text"><label for="poll@(Model.ID)_3">3</label></div>
+                                <div class="clear"></div>
+                            </div>
+                            <div class="two">
+                            	<div class="radio_btn"><input type="radio" name="poll@(Model.ID)" id="poll@(Model.ID)_4" value="4"></div>
+                                <div class="radio_text"><label for="poll@(Model.ID)_4">4</label></div>
+                                <div class="clear"></div>
+                            </div>
+                            <div class="two">
+                            	<div class="abslt_text2">במידה רבה מאוד</div>
+                            	<div class="radio_btn"><input type="radio" name="poll@(Model.ID)" id="poll@(Model.ID)_5" value="5"></div>
+                                <div class="radio_text"><label for="poll@(Model.ID)_5">5</label></div>
+                                <div class="clear"></div>
+                            </div>
+                            <div class="clear"></div>
+}

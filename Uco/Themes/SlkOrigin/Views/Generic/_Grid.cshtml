@@ -1,0 +1,912 @@
+﻿@model dynamic
+@using Uco.Infrastructure
+@using System
+@{
+   
+System.Type t = Model.GetType();
+
+var ModelName = t.Name;
+var gridName = t.Name+"grid";
+if (TempData["GridPrefix"] != null)
+{
+    gridName =((string)TempData["GridPrefix"])+ gridName;
+}
+ // ViewBag.Title = RP.T("Admin.Views."+ModelName+".Index.Title");
+    Layout = null;
+// getting config
+var dnAttribute = LS.GetModelGeneral(t, ViewBag.CurrentRole);
+var customLabel = new Dictionary<string, string>();
+if(TempData["CustomLabel"]!= null)
+{
+    customLabel = (Dictionary<string, string>)TempData["CustomLabel"];
+}
+ var pDict = t.GetProperties().ToDictionary(x=>x.Name);
+ var Filter = new Dictionary<Type, string>();
+ bool IsSelectGrid = TempData["IsSelectGrid"] != null;
+ string TitleSelector = (string)TempData["SelectGridTitleSelector"];
+ string PreSorting = "";
+ List<string> filters = new List<string>();
+ if (TempData["FilterList"]!= null)
+ {
+     filters = (List<string>)TempData["FilterList"];
+ }
+ var extendFilters = new Dictionary<string, object>();
+ if (TempData["FilterExtendedList"] != null)
+ {
+     extendFilters = (Dictionary<string, object>)TempData["FilterExtendedList"];
+ }
+ bool IsUcoColumn = false;
+  Dictionary<string, string> _columns = new Dictionary<string, string>();
+ if(ViewData["UcoColumns"] != null)
+ {
+_columns = (Dictionary<string, string>)ViewData["UcoColumns"];
+IsUcoColumn = true;
+}
+}
+
+@using System.Reflection
+@using System.Collections.Generic
+@using System.Linq
+@using System.ComponentModel.DataAnnotations
+<h2>@ViewBag.Title</h2>
+
+@if (TempData["TopFilter"] !=  null || pDict.Values.Any(y => y.GetCustomAttributes<ModelAttribute>()
+    .Where(x => x.Role == ViewBag.CurrentRole || x.Role == null)
+    .OrderByDescending(x => x.Role).ToList().FirstOrDefault() != null
+    && 
+     y.GetCustomAttributes<ModelAttribute>()
+    .Where(x => x.Role == ViewBag.CurrentRole || x.Role == null)
+    .OrderByDescending(x => x.Role).ToList().FirstOrDefault().FilterOnTop
+    ))
+{ 
+<div id="@(gridName)filterbox" class="gridfilterbox">
+
+    @foreach (var p in pDict.Values)
+    {
+
+        var attr = (DisplayAttribute)p.GetCustomAttribute(typeof(DisplayAttribute));
+        var fTitle = p.Name;
+
+        if (p.Name.Contains("ID") && pDict.ContainsKey(fTitle.Replace("ID", "")))
+        {
+            continue;
+        }
+        if (attr != null)
+        {
+            // fTitle = attr.Name;
+        }
+        var curProp = p.PropertyType;
+        var opt = (ModelAttribute)p.GetCustomAttributes<ModelAttribute>
+            ().Where(x => x.Role == ViewBag.CurrentRole || x.Role == null).OrderByDescending(x => x.Role).ToList().FirstOrDefault();
+        if (opt != null && opt.FilterOnTop || filters.Contains(p.Name))
+        {
+            
+                                                if(p.PropertyType.IsGenericType){
+                                                    //  continue;
+                                                    if (p.PropertyType.Name == "Nullable`1")
+                                                    {
+                                                      curProp = p.PropertyType.GenericTypeArguments[0];
+                                                    }
+                                                   
+                                              }
+            <div class="editor-label">
+    @if (customLabel.ContainsKey(p.Name))
+    {
+         @Html.Label(p.Name, customLabel[p.Name])
+    }
+    else { 
+    @Html.Label(p.Name)
+    }</div>
+            <div class="editor-field">
+                @if (p.PropertyType.Namespace == "Uco.Models" && p.PropertyType.BaseType.Name != "Enum")
+                {
+                    var newModel = Activator.CreateInstance(p.PropertyType);
+                    string editorTemplate = "GenericDropDown";
+                    var UIhint = (UIHintAttribute)p.GetCustomAttribute<UIHintAttribute>();
+                    if (UIhint != null)
+                    {
+                        editorTemplate = UIhint.UIHint;
+                    }
+                    ViewData.TemplateInfo.HtmlFieldPrefix = p.Name + "ID";
+                if(!string.IsNullOrEmpty(opt.KeyField))
+                {
+                    ViewData.TemplateInfo.HtmlFieldPrefix = opt.KeyField;
+                }
+                    ViewData["KeyField"] = "ID";
+                if (!string.IsNullOrEmpty(opt.ForeignKey))
+                {
+                    ViewData["KeyField"] = opt.ForeignKey;
+                }
+                    @Html.Partial("EditorTemplates/" + editorTemplate, newModel)
+                    ViewData.TemplateInfo.HtmlFieldPrefix = "";
+                    
+                }
+                else
+                {
+                    @Html.Editor(p.Name)
+                   if (curProp.Name == "DateTime")
+                   { 
+                       <text> - </text>
+                        ViewData.TemplateInfo.HtmlFieldPrefix = p.Name+"_dateto";
+                         @Html.Partial("EditorTemplates/DateTime", DateTime.Now)
+                    @*@Html.Editor(p.Name)*@
+                     ViewData.TemplateInfo.HtmlFieldPrefix = "";
+                    }
+                }
+            </div>
+        }
+
+
+    }
+    @foreach (var extf in extendFilters)
+    {
+        var filterType = extf.Value.GetType();
+        <div class="editor-label">@Html.Label(extf.Key.Replace(".", "_"), RP.S("Models." + extf.Key))</div>
+            <div class="editor-field">
+@if (filterType.Namespace == "Uco.Models" && filterType.BaseType.Name != "Enum")
+                {
+                    var newModel = Activator.CreateInstance(filterType);
+                    string editorTemplate = "GenericDropDown";
+
+                    ViewData.TemplateInfo.HtmlFieldPrefix = extf.Key;
+
+    @Html.Partial("EditorTemplates/" + editorTemplate, newModel)
+                    ViewData.TemplateInfo.HtmlFieldPrefix = "";
+                    
+                }
+                else
+                {
+                @Html.Editor(extf.Key)
+                }
+                </div>
+        
+    }
+
+    <div class="button-wrap">
+        <a href="javascript:void(0);" class="k-button" onclick="@(gridName)Filtering.filter('@(gridName)filterbox');">@RP.T("Admin.Common.Button.Search")</a>
+        <a href="javascript:void(0);" class="k-button" onclick="@(gridName)Filtering.clear();">@RP.T("Admin.Common.Button.Clear")</a>
+    </div>
+
+</div>
+<br/>
+}
+<div id="@(gridName)"></div>
+
+
+<script>
+
+    var @(gridName)Filtering = {
+        filter: function (id) {
+            var data = { logic: "and", filters: [] };
+            //{ field: "name", operator: "startswith", value: "Jane" }
+            var grid = $("#@(gridName)").data('kendoGrid');
+            //  console.log(grid.dataSource.options.schema.model);
+            $('#' + id + ' input').each(function (i, e) {
+                if ($(e).attr('name') && $(e).val())
+                {
+                    var inpname = $(e).attr('name');
+                    var objname = inpname.split(".")[0];
+                    if(objname in grid.dataSource.options.schema.model.fields)
+                    {
+
+                        var model = grid.dataSource.options.schema.model.fields[objname];
+                        if(model.type == 'number' || model.type == 'object'){
+                            if($(e).attr('data-zero') && $(e).val() < 1)
+                            {
+                                return;
+                            }
+                        }
+                        var operator = 'eq';
+                        if(model.type == 'date'){
+                            operator = 'gt'; // >
+                            var todate = $('#' + id + ' input[name="'+inpname+'_dateto"]');
+                            if(todate.length >0)
+                            {
+                                data.filters.push({ field: $(e).attr('name'), operator: 'lte', value: model.parse(todate.val()) });
+                            }
+                        }
+                        if(model.type == 'string'){
+                            operator = 'contains'; // .startswith
+                        }
+                        //lte <=
+                        //  console.log(model);
+                        var parseVal = $(e).val();
+                        if(model.type != 'object')
+                        {
+                            parseVal =model.parse(parseVal);
+                        }
+                        data.filters.push({ field: $(e).attr('name'), operator: operator, value: parseVal });
+                    }
+
+                }
+            });
+
+            grid.dataSource.filter(data);
+
+        },
+        clear: function () {
+            var grid = $("#@(gridName)").data('kendoGrid');
+            grid.dataSource.filter({});
+        },
+        setFilter: function (name, value) {
+            var grid = $("#@(gridName)").data('kendoGrid');
+            grid.dataSource.filter({ field: name, operator: "eq", value: value });
+            //grid.dataSource.page(1);
+            // alert(name + value);
+        },
+    };
+
+    function IntToTime(i) {
+        var hr = Math.floor(i / 60);
+        var mn = i % 60 ; if(mn<10){mn='0'+mn;}
+        //  var part ="AM";
+        // if(hr>12)
+        //  {
+        //    hr-=12;
+        //     part="PM";
+        // }
+        // if(hr == 0){hr = 12;}
+        var time = hr + ":" + mn;// + " " + part;
+        return time;
+    }
+    @foreach(var p in pDict.Values)
+    {
+        if (p.PropertyType.BaseType != null && p.PropertyType.BaseType.Name == "Enum")
+    {
+        <text>
+
+    var @(p.PropertyType.Name)Enums = {
+        @foreach( var en in Enum.GetValues(p.PropertyType) )
+            {
+<text>@((int)en):'@RP.T("Enums."+en.ToString())', </text>
+
+        }
+
+    };
+    </text>
+        }
+    }
+    $(document).ready(function () {
+        /*
+        Docs
+        http://docs.telerik.com/kendo-ui/api/javascript/ui/grid
+        */
+        var gridLocal = function(){
+            if('messages' in kendo.ui.Grid.prototype.options){
+                return  kendo.ui.Grid.prototype.options.messages.commands.create;
+            }else{
+                return "Add new";
+            }
+        }
+        $("#@(gridName)").kendoGrid({
+            @if(!IsSelectGrid && dnAttribute.CreateAjax ){   <text>"toolbar": [  @if(dnAttribute.CreateAjax )
+        { <text>{ name: "create" ,text:gridLocal()
+
+            },</text> }
+            ],
+            </text>
+         }
+            dataSource: {
+
+                type: "json",
+                transport: {
+                    "prefix": "",
+                    read: {
+                        url: "@Url.Action("_AjaxRead", "Generic", new {model = ModelName })",
+                        type: "POST",
+                        dataType: "json",
+                        // data: { filter:'ID~eq~3'  }
+                    },
+                    @if(dnAttribute.AjaxEdit )
+                        { <text>
+                    "update": {
+                        "url": "@Url.Action("_AjaxUpdate", "Generic", new {model = ModelName })"
+                    },
+                    </text> }
+                    @if(dnAttribute.CreateAjax )
+                            { <text>
+                    "create": {
+                        "url": "@Url.Action("_AjaxInsert", "Generic", new {model = ModelName })"
+                    },</text> }
+                    @if(dnAttribute.Delete )
+                                { <text>
+                    "destroy": {
+                        "url": "@Url.Action("_AjaxDelete", "Generic", new {model = ModelName })"
+                    },
+                    </text> }
+                },
+
+                schema: {
+                    data: "Data",
+                    total: "Total",
+                    errors: "Errors",
+                    model: {
+                        "id": "ID",
+                        fields: {
+                            @foreach (var p in t.GetProperties())
+                                            {
+                                                var assdd="";
+
+                                                // assdd=",editable: false";
+                                                var opt = (ModelAttribute)p.GetCustomAttributes<ModelAttribute>().Where(x=>x.Role == ViewBag.CurrentRole || x.Role==null).OrderByDescending(x=>x.Role).ToList().FirstOrDefault();
+                                                if(opt!=null )
+                                                {
+
+                                                    if(opt.PreOrder)
+                                                    {
+                                                        string sortWay = "asc";
+                                                        if(opt.PreOrderDesc)
+                                                        {
+                                                            sortWay = "desc";
+                                                        }
+                                                        PreSorting += "{ field: \"" + p.Name + "\", dir: \"" + sortWay + "\" },";
+                                                    }
+                                                    if(!opt.AjaxEdit)
+                                                    {
+                                                        if(!opt.Show){
+                                                            //continue;
+                                                        }
+                                                        assdd=",editable: false,";
+                                                        // continue;
+                                                    }
+
+                                                }
+                                var curProp = p.PropertyType;
+                                                if(p.PropertyType.IsGenericType){
+                                                    //  continue;
+                                                    if (p.PropertyType.Name != "Nullable`1")
+                                                    {
+                                                        continue;
+                                                    }
+                                                    curProp = p.PropertyType.GenericTypeArguments[0];
+                                                    assdd = ",nullable: true,";
+
+                                                }
+                                                if(p.Name.Contains("ID")){
+                                                    // assdd=",editable: false,";
+                                                    if(p.Name == "ID"){
+                                                        assdd=",editable: false,";
+                                                    }
+                                                    if (curProp.Name == "Guid")
+                                                    {
+                                                        @Html.Raw("  \"" + p.Name + "\": { \"type\": \"string\",defaultValue: \"00000000-0000-0000-0000-000000000000\" " + assdd + "}, \n")
+                                                    }else{
+                                                        @Html.Raw("  \""+p.Name+"\": { \"type\": \"number\" ,defaultValue: 0"+assdd+"}, \n")
+                                                    }
+                                                }else if(p.Name.Contains("Date")){
+                                                    @Html.Raw("  \""+p.Name+"\": { \"type\": \"date\" "+assdd+"}, \n")
+                                                }
+                                                    //PropertyType.FullName
+                                                else if (curProp.Name == "Decimal")
+                                                {
+                                                    @Html.Raw("  \""+p.Name+"\": { \"type\": \"number\",defaultValue: 0 "+assdd+" }, \n")
+                                                }
+                                                else if (curProp.Name == "Int32")
+                                                {
+                                                    @Html.Raw("  \""+p.Name+"\": { \"type\": \"number\",defaultValue: 0 "+assdd+" }, \n")
+                                                }
+                                                else if (curProp.BaseType.Name == "Enum")
+                                                {
+                                                    @Html.Raw("  \""+p.Name+"\": { \"type\": \"number\",defaultValue: 0 "+assdd+" }, \n")
+                                                }
+                                                else if (curProp.Name == "Boolean")
+                                                {
+                                                    @Html.Raw("  \""+p.Name+"\": { \"type\": \"boolean\" "+assdd+" }, \n")
+                                                }
+                                                else if (curProp.Name == "DateTime")
+                                                {
+                                                    @Html.Raw("  \""+p.Name+"\": { \"type\": \"date\" "+assdd+" }, \n")
+                                                }
+                                                else if (curProp.Namespace == "Uco.Models")
+                                                {
+                                                    assdd=",editable: false,nullable: true,";
+                                                    @Html.Raw("  \""+p.Name+"\": { \"type\": \"object\" "+assdd+" }, \n")
+                                                    // continue;
+                                                }
+                                                else{
+                                                    @Html.Raw("  \"" + p.Name + "\": { \"type\": \"string\" " + assdd + " }, \n")
+                                                }
+                                            }
+                            // "ID": {"type":"number" ,editable: false}
+                        }
+
+                    }
+                },
+                requestEnd: function(e) {
+                    if($('#@(gridName)e-checkall').length > 0)
+                    {
+                        $('#@(gridName)e-checkall')[0].checked = false;
+                    }
+                },
+                pageSize: 20,
+                "error": error_handler,
+                "sync":function(e){ this.read(); },
+                "serverPaging": true,
+                "serverSorting": true,
+                "serverFiltering": true,
+                "serverGrouping": true,
+                "serverAggregates": true,
+                @if(ViewBag.AdditionalFilterField!= null){
+                               <text>
+                filter: { field: "@ViewBag.AdditionalFilterField", operator: "eq", value: '@ViewBag.AdditionalFilterID' }  ,
+                </text>
+                           }else{
+                                <text> "filter": [], </text>
+                            }
+                "type": "aspnetmvc-ajax",
+
+                sort: [@Html.Raw(PreSorting)],
+            },
+            refresh: true,
+            //  detailTemplate: kendo.template($("#template").html()),
+            // detailInit: detailInit,
+            // dataBound: function () {
+            //this.expandRow(this.tbody.find("tr.k-master-row").first());
+            //   },
+            pageable: {
+                refresh: true,
+                @if(IsSelectGrid)
+                {
+                <text>
+                pageSizes: [10, 20, 50],
+                </text>
+                }
+                pageSize: 10
+            },
+
+            columns: [
+    @{
+        if(IsSelectGrid)
+        {
+            <text>
+             {
+                 field: "ID", width: "50px", title: " ", sortable: false, filterable: false, editor: ' ',
+                 template: "<input type=\"checkbox\" class=\"checkbox\"  value=\"@(TitleSelector)\" />",
+                 headerTemplate: '<input type="checkbox" id="@(gridName)e-checkall" /><label for="@(gridName)e-checkall">@RP.T("Admin.Views.Common.MarkAll")</label>'
+             },
+             </text>
+        }
+        var listProperties = t.GetProperties().ToList();
+         if(IsUcoColumn)
+                        {
+                            var backup = listProperties.Select(x=>x).ToList();
+                            listProperties.Clear();
+             foreach(var ptext in _columns)
+             {
+                 var p = backup.FirstOrDefault(x => x.Name == ptext.Key);
+                 if(p!=null)
+                 {
+                     listProperties.Add(p);
+                 }
+             }
+         }
+        foreach (var p in listProperties)
+                      {
+
+                 var attr = (DisplayAttribute)p.GetCustomAttribute(typeof(DisplayAttribute));
+                 var fTitle = p.Name;
+
+                        if(p.Name.Contains("ID") && pDict.ContainsKey(fTitle.Replace("ID",""))){
+                            continue;
+                        }
+                        if (attr != null)
+                        {
+                           // fTitle = attr.Name;
+                        }
+                        var curProp = p.PropertyType;
+                        var opt = (ModelAttribute)p.GetCustomAttributes<ModelAttribute>().Where(x=>x.Role == ViewBag.CurrentRole || x.Role==null).OrderByDescending(x=>x.Role).ToList().FirstOrDefault();
+                        if(opt==null ){opt = new ModelAttribute();}
+                        if(IsUcoColumn)
+                        {
+                            if(_columns.ContainsKey(p.Name))
+                            {
+                                opt.Show = true;
+                            }
+                            else
+                            {
+                                opt.Show = false;
+                            }
+                        }
+                        var addAttrString = "sortable: false, filterable: false ,";
+                        var UIhintAtr = (UIHintAttribute)p.GetCustomAttribute<UIHintAttribute>();
+                        if(opt!=null )
+                        {
+                            addAttrString="";
+                            if(!opt.Sort){
+                                addAttrString+="sortable: false,";
+                            }
+                            if(!opt.Filter){
+                                addAttrString+="filterable: false,";
+                            }
+                            else
+                            {
+                                addAttrString += "filterable: {cell: {showOperators: true}},";
+                            }
+                            if(!opt.Show)
+                            {
+                                addAttrString+="hidden: true, ";
+                                if(!opt.AjaxEdit)
+                                {
+                                    continue;
+                                }
+                            }
+                            else
+                            {
+                                fTitle = M(t.Name, p.Name);
+                                var UIhint = (UIHintAttribute)p.GetCustomAttribute<UIHintAttribute>();
+                                if (UIhint != null && UIhint.UIHint == "Image") {
+                                    addAttrString += "template:\"<img  height=\\\"30\\\"  src=\\\"#: " + p.Name + " #\\\" alt=\\\"alt\\\" />\", ";
+                                }
+                                if (UIhint != null && UIhint.UIHint == "IntTime") {
+                                    addAttrString+= "template:\" #: IntToTime("+p.Name+") # \", ";
+                                }
+                            }
+                           // addAttrString+="editor:'"+p.Name+"',";
+                            if(opt.AjaxEdit)
+                            {
+                                try{
+                                addAttrString+="editor:'"+(Html.Editor(p.Name).ToHtmlString() + Html.ValidationMessage(p.Name).ToHtmlString())
+                   .Replace(System.Environment.NewLine," \\"+System.Environment.NewLine)
+           .Replace("'", "\\'")
+   .Replace("</script>","</sc'+'ript>")
++"',";
+}catch(Exception e){
+addAttrString+="editor:' Exception: "+p.Name+"',";
+}
+
+            }
+         //   continue;
+                        }
+                        if (p.PropertyType.BaseType != null && p.PropertyType.BaseType.Name == "Enum")
+                        {
+                            addAttrString += "template:\"# if (" + p.PropertyType.Name + "Enums[" + p.Name + "]) { # #: " + p.PropertyType.Name + "Enums[" + p.Name + "] # # } #\", ";
+                        }
+                        if (p.PropertyType.Namespace == "Uco.Models" && p.PropertyType.BaseType.Name != "Enum" && opt.Show)
+                        {
+                            //ShowInParentGrid
+//Show additional columns
+var addattrname = p.PropertyType.GetProperties().Where(x =>x.GetCustomAttributes<ModelAttribute>()!=null
+&& x.GetCustomAttributes<ModelAttribute>().Count() >0
+&& x.GetCustomAttributes<ModelAttribute>().FirstOrDefault().ShowInParentGrid);
+string addTemplateConf =  " sortable: false, filterable: false,";
+
+foreach(var addE in addattrname)
+{
+    //branch for complex and none
+if (addE.PropertyType.Namespace == "Uco.Models" && addE.PropertyType.BaseType.Name != "Enum")
+{//complex
+
+    string childPropertyName = "Name";
+    if(addE.PropertyType.GetProperty("Name") == null)
+    {
+        if (addE.PropertyType.GetProperty("Title") != null)
+        {
+            childPropertyName = "Title";
+        }
+        else if (addE.PropertyType.GetProperty("Value") != null)
+        {
+            childPropertyName = "Value";
+        }
+    }
+    var tmpl = "#: " + p.Name + "." + addE.Name + "." + childPropertyName + " #";
+    var UIhint = (UIHintAttribute)addE.GetCustomAttribute<UIHintAttribute>();
+    if (UIhint != null && UIhint.UIHint == "Image")
+    {
+        tmpl = "<img height=\\\"30\\\"  src=\\\"#: " + p.Name + "." + addE.Name + ".Name #\\\" alt=\\\"alt\\\" />";
+    }
+    var fTitleEach = M(p.PropertyType.Name, addE.Name);
+    var addTemplateConfres = addTemplateConf + "template:\"# if (" + p.Name + " && " + p.Name + "." + addE.Name + ") { # " + tmpl + " # } #\", editor: function(tr,d){ $(tr).html(''); }";
+
+    if (addE.PropertyType.GetProperty("Name")!=null)
+    {
+          @Html.Raw("{ field: \"" + addE.Name + "\",title: \"" + fTitleEach + "\", " + addTemplateConfres + " },\n")
+    }
+                        }
+else
+    if (!(pDict.ContainsKey(p.Name + "ID") && ViewBag.AdditionalFilterField != p.Name + "ID" && addE.Name == "Name"))
+{ // not complex
+
+
+    var tmpl = "#: " + p.Name + "." + addE.Name + " #";
+    var UIhint = (UIHintAttribute)addE.GetCustomAttribute<UIHintAttribute>();
+    if (UIhint != null && UIhint.UIHint == "Image")
+    {
+        tmpl = "<img height=\\\"30\\\"  src=\\\"#: " + p.Name + "." + addE.Name + " #\\\" alt=\\\"alt\\\" />";
+    }
+    var fTitleEach = M(p.PropertyType.Name, addE.Name);
+    var addTemplateConfres = addTemplateConf + "template:\"# if (" + p.Name + " && " + p.Name + "." + addE.Name + ") { # " + tmpl + " # } #\", editor: function(tr,d){ $(tr).html(''); }";
+
+
+      @Html.Raw("{ field: \"" + addE.Name + "\",title: \"" + fTitleEach + "\", " + addTemplateConfres + " },\n")
+    }
+
+}
+
+//end show additional columns
+var genattrname = p.PropertyType.GetProperties().FirstOrDefault(x =>x.GetCustomAttributes<ModelAttribute>()!=null
+&& x.GetCustomAttributes<ModelAttribute>().Count() >0
+&& x.GetCustomAttributes<ModelAttribute>().FirstOrDefault().IsDropDownName);
+string DropDownName = "Name";
+string AndIf ="";
+           if(genattrname!=null)
+{
+DropDownName = genattrname.Name;
+if(genattrname.PropertyType.Namespace =="Uco.Models"){
+AndIf=" && "+p.Name+"."+genattrname.Name;
+DropDownName+=".Name";
+}
+}
+//"+p.Name+"."+DropDownName+" //this for show var
+addAttrString+="template:\"# if ("+p.Name+AndIf+") { #  #: "+p.Name+"."+DropDownName+" # # } #\", ";
+if (opt.Filter)
+{
+    Filter[p.PropertyType] = p.Name;
+    addAttrString += " filterable: { ui: " + p.Name + "Filter,operators: { number: {  eq: \"Is equal to\",neq: \"Is not equal to\" } } }, ";
+}
+if (pDict.ContainsKey(p.Name + "ID") && ViewBag.AdditionalFilterField != p.Name + "ID")
+{
+    string editorTemplate = "GenericDropDown";
+    var UIhint = (UIHintAttribute)p.GetCustomAttribute<UIHintAttribute>();
+    if (UIhint != null) {
+        editorTemplate = UIhint.UIHint;
+    }
+
+    var refP = pDict[p.Name + "ID"];
+    var newModel = Activator.CreateInstance(p.PropertyType);
+   // fTitle = M(t.Name, p.Name);
+   // p.PropertyType.GetProperty("ID").SetValue(newModel, (object)refP.GetValue(Model));
+ViewData.TemplateInfo.HtmlFieldPrefix = p.Name+"ID";
+ @Html.Raw("{ field: \"" + refP.Name + "\",title: \"" + fTitle + "\", " + addAttrString + " editor: '" +
+        Html.Partial("EditorTemplates/" + editorTemplate, newModel)
+    .ToHtmlString()
+.Replace(System.Environment.NewLine," \\"+System.Environment.NewLine)
+           .Replace("'", "\\'")
+   .Replace("</script>","</sc'+'ript>")
++"', },\n")
+ViewData.TemplateInfo.HtmlFieldPrefix = "";
+continue;
+}
+else { continue; }
+       // continue;
+        }
+                        else if (p.PropertyType.IsGenericType)
+                        {
+                            if (p.PropertyType.Name != "Nullable`1")
+                            {
+                                continue;
+                            }
+                            curProp = p.PropertyType.GenericTypeArguments[0];
+
+
+                        }
+                        if (curProp.Name == "DateTime")
+                        {
+                    @Html.Raw("{ field: \""+p.Name+"\",title: \""+fTitle+"\" ,format: \"{0: dd/MM/yyyy HH:mm}\", "+addAttrString+"},\n")
+        }else
+            //if(!p.Name.Contains("ID"))
+            {
+
+
+                       @Html.Raw("{ field: \""+p.Name+"\",title: \""+fTitle+"\", "+addAttrString+" },\n")
+                //+" "+p.PropertyType.Name //Enum.GetName(typeof(DayOfWeek),Day)
+            }
+        }
+
+        }
+@{
+    var controllerContext = Html.ViewContext.Controller.ControllerContext;
+    var viewfolder = controllerContext.RouteData.Values["controller"];
+    controllerContext.RouteData.Values["controller"] = ModelName;
+
+}
+@if (Html.IsPartialExist(ModelName+"Buttons"))
+{
+@Html.Partial(ModelName + "Buttons", (object)Model)
+}
+@{
+    controllerContext.RouteData.Values["controller"] = viewfolder;
+    }
+@if (!IsSelectGrid &&  dnAttribute.Edit)
+{
+    string editText = RP.S("Admin.Common.Edit");
+    if (!string.IsNullOrEmpty(dnAttribute.EditText))
+    {
+        editText = RP.S("Admin.Common.Button." + dnAttribute.EditText);
+}
+<text>
+{
+    "width": "100px",
+    "template": "<a class=\"k-button\" href=\"@Url.Action("Edit", "Generic", new {model = ModelName })/#= ID #\">@editText</a>"
+},
+</text>
+}
+@if (!IsSelectGrid && (dnAttribute.AjaxEdit || dnAttribute.Delete))
+{
+var w ="100px";
+if(dnAttribute.AjaxEdit )
+{
+w ="190px";
+}
+<text>
+{
+    "width": "@w",
+    "buttonType": "Image",
+    "command": [
+@if(dnAttribute.AjaxEdit)
+{
+<text>
+      {  "name": "edit",
+          "buttonType": "Icon",
+          "text": "@RP.T("Admin.Common.Button.Edit")"
+      },
+</text>
+}
+@if(dnAttribute.Delete)
+{
+<text>
+{
+    "name": "destroy",
+    "buttonType": "Image",
+    "text": "@RP.T("Admin.Common.Button.Delete")"
+},
+</text>
+}
+    ]
+},
+</text>
+}
+            ],
+            //   height: 600,
+            "scrollable": false,
+            filterable:true,
+            sortable: true,
+            "editable": {
+                "confirmation": "@RP.T("Admin.Common.Grid.AreYouSureDeleteRecord")",
+                "confirmDelete": "@RP.T("Admin.Common.Button.Delete")",
+                "cancelDelete": "@RP.T("Admin.Common.Button.Cancel")",
+                "mode": "@dnAttribute.EditMode",
+                "create": true,
+                "update": true,
+                "destroy": true
+            },
+
+
+
+        });
+        var @(gridName) = $("#@(gridName)").data('kendoGrid');
+        @(gridName).dataSource.transport.parameterMap = function(data,type){
+
+            // console.log(type);
+            if(type != "read")
+            {
+                for(var i in data)
+                {
+                    //console.log(Object.prototype.toString.call( data[i] ));
+                    if( Object.prototype.toString.call( data[i] ) === '[object Object]' ) {
+                        delete data[i];
+                    }
+                    if( Object.prototype.toString.call( data[i] ) === '[object Array]' ) {
+                        delete data[i];
+                    }
+                    if( Object.prototype.toString.call( data[i] ) === '[object Date]' ) {
+                        data[i] = kendo.toString(kendo.parseDate(data[i]), "G");// Date.parse(data[i]);
+                    }
+                    if( Object.prototype.toString.call( data[i] ) === '[object String]' && data[i] == '[object Object]') {
+
+                        data[i] = $('.k-grid-edit-row [name="'+i+'"]',$("#@(gridName)")).val();
+                         
+                    }
+
+                    //if(i == 'UserID' && !data[i]){
+                    //    data[i]=
+                    // }
+                    //@@ViewBag.AdditionalFilterField", operator: "eq", value: '@ViewBag.AdditionalFilterID'
+                    @if(ViewBag.AdditionalFilterField!=null){
+<text>
+                    if(i == '@ViewBag.AdditionalFilterField')
+                    {
+                        data[i] = '@ViewBag.AdditionalFilterID' ;
+                    }
+                    if(i in @(gridName).dataSource.options.schema.model.fields)
+                    {
+                        var model = @(gridName).dataSource.options.schema.model.fields[i];
+
+                        if(!data[i] && 'defaultValue' in model)
+                        {
+
+                            data[i] = model.defaultValue;
+                        }
+                    }
+                    </text>
+}
+                }
+            }
+
+            kendo.data.transports["aspnetmvc-ajax"](data);
+            data = new kendo.data.transports["aspnetmvc-ajax"]({ prefix: "" }).parameterMap(data, type);
+            //  console.log(data);
+            return data;
+        }
+
+        function error_handler(e) {
+
+            if (e.errors) {
+                e.preventDefault();   // cancel grid rebind if error occurs
+                var message = "Errors:\n";
+                $.each(e.errors, function (key, value) {
+                    if ('errors' in value) {
+                        $.each(value.errors, function () {
+                            message += this + "\n";
+                        });
+                    }
+                });
+                alert(message);
+            }
+        }
+        function detailInit(e) {
+            var detailRow = e.detailRow;
+            console.log(e);
+
+
+        }
+        @foreach(var type in Filter)
+        {
+            var cachedList = LS.GetSelectList(type.Key);
+            <text>
+        function @(type.Value)Filter(element) {
+            element.kendoDropDownList({
+                dataSource: [
+
+                    @foreach(var item in cachedList)
+                    {
+                        if(type.Key.Name != "Category")
+                        {
+                            break;
+                        }
+                        <text>{Name:'@item.Text',ID:@item.Value},</text>
+                       // break;
+                    }
+
+                ],
+                dataTextField: "Name",
+                dataValueField: "ID",
+                optionLabel: "@RP.T("Admin.Views.Grid.Filter.Select")"
+            });
+        }
+        </text>
+        }
+
+    });
+
+</script>
+
+
+@{
+    controllerContext.RouteData.Values["controller"] = ModelName;
+   
+}
+@if (Html.IsPartialExist(ModelName+"AfterGrid"))
+{
+@Html.Partial(ModelName + "AfterGrid", (object)Model)
+}
+@{
+    controllerContext.RouteData.Values["controller"] = viewfolder;
+    }
+
+@if(dnAttribute.Create)
+{
+    ViewContext.RouteData.Values["controller"] = "Generic";
+    ViewContext.RouteData.Values["model"] = ModelName;
+<br />
+
+ if(ViewBag.AdditionalFilterField!= null){
+var param = new RouteValueDictionary();
+param.Add((string)ViewBag.AdditionalFilterField,ViewBag.AdditionalFilterID);
+@Html.ActionLink(RP.T("Admin.Views.Command.Create").ToString(), "Create",param, new Dictionary<string,Object>{ { "class" , "k-button"} })
+                              
+                           }
+else{
+    
+@Html.ActionLink(RP.T("Admin.Views.Command.Create").ToString(), "Create", null, new { @class = "k-button" })
+}
+}

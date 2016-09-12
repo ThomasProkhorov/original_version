@@ -1,0 +1,14 @@
+﻿@model Uco.Models.Banner
+
+@{
+    ViewBag.Title = "Edit banner";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutNoTree.cshtml";
+}
+<h2>@ViewBag.Title</h2>
+@using (Html.BeginForm()) {
+    @Html.ValidationSummary(true)
+    @Html.EditorForModel()
+    <p>
+        <input type="submit" value="Save" class="k-button k-state-default" /> @Html.ActionLink("Back to list", "Index")
+    </p>
+}

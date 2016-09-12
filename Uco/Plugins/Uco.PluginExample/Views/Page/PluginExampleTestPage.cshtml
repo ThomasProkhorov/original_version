@@ -1,0 +1,13 @@
+﻿@model Uco.PluginExample.Models.PluginExampleTestPage
+@{
+    Layout = ViewBag.Layout;
+}
+<div id="content">
+    <h1>@ViewBag.H1</h1>
+    @Html.Raw(Model.Text)
+    sdfsd
+</div>
+
+LongTailArticleListPage
+@Html.Action("_TestAction", "Data")
+@Html.Partial("_TestPartial")

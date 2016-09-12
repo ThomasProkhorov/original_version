@@ -1,0 +1,111 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc;
+@{
+    bool RTL = SF.AdminIsRTL();
+
+    string Skin = System.Configuration.ConfigurationManager.AppSettings["SkinDefault"];
+    if (Session["SkinSelectList"] != null) { Skin = Session["SkinSelectList"] as string; }
+
+    if (RTL)
+    {
+
+        Style.AddHead("~/Content/Kendo/2014.1.318/kendo.common.min.css");
+        Style.AddHead("~/Content/kendo/2014.1.318/kendo." + Skin + ".min.css");
+        Style.AddHead("~/Areas/Admin/Content/uco.css");
+        Style.AddHead("~/Content/Kendo/2014.1.318/kendo.rtl.min.css");
+        Style.AddHead("~/Areas/Admin/Content/uco.rtl.css");
+    }
+    else
+    {
+        Style.AddHead("~/Content/Kendo/2014.1.318/kendo.common.min.css");
+        Style.AddHead("~/Content/kendo/2014.1.318/kendo." + Skin + ".min.css");
+        Style.AddHead("~/Areas/Admin/Content/uco.css");
+    }
+
+    Style.AddHead("~/Content/colorpic/colorpicker.css");
+    Style.AddHead("~/Content/colorpic/layout.css");
+
+    Script.AddHead("~/Scripts/Kendo/2014.1.318/jquery.min.js");
+    Script.AddHead("~/Scripts/Kendo/2014.1.318/kendo.web.min.js");
+    Script.AddHead("~/Scripts/Kendo/2014.1.318/kendo.aspnetmvc.min.js");
+    Script.AddHead("~/Scripts/kendo/2014.1.318/cultures/kendo.culture." + SF.GetLangCodeThreading() + ".min.js");
+    Script.AddHead("~/Scripts/kendo/2014.1.318/gridlocal/kendo." + SF.GetLangCodeThreading() + ".js");
+    Script.AddHead("~/Areas/Admin/Content/admin.js");
+    Script.AddHead("~/Scripts/pstooltip.js");
+    Script.AddHead("~/Scripts/colorpic/colorpicker.js");
+    Script.AddHead("~/Scripts/colorpic/eye.js");
+    Script.AddHead("~/Scripts/colorpic/utils.js");
+    Script.AddHead("~/Scripts/colorpic/layout.js?ver=1.0.2");
+
+
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Uco Admin | @ViewBag.Title</title>
+    <meta charset="utf-8" />
+    @Style.RenderHead()
+    @Script.RenderHead()
+    <script type="text/javascript">
+        kendo.culture("@(SF.GetLangCodeThreading())");
+    </script>
+    @RenderSection("scripts", required: false)
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCYPEvsunqAQGnXmCZ7tSZ2IJ0L0QlWHNo&sensor=false"></script>
+
+    <!--[if lt IE 9]><script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script><script src="http://css3-mediaqueries-js.googlecode.com/svn/trunk/css3-mediaqueries.js"></script><![endif]-->
+</head>
+<body class="@(RTL ? "k-rtl" : "k-ltr")">
+    <!--[if lt IE 8]><div class="ie67"><p style='font-weight:bold; font-size:20px; padding:0 10px; text-align:center; margin:20px 0 20px; color:red;'>Your using old and unsuported browser. Upgrade you browser!<br/><a href='http://www.microsoft.com/windows/internet-explorer/default.aspx'>Click here to upgrade.</a></p></div><![endif]-->
+    <div id="page">
+        <div id="header">@Html.Partial("_Menu")<div id="header_logof">@Html.Partial("_LogOnPartial")</div></div>
+        <div id="content">
+            @if (!string.IsNullOrEmpty(ViewBag.MessageRed))
+            {
+                <div class="message_red">
+                    @ViewBag.MessageRed
+                </div>
+            }
+            @if (!string.IsNullOrEmpty(ViewBag.MessageYellow))
+            {
+                <div class="message_yellow">
+                    @ViewBag.MessageYellow
+                </div>
+            }
+            @if (!string.IsNullOrEmpty(ViewBag.MessageGreen))
+            {
+                <div class="message_green">
+                    @ViewBag.MessageGreen
+                </div>
+            }
+            <div class="in_content">
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+    <span id="layout_notification" style="display:none;"></span>
+    <script id="infoTemplate" type="text/x-kendo-template">
+        <div class="u-notification-info">
+            <img src="/Areas/Admin/content/icons/envelope.png" />
+            <h3>#= title #</h3>
+            <p>#= message #</p>
+        </div>
+    </script>
+
+    <script id="errorTemplate" type="text/x-kendo-template">
+        <div class="u-notification-error">
+            <img src="/Areas/Admin/content/icons/error-icon.png" />
+            <h3>#= title #</h3>
+            <p>#= message #</p>
+        </div>
+    </script>
+
+    <script id="successTemplate" type="text/x-kendo-template">
+        <div class="u-notification-success">
+            <img src="/Areas/Admin/content/icons/success-icon.png" />
+            <h3>#= message #</h3>
+        </div>
+    </script>
+     @Script.RenderFooter()
+     @Style.RenderFooter()
+</body>
+</html>

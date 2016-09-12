@@ -1,0 +1,10 @@
+﻿@model string
+@{
+    SelectList Items = new SelectList(LS.CurrentEntityContext.PageLocations.Select(r => r.Title).ToList(), Model);
+}
+@(Html.Kendo().DropDownList()
+        .Name(ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty))
+        .BindTo(Items)
+        .OptionLabel("בחר סניף")
+        .HtmlAttributes(new { id = ViewData.TemplateInfo.GetFullHtmlFieldName(string.Empty) })
+)

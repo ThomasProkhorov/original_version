@@ -1,0 +1,50 @@
+﻿@model List<Uco.Models.Banner>
+    @{
+        Random rnd = new Random();
+        int month = rnd.Next(450021, 1870021); 
+    }
+@foreach (var item in Model)
+{
+    <div class="js_cycle_@(month)" data-id="@item.ID" onclick="jscycle@(month).click(this);">
+        @Html.Raw(item.Output)
+    </div>
+}
+<script>
+    var jscycle@(month) = {
+        selector: '.js_cycle_@(month)',
+        interval: 5000,
+        cur: 0,
+        click: function (e) {
+            var id = $(e).attr('data-id');
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: "/PagePart/_BannerClick/"+id,
+                data: {ID:id},
+                cache: false,
+                error: function () {  }
+            }).done(function (data) {
+                if (data.result == "ok") {
+                    
+                } else {
+                   
+                }
+            }); 
+        },
+        next: function () {
+            $(jscycle@(month).selector).hide();
+            jscycle@(month).cur++;
+            if ($(jscycle@(month).selector + ':eq(' + jscycle@(month).cur + ')').length == 0)
+            {
+                jscycle@(month).cur=0;
+            }
+            $(jscycle@(month).selector + ':eq('+jscycle@(month).cur+')').show();
+        },
+        onstart: function () {
+            $(jscycle@(month).selector).hide();
+            $(jscycle@(month).selector + ':eq(0)').show();
+            setInterval(jscycle@(month).next, jscycle@(month).interval);
+        },
+    };
+    jscycle@(month).onstart();
+</script>

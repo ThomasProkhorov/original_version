@@ -1,0 +1,36 @@
+﻿@model int
+
+<div class="clear"></div>
+@if (Model == 0)
+{
+    <div>אפשרות עריכה תהיה זמינה לאחר יצירת העמוד</div>
+}
+else
+{
+    @(Html.Kendo().Grid<Uco.Models.XmlContact>()
+            .Name("XmlContacts")
+            .DataSource(dataSource => dataSource.Ajax()
+                .Model(model => { model.Id(r => r.ID); })
+                .Model(model => model.Field(r => r.ID).Editable(false))
+                .Read(r => r.Action("_XmlContacts_AjaxIndex", "ListItem", new { ParentID = Model }))
+                .Destroy(r => r.Action("_XmlContacts_AjaxDelete", "ListItem", new { ParentID = Model }))
+            )
+            .Columns(columns =>
+            {
+                columns.Bound(r => r.ID).Width(50);
+                columns.Bound(r => r.Order).Width(80);
+                columns.Bound(r => r.Title);
+                columns.Bound(r => r.FullName);
+                columns.Bound(r => r.Email);
+                columns.Template(r => r.ID).ClientTemplate(
+                    "<a class='k-button' href='" + Url.Action("EditXMLContact", "ListItem") + "?ID=#= ID #&ParentID=" + Model + "'>ערוך</a>"
+                    + "<a class='k-button' href='" + Url.Action("DeleteXmlContact", "ListItem") + "?ID=#= ID #&ParentID=" + Model + "'>מחק</a>"
+                ).Width(200);
+            })
+            .ToolBar(commands => commands.Custom().Text("הוסף רשומה חדשה").Action("CreateXMLContact", "ListItem", new { ParentID = Model }))
+            .Pageable()
+            .Sortable()
+            .Filterable()
+            .Groupable()
+    )
+}

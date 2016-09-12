@@ -1,0 +1,27 @@
+﻿<!--=========login_signup_popup =========== -->
+<div id="light6" class="white_content3" style="width: 436px;">
+    <div class="popup_close1"><a href="javascript:void(0)" onclick="document.getElementById('light6').style.display='none';document.getElementById('fade').style.display='none'"><img src="~/Content/DesignFiles/popup_close1.png" alt=""></a> <a href="#"></a></div>
+    <div class="prct_pop_white">
+
+        <!-- p_area end here -->
+        <div class="p_inner">
+
+            <div class="left_inner float_lft">
+                <div class="login_box_heading1"><span class="heading2">@RP.T("Views.Shop._LoginSignupPopup.SendPasswors")</span></div>
+                <div class="login_box1_in">
+                    <form class="form4" action="" method="post" name="form1" id="form1">
+                        @Html.Partial("_Captcha", new Uco.Models.Captcha())
+                        @Html.Partial("_InvisibleCaptcha", new Uco.Models.InvisibleCaptcha())
+                        <div class="row"><input name="Model" type="text" value="" class="single-line" placeholder="@RP.T("Views.Shop._LoginSignupPopup.Email")" id="textfield"></div>
+                        <div class="send_btn2"><a onclick="Shop.DoSendPass(this,event);" href="#"><img width=" 106" height="35" alt="" src="~/Content/DesignFiles/form4_btn2.png" /></a></div>
+                    </form>
+                </div>
+            </div>
+            <div class="clear"></div>
+        </div>
+    </div>
+</div>
+<a href="javascript:void(0)" onclick="document.getElementById('light6').style.display='none';document.getElementById('fade').style.display='none'">
+    <div id="fade" class="black_overlay"></div>
+</a>
+<!--=========login_signup_popup =========== -->

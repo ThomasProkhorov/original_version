@@ -1,0 +1,42 @@
+﻿@{
+    ViewBag.Title = RP.T("Admin.Views.Contact.Index.Title"); ;
+    Layout = "~/Areas/Member/Views/Shared/_LayoutNoTree.cshtml";
+}
+
+<h2>@RP.T("Admin.Views.Contact.Index.Title")</h2>
+
+@(Html.Kendo().Grid<Uco.Models.Contact>()
+        .Name("Grid")
+        .DataSource(dataSource => dataSource.Ajax()
+            .Model(model => { model.Id(item => item.ID); })
+            .Read(r => r.Action("_AjaxIndex", "Contact"))
+            .Sort(sort =>
+            {
+                sort.Add(r => r.ContactDate).Descending();
+            })
+            .Destroy(r => r.Action("_AjaxDelete", "Contact"))
+        )
+        .Columns(columns =>
+        {
+           // columns.Bound(r => r.ContactDate).Format("{0:dd/MM/yyyy}").Width(200);
+            columns.Bound(r => r.ContactName).ClientTemplate("<a href='" + Url.Action("Details", "Contact") + "?ID=#= ID #'" + ">"
+                + "#= ContactName # <br/> #= ContactEmail #" + "</a>");
+           // columns.Bound(r => r.ContactEmail);
+          //  columns.Bound(r => r.ContactPhone);
+            // columns.Bound(r => r.RoleDefault);
+            // columns.Bound(r => r.Rool);
+           // columns.Template(r => r.ID).ClientTemplate("#= ContactUrl #");
+           
+            columns.Command(commands =>
+            {
+                commands.Destroy();
+            }).Width(40);
+        })
+        .Pageable()
+        .Sortable(sortable => sortable
+            .AllowUnsort(true)
+            .SortMode(GridSortMode.MultipleColumn))
+        .Filterable()
+        .Groupable()
+        .ToolBar(commands => commands.Custom().Text(@RP.T("Admin.Views.Command.ExportToCSV").ToString()).Action("CSVExport", "Contact"))
+)

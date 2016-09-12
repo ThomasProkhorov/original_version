@@ -1,0 +1,25 @@
+﻿<br />
+<a id="clearmap" href="javascript:void(0);" class="k-button">מחק כל המק"טים הקצרים ללא מיפוי</a>
+<script>
+    $('#clearmap').click(function () {
+        if (confirm('האם אתה בטוח?')) {
+            $.ajax({
+                type: "GET",
+                dataType: "html",
+
+                url: "/ProductShop/RemoveNotMappedShortSku",
+                error: function () { alert('Server error'); }
+            }).done(function (data) {
+
+
+
+                alert('@RP.T("Member.ProductSkuMap.Removed")');
+
+            })
+    .always(function () {
+
+    });
+            //location.href = '/ProductShop/RemoveNotMappedShortSku';
+        }
+    });
+</script>

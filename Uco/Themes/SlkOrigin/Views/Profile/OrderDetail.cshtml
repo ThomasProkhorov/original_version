@@ -1,0 +1,475 @@
+﻿@using Uco.Models.Overview
+@using Uco.Models
+@model Order
+@{
+    ViewBag.Title = RP.T("Views.Profile.OrderDetail.ViewBagTitle");
+    Layout = "~/Themes/SlkOrigin/Views/Shared/_LayoutShop.cshtml";
+    ViewBag.Url = "~/Profile/Orders/";
+}
+@*rewrite shopping cart footer*@
+@*@section FooterZone{
+
+    }*@
+@section topmenu{
+    @Html.Action("_TopStatus", "Profile")
+}
+<div class="midd_section">
+    <div class="center_div">
+        <div class="container one">
+            <div class="profile_left_container">
+                <div class="right_sec">
+
+                    <h1 class="main_heading_h1_profile main_heading_h1_profile_br">@RP.T("Views.Profile.Menu.OrderDetail")</h1>
+                    <div><b>@RP.T("Views.Profile.OrderDetail.Number")@Model.ID</b></div>
+
+                    <div class="">@RP.T("Views.Profile.OrderDetail.StatusText") @RP.T("Enums."+Model.OrderStatus.ToString()) </div>
+
+                    <div class="">@RP.T("Views.Profile.OrderDetail.TotalCardText") @ShoppingService.FormatPrice(Model.TotalCard)</div>
+
+                    <div class="">@RP.T("Views.Profile.OrderDetail.TotalCashText") @ShoppingService.FormatPrice(Model.TotalCash)</div>
+
+                    <div class="">@RP.T("Views.Profile.OrderDetail.NameText") @Model.FullName </div>
+
+                    <div class="">@RP.T("Views.Profile.OrderDetail.AddressText") @Model.ShipAddress </div>
+                   @if (Model.RegularOrder && Model.RegularInterval != RegularInterval.NotRegular)
+                   { 
+                     <form id="detailsform">
+                        <input type="hidden" name="ID" value="@Model.ID" />
+                        <div>@RP.T("Views.Profile.OrderDetail.ActiveText") @Html.EditorFor(m => m.Active)</div>
+                        <div>@RP.T("Views.Profile.OrderDetail.InternalText") @Html.EditorFor(m => m.RegularInterval)</div>
+                        <div>
+                            @RP.T("Views.Profile.OrderDetail.ShipTimeText") <input type="text" name="ShipTime" id="ShipTime" value="@Model.ShipTime" />
+                            <script>
+                                jQuery(function(){jQuery("#ShipTime").kendoDateTimePicker();})
+                            </script>
+                        </div>
+                        <a href="#" onclick="Shop.SaveOrderDetail(this,event)" class="k-button">@RP.T("Views.Profile.OrderDetail.SaveBtnText")</a>
+                    </form>
+                   }
+                   else
+                   {
+                       <button class="k-button" onclick="Shop.ReOrder(this,event,@Model.ID)">@RP.T("Views.Profile.OrderDetail.Reorder")</button>
+                   }
+                    <div id="OrderItemgrid"></div>
+
+                    <script>
+                        var OrderItemStatusEnums = {
+                    @foreach( var en in Enum.GetValues(typeof(OrderItemStatus) ))
+    {
+        <text>@((int)en):'@RP.T("Enums."+en.ToString())', </text>
+
+    }
+
+                        };
+                        $(document).ready(function () {
+                            /*
+                            Docs
+                            http://docs.telerik.com/kendo-ui/api/javascript/ui/grid
+                            */
+
+                            $("#OrderItemgrid").kendoGrid({
+                             @if (Model.RegularOrder && Model.RegularInterval != RegularInterval.NotRegular)
+                                {<text>   "toolbar": [{    name:"create", text: "@RP.T("Views.Profile.OrderDetail.AddNewRecordText").ToString()"             }],</text> }
+                                dataSource: {
+
+                                    type: "json",
+                                    transport: {
+                                        "prefix": "",
+                                        read: {
+                                            url: "/Profile/OrderItemAjaxRead",
+                                            type: "POST",
+                                            dataType: "json",
+                                            // data: { filter:'ID~eq~3'  }
+                                        },
+
+                                        "update": {
+                                            "url": "/Profile/OrderItemAjaxUpdate"
+                                        },
+
+                                        "create": {
+                                            "url": "/Profile/OrderItemAjaxInsert"
+                                        },
+                                        "destroy": {
+                                            "url": "/Profile/OrderItemAjaxDelete"
+                                        },
+                                    },
+
+                                    schema: {
+                                        data: "Data",
+                                        total: "Total",
+                                        errors: "Errors",
+                                        model: {
+                                            "id": "ID",
+                                            fields: {
+                                                "ID": { "type": "number" ,editable: false,},
+                                                "OrderID": { "type": "number",editable: false, },
+                                                "ProductShopID": { "type": "number" },
+                                                "ProductShop": { "type": "object" ,editable: false,nullable: true, },
+                                                "ProductAttributeOptionID": { "type": "number" ,defaultValue:0},
+                                                "ProductAttributeOption": { "type": "object" ,editable: false,nullable: true, },
+                                                "Price": { "type": "number"  },
+                                                "Quantity": { "type": "string" ,defaultValue:1 },
+                                                "UnitPrice": { "type": "number"  },
+                                                "OrderItemStatusID": { "type": "number",defaultValue:1 },
+                                                "OrderItemStatus": { "type": "object" ,editable: false,nullable: true, },
+                                                // "ID": {"type":"number" ,editable: false}
+                                            }
+
+                                        }
+                                    },
+                                    pageSize: 20,
+                                    "error": error_handler,
+                                    "sync":function(e){ this.read(); },
+                                    "serverPaging": true,
+                                    "serverSorting": true,
+                                    "serverFiltering": true,
+                                    "serverGrouping": true,
+                                    "serverAggregates": true,
+
+                                    filter: { field: "OrderID", operator: "eq", value: @Model.ID }  ,
+
+                                    "type": "aspnetmvc-ajax",
+                                },
+                                refresh: true,
+                                //  detailTemplate: kendo.template($("#template").html()),
+                                // detailInit: detailInit,
+                                // dataBound: function () {
+                                //this.expandRow(this.tbody.find("tr.k-master-row").first());
+                                //   },
+                                pageable: {
+                                    refresh: true,
+                                    // pageSizes: [10, 20, 50],
+                                    pageSize: 10
+                                },
+
+                                columns: [
+                    { field: "ID",title: "@RP.T("Views.Profile.OrderDetail.GridIDHiddenTitle")", sortable: false, filterable: false , hidden: true},
+                    { field: "OrderID",title: "@RP.T("Views.Profile.OrderDetail.GridOrderIDHiddenTitle")", sortable: false,filterable: false,hidden: true,  },
+                    { field: "ProductShop.Product.Image",title: "@RP.T("Views.Profile.OrderDetail.GridImageTitle")", sortable: false,filterable: false,
+                        template:"# if (ProductShop && ProductShop.Product) { #  <img src=\"#: ProductShop.Product.Image #\" height='80' width='80' alt=\"alt\" /> # } #",
+                        editor: function(tr,d){ $(tr).html(''); }},
+                    { field: "ProductShop.Product.SKU",title: "@RP.T("Views.Profile.OrderDetail.GridSKUTitle")", sortable: false,filterable: false
+                        ,template:"# if (ProductShop && ProductShop.Product) { #  #: ProductShop.Product.SKU # # } #", editor: function(tr,d){ $(tr).html(''); }},
+                    { field: "ProductShopID",title: "@RP.T("Views.Profile.OrderDetail.GridProductNameTitle")", sortable: false,filterable: false,template:"# if (ProductShop && ProductShop.Product) { #  #: ProductShop.Product.Name # # } #",  editor: ' \
+ \
+ \
+<input id="ProductShopID"  name="ProductShopID" value="0"/> \
+ \
+<script> \
+    $(\'#ProductShopID\') \
+                            .kendoComboBox( \
+    { \
+        placeholder: "Select ", \
+        dataTextField: "Name", \
+        dataValueField: "ID", \
+ \
+        filter: "contains", \
+        minLength: 1, \
+        "autoBind": true, \
+        dataSource: { \
+            schema: { \
+                data: "Data", \
+                total: "Total", \
+                errors: "Errors",}, \
+            type: "json", \
+            serverFiltering: true, \
+            filter: [], \
+    change: function () { \
+                        }, \
+    transport: { \
+                "prefix": "", \
+                read: { \
+                    url: "/Profile/ProductShop_AjaxAutoComplete?ShopID=@Model.ShopID" \
+, \
+                    type: "POST", \
+                    data: function () { \
+                        var data = kendo.ui.ComboBox.requestData(\'#ProductShopID\'); \
+                       \
+                        /**   data["ShopID"] = @Model.ShopID; data["filter"] = "ShopID~eq~3"; \
+                        console.log(data); \
+                        **/ \
+                        return data; \
+                    }, \
+                } \
+            } \
+        } \
+    }); \
+$(\'#ProductShopID\').change(function(){ \
+                            var combobox = $("#ProductAttributeOptionID").data("kendoComboBox"); \
+ \
+                            combobox.filter = "ProductShopID~eq~" + $(\'#ProductShopID\').val(); \
+                            combobox.text(""); \
+                            combobox.value(""); \
+ \
+                            combobox.one("dataBound", function () { \
+                                this.select(0); \
+                                $(\'#ProductAttributeOptionID\').val(this.value()); \
+                                this.trigger("change"); \
+                            }); \
+ \
+ \
+                            combobox.dataSource.read(); \
+ \
+ \
+ }); \
+</sc'+'ript> \
+ \
+', },
+                    { field: "ProductAttributeOptionID",title: "@RP.T("Views.Profile.OrderDetail.GridSelectesAttributeTitle")", sortable: false,filterable: false,template:"# if (ProductAttributeOption && ProductAttributeOption.ProductAttribute) { #  #: ProductAttributeOption.ProductAttribute.Name # # } # # if (ProductAttributeOption && ProductAttributeOption.Name) { #  #: ProductAttributeOption.Name # # } #",  editor: ' \
+ \
+ \
+<input id="ProductAttributeOptionID"  name="ProductAttributeOptionID" value="0"/> \
+ \
+<script> \
+    $(\'#ProductAttributeOptionID\') \
+                            .kendoComboBox( \
+    { \
+        placeholder: "Select ", \
+        dataTextField: "Name", \
+        dataValueField: "ID", \
+ \
+        filter: "contains", \
+        minLength: 1, \
+        "autoBind": true, \
+        dataSource: { \
+            schema: { \
+                data: "Data", \
+                total: "Total", \
+                errors: "Errors",}, \
+            type: "json", \
+            serverFiltering: true, \
+            filter: [], \
+            transport: { \
+                "prefix": "", \
+                read: { \
+                    url: "/Profile/ProductAttributeOption_AjaxAutoComplete" \
+, \
+                    type: "POST", \
+                    data: function () { \
+                        var data = kendo.ui.ComboBox.requestData(\'#ProductAttributeOptionID\'); \
+                         \
+                         data["ProductShopID"] = $(\'#ProductShopID\').val();  \
+                        \
+                         \
+                        return data; \
+                    }, \
+                } \
+            } \
+        } \
+    }); \
+ \
+</sc'+'ript> \
+ \
+', },
+
+                    //{ field: "ProductAttributeOption.Name",title: "Attribute",  sortable: false, filterable: false,
+                    //template:"# if (ProductAttributeOption && ProductAttributeOption.Name) { #  #: ProductAttributeOption.Name # # } #", editor: function(e,b){ $(e).html( b.model.ProductAttributeOption.Name);} },
+
+                    { field: "Price",title: "@RP.T("Views.Profile.OrderDetail.GridPriceTitle")", sortable: false, filterable: false ,editor: ' ', },
+                    { field: "Quantity",title: "@RP.T("Views.Profile.OrderDetail.GridQuantityTitle")", sortable: false, filterable: false , },
+                    { field: "UnitPrice",title: "@RP.T("Views.Profile.OrderDetail.GridUnitPriceTitle")", sortable: false, filterable: false ,editor: ' ', },
+
+                    { field: "OrderItemStatus",title: "@RP.T("Views.Profile.OrderDetail.GridStatusTitle")", sortable: false,filterable: false
+                        ,template:"# if(OrderItemStatusEnums[OrderItemStatusID]) { # #: OrderItemStatusEnums[OrderItemStatusID] # # } #",
+                        editor: ' ', },
+
+                    @if (Model.RegularOrder && Model.RegularInterval != RegularInterval.NotRegular)
+                                { <text>
+                    {
+                        "width": "160px",
+                        "template": "# if (ID > 0) { # "
+
+                    +" <a onclick=\"gridAPI.edit(this,#= ID #);\" class=\"k-button\" >@RP.T("Views.Profile.OrderDetail.GridChangeBtnText")</a> "
+                    +"<a style=\"display:none;\" onclick=\"gridAPI.cancelRow(this,#= ID #);\" class=\"k-button cancelrowa\" >@RP.T("Views.Profile.OrderDetail.GridCancelBtnText")</a>"
+                    +"# } else { # "
+                    +"<a onclick=\"gridAPI.saveRow(this,#= ID #);\" class=\"k-button\" >@RP.T("Views.Profile.OrderDetail.GridSaveBtnText")</a> "
+                    +"<a onclick=\"gridAPI.cancelRow(this,#= ID #);\" class=\"k-button\" >@RP.T("Views.Profile.OrderDetail.GridCancelBtnText")</a>" //
+                    +" # } #"
+                    },
+
+
+                    {
+                        "width": "110px",
+                        "buttonType": "Image",
+                        "command": [
+
+                          //{  "name": "edit",
+                          //    "buttonType": "Icon",
+                          //    "text": "Edit"
+                          //},
+
+
+                    {
+                        "name": "destroy",
+                        "buttonType": "Image",
+                        "text": "@RP.T("Views.Profile.OrderDetail.DeleteBtnText")"
+                    },
+
+                        ]
+                    },
+                    </text>
+                    }
+                                ],
+                                //   height: 600,
+                                "scrollable": false,
+                                filterable: true,
+                                sortable: true,
+                                "editable": {
+                                    "confirmation": "@RP.T("Views.Profile.OrderDetail.ConfirmationDeleteText")",
+                                    "confirmDelete": "@RP.T("Views.Profile.OrderDetail.ConfirmDeleteText")",
+                                    "cancelDelete": "@RP.T("Views.Profile.OrderDetail.CancelDeleteText")",
+                                    "mode": "inline",
+                                    "create": true,
+                                    "update": true,
+                                    "destroy": true
+                                },
+
+
+
+                            });
+
+
+                            var OrderItemgrid = $("#OrderItemgrid").data('kendoGrid');
+                            OrderItemgrid.dataSource.transport.parameterMap = function(data,type){
+
+                                // console.log(type);
+                                if(type != "read")
+                                {
+                                    for(var i in data)
+                                    {
+                                        //console.log(Object.prototype.toString.call( data[i] ));
+                                        if( Object.prototype.toString.call( data[i] ) === '[object Object]' ) {
+                                            delete data[i];
+                                        }
+                                        if( Object.prototype.toString.call( data[i] ) === '[object Array]' ) {
+                                            delete data[i];
+                                        }
+                                        if( Object.prototype.toString.call( data[i] ) === '[object Date]' ) {
+                                            data[i] = kendo.toString(kendo.parseDate(data[i]), "G");// Date.parse(data[i]);
+                                        }
+                                        //if(i == 'UserID' && !data[i]){
+                                        //    data[i]=
+                                        // }
+                                        //@ViewBag.AdditionalFilterField", operator: "eq", value: 2
+
+                                        if(i == 'OrderID')
+                                        {
+                                            data[i] = @Model.ID ;
+                                        }
+
+
+                                    }
+                                }
+
+                                kendo.data.transports["aspnetmvc-ajax"](data);
+                                data = new kendo.data.transports["aspnetmvc-ajax"]({ prefix: "" }).parameterMap(data, type);
+                                //  console.log(data);
+                                return data;
+                            }
+
+                            function error_handler(e) {
+
+                                if (e.errors) {
+                                    e.preventDefault();   // cancel grid rebind if error occurs
+                                    var message = "Errors:\n";
+                                    $.each(e.errors, function (key, value) {
+                                        if ('errors' in value) {
+                                            $.each(value.errors, function () {
+                                                message += this + "\n";
+                                            });
+                                        }
+                                    });
+                                    alert(message);
+                                }
+                            }
+                            function detailInit(e) {
+                                var detailRow = e.detailRow;
+                                console.log(e);
+
+
+                            }
+
+                        });
+                        var gridAPI = {
+                            edit:function(e,id){
+                                var grid = $("#OrderItemgrid").data('kendoGrid');
+                                $('.cancelrowa').hide();
+                                grid.editRow($(e).parents('tr:eq(0)'));
+                                $(e).attr('onclick','gridAPI.saveRow(this,'+id+');').text("@RP.T("Views.Profile.OrderDetail.GridSaveBtnText").ToString()");
+                                $('.cancelrowa', $(e).parents('tr:eq(0)')).show();
+                            },
+                            cancelRow:function(e,id){
+                                var grid = $("#OrderItemgrid").data('kendoGrid');
+                                grid.cancelChanges();
+                            },
+                            saveRow:function(e,id){
+                                var grid = $("#OrderItemgrid").data('kendoGrid');
+                                var data = grid.dataSource.get(id);
+                                data.set('OrderItemStatusID', 4);
+                                grid.saveRow();
+                            },
+                            accept:function(e,id){
+                                var grid = $("#OrderItemgrid").data('kendoGrid');
+                                var data = grid.dataSource.get(id);
+                                data.set('OrderItemStatusID', 2);
+                                grid.saveChanges();
+                            },
+                            outofstock:function(e,id){
+                                var grid = $("#OrderItemgrid").data('kendoGrid');
+                                var data = grid.dataSource.get(id);
+                                data.set('OrderItemStatusID', 3);
+                                grid.saveChanges();
+                            },
+
+                        };
+</script>
+
+                    <p class="clear">
+                        
+                        @if (Model.RegularOrder && Model.RegularInterval != RegularInterval.NotRegular)
+                                {
+                        @Html.ActionLink(@RP.T("Admin.Views.Command.BackToList").ToString(), "RegularOrders")
+                                }
+                        else
+                        {
+                           @Html.ActionLink(@RP.T("Admin.Views.Command.BackToList").ToString(), "Index") 
+                        }
+                    </p>
+
+                    <p>
+                       @(Html.Kendo().Grid<Uco.Models.OrderNote>()
+    .Name("Grid")
+    .DataSource(dataSource =>
+        dataSource.Ajax()
+            .Model(model => { model.Id(item => item.ID); })
+                    .Read(r => r.Action("_OrderNote", "Profile", new { OrderID = Model.ID }))
+                               //.Destroy(r => r.Action("_AjaxDelete", "Category"))
+    )
+    .Columns(columns =>
+    {
+        //columns.Bound(r => r.ID).Width(20);
+        columns.Bound(r => r.CreateDate).Format("{0: dd/MM/yyyy HH:mm}").Title(RP.S("Views.Profile.OrderDetail.Note.CreateDate"));
+        columns.Bound(r => r.Note).Title(RP.S("Views.Profile.OrderDetail.Note.Note"));
+        columns.Bound(r => r.Field).Title(RP.S("Views.Profile.OrderDetail.Note.Field"));
+        columns.Bound(r => r.OldValue).Title(RP.S("Views.Profile.OrderDetail.Note.OldValue"));
+        columns.Bound(r => r.NewValue).Title(RP.S("Views.Profile.OrderDetail.Note.NewValue"));
+
+    })
+    .Pageable(x=>x.Refresh(true))
+    .Sortable( )
+   // .Filterable()
+    .Groupable()
+                    )
+                    </p>
+
+
+                </div>
+            </div>
+
+
+            @* Menu *@
+            @Html.Partial("_Menu")
+        </div>
+        <div class="clear"></div>
+    </div>
+</div>

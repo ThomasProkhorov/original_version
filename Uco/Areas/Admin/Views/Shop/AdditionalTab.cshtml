@@ -1,0 +1,14 @@
+@model Uco.Models.Shop
+@using Uco.Infrastructure
+@using System
+@using System.Web.Mvc
+@{
+   
+
+}
+
+<div>
+
+     <a class="k-button" href="javascript: if(confirm('@RP.T("Admin.View.Shop.AdditionalTab.AreYouSure")')){ location.href ='@Url.Action("Copy", "Shop", new { Id = Model.ID })'; }">@RP.T("Admin.Shop.Copy")</a>
+
+</div>

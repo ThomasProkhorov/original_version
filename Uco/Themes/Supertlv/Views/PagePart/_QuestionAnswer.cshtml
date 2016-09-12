@@ -1,0 +1,15 @@
+﻿@model List<Uco.Models.NewsPage>
+<div class="contact_left">
+    <div class="cart2_left_heading"><span class="contact_left_head">@RP.T("Views.Shared._QuestionAnswer.QuestionsAndAnswersTitle")</span></div>
+    <div class="contact_left_listing">
+        <ul>
+            @foreach (Uco.Models.NewsPage item in Model)
+            {
+                <li>
+                    <a href="#"><span>@item.Title</span></a>
+                    <div class="open_arrow_text">@item.ShortDescription</div>
+                </li>
+            }
+        </ul>
+    </div>
+</div>

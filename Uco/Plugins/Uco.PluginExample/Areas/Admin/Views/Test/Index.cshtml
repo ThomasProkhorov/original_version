@@ -1,0 +1,12 @@
+﻿@using Kendo.Mvc.UI;
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutNoTree.cshtml";
+}
+PluginExample
+@{
+    Uco.PluginExample.Models.PluginExampleTestPage t = new Uco.PluginExample.Models.PluginExampleTestPage();  
+    
+}
+@Html.EditorFor(m => t)

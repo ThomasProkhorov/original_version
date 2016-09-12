@@ -1,0 +1,36 @@
+﻿@model IEnumerable<Uco.Models.SearchPage>
+@using Telerik.Web.Mvc.UI
+
+@{
+    ViewBag.Title = "Pages";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutNoTree.cshtml";
+}
+
+<h2>עמודי חיפוש</h2>
+
+@(Html.Telerik().Grid(Model)
+        .Name("Grid")
+        .DataKeys(keys =>
+        {
+            keys.Add(r => r.ID);
+        })
+        .DataBinding(dataBinding =>
+        {
+            dataBinding.Ajax()
+                .Select("_AjaxIndexPages", "Search")
+                .Delete("_AjaxDeletePages", "Search");
+        })
+        .Columns(columns =>
+        {
+            columns.Bound(r => r.Title);
+            columns.Bound(r => r.SeoUrlName);
+            columns.Command(commands =>
+            {
+                commands.Custom("Edit").Text("עריכה").DataRouteValues(route => route.Add(r => r.ID).RouteKey("ID")).Action("EditPages", "Search");
+                commands.Delete();
+            }).Width(270).Title("פקודות");
+        })
+        .Pageable()
+        .Sortable()
+        .Filterable()
+)

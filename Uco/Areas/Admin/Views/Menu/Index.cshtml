@@ -1,0 +1,442 @@
+﻿@model List<Uco.Models.MenuModel>
+@using System.Web.Script.Serialization;
+@{
+    ViewBag.Title = RP.T("Admin.Views.Menu.Index.Title");
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutNoTree.cshtml";
+    string Lang = ViewBag.Lang;
+string Group = ViewBag.Group;
+   SelectList Items = new SelectList(System.Configuration.ConfigurationManager.AppSettings["Languages"].Split(',').ToList(), Lang);
+  SelectList Items2 = new SelectList(SF.GetMenuGroups(), Group);
+
+var jsonSerialiser = new JavaScriptSerializer();
+var json = jsonSerialiser.Serialize(Model);
+}
+
+@*@Html.Raw(json)*@
+
+<h2>@ViewBag.Title</h2>
+<div>
+
+@(Html.Kendo().DropDownList()
+    .Name("Languages")
+    .DataTextField("Text")
+    .DataValueField("Value")
+    .BindTo(Items)
+    .Value(Lang)
+)
+<br/>
+<br/>
+@(Html.Kendo().DropDownList()
+    .Name("MenuGroups")
+    .DataTextField("Text")
+    .DataValueField("Value")
+    .BindTo(Items2)
+    .Value(Group)
+)
+
+
+<br/>
+ <br/>
+<input class="k-textbox" placeholder="@RP.T("Admin.Views.Menu.Index.Item.Title")" type="text" id="appendNodeText" />
+<button class="k-button" onclick="MenuBuilder.Add();">@RP.T("Admin.Views.Command.Add")</button>
+</div>
+<br/>
+<br/>
+<div id="example">
+            <div class="demo-section k-header">
+
+                <div id="treeview-left"></div>
+
+            
+            </div>
+
+
+
+
+<script id="treeview-template" type="text/kendo-ui-template">
+<span 
+data-ID="#: item.ID #"
+data-ParentID="#: item.ParentID #"
+data-LangCode="#: item.LangCode #"
+data-Group="#: item.Group #"
+data-DisplayOrder="#: item.DisplayOrder #"
+data-Title="#: item.Title #"
+data-PageUrl="#: item.PageUrl #" 
+data-CustomClass="#: item.CustomClass #" 
+data-CustomCss="#: item.CustomCss #" 
+data-Published="#: item.Published #"
+data-TargetBlank="#: item.TargetBlank #"
+ class="tree-item-val">#: item.Title #</span>
+
+<i class="edit-link" onclick="MenuBuilder.PopUp(event,this);"><span class="k-icon k-edit"></span></i>
+<i class="edit-link" onclick="MenuBuilder.Delete(event,this);"><span class="k-icon k-delete"></span></i>
+<i class="edit-link selectedvis" onclick="MenuBuilder.PrepareAdd(event,this);"><span class="k-icon k-add"></span></i>
+
+        </script>
+
+<script id="treeview-edittemplate" type="text/kendo-ui-template">
+<div class="tree-edit-wrap">
+
+<div class="input-wrap">
+<label>@RP.T("Admin.Views.Menu.Index.Item.Title")</label>
+<input class="k-textbox" type="text" name="Title" value="#: title #" />
+</div>
+
+<div class="input-wrap">
+<label>@RP.T("Admin.Views.Menu.Index.Item.PageUrl")</label>
+<input class="k-textbox" type="text" name="PageUrl" value="#: pageurl #" />
+</div>
+
+<div class="input-wrap">
+<label>@RP.T("Admin.Views.Menu.Index.Item.CustomClass")</label>
+<input class="k-textbox" type="text" name="CustomClass" value="#: customclass #" />
+</div>
+
+<div class="input-wrap">
+<label>@RP.T("Admin.Views.Menu.Index.Item.CustomCss")</label>
+<input class="k-textbox" type="text" name="CustomCss" value="#: customcss #" />
+</div>
+
+<div class="input-wrap">
+<label>@RP.T("Admin.Views.Menu.Index.Item.Published")</label>
+<input type="checkbox" name="Published" # if (published) { #
+                checked="checked"
+            # } #  />
+</div>
+
+<div class="input-wrap">
+<label>@RP.T("Admin.Views.Menu.Index.Item.TargetBlank")</label>
+<input type="checkbox" name="TargetBlank" # if (targetblank) { #
+                checked="checked"
+            # } #  />
+</div>
+
+<div>
+<i class="k-button" onclick="MenuBuilder.SavePopUp(event,this);">@RP.T("Admin.Views.Command.Save")</i>
+<i class="k-button" onclick="MenuBuilder.ClosePop(event,this);">@RP.T("Admin.Views.Command.Cancel")</i>
+</div>
+</div>
+</script>
+            <script>
+                $(document).ready(function () {
+                    $("#Languages").change(function () {
+                        window.location = "@(Url.Action("Index", "Menu"))?lang=" + $(this).val()+'&group=@(Group)';
+                    });
+                    $("#MenuGroups").change(function () {
+                        window.location = "@(Url.Action("Index", "Menu"))?group=" + $(this).val()+'&lang=@(Lang)';
+                    });
+                });
+
+                var MenuBuilder = {
+                    curItem: {},
+                    treeView:{},
+                    PrepareAdd:function(e,k){
+                       // var t = $(k).parents('div:eq(0)');
+                       // t.click();
+                        $("#appendNodeText").val('New');
+                        MenuBuilder.Add();
+                    },
+                    Add:function(){
+                        var title = $("#appendNodeText").val();
+                        if(!title){ alert('Title required'); return;}
+                        var selectedNode = MenuBuilder.treeView.select();
+                        console.log(selectedNode);
+                        // passing a falsy value as the second append() parameter
+                        // will append the new node to the root group
+                        var diID =0;
+                        if (selectedNode.length == 0) {
+                            selectedNode = null;
+                        }else{
+                            diID = $(selectedNode).find('span.tree-item-val').attr('data-ID');
+                        }
+                        var newItem = {
+                            Title: $("#appendNodeText").val(),
+                            PageUrl:'',
+                            ParentID:diID,
+                            CustomClass:'',
+                            CustomCss:'',
+                            Published:false,
+                            TargetBlank:false,
+                            LangCode:'@Lang',
+                            Group:'@Group',
+                            DisplayOrder:100000
+                        };
+                        $.ajax(
+                                                      {
+                                                          type: "POST",
+                                                          url: "/Admin/Menu/AjaxInsert",
+                                                          data: newItem,
+                                                          success: function(data){
+                                                              MenuBuilder.treeView.append(data.newItem, selectedNode);
+                                                              $("#appendNodeText").val('');
+                                                          },
+                                                      });
+                        
+                       
+                    },
+                    Delete:function(e, k){
+                        var t = $(k).parents('div:eq(0)');
+                        var v = t.find('span.tree-item-val');
+                        var ID = v.attr('data-ID');
+                        $.ajax(
+                                                                   {
+                                                              type: "POST",
+                                               url: "/Admin/Menu/AjaxDelete",
+                                               data: {ID:ID  },
+                                               success: function(data){
+                                                   $(k).parents('li:eq(0)').remove();
+                                            console.log(data);
+                                             },
+                                                });
+                    },
+                    SaveParent: function (e) {
+                        // console.log(e);
+                        var ID = $(e.sourceNode).find('span.tree-item-val').attr('data-ID');
+                        var newParenID = $(e.sourceNode).parents('li:eq(0)').find('span.tree-item-val').attr('data-ID');
+                        if(!newParenID){newParenID=0;}
+
+//sorting position
+                        $('#treeview-left .k-item').each(function(num,li){
+                            //detect changed DisplayPosition and save
+                            var di = $(li).find('span.tree-item-val').attr('data-DisplayOrder');
+                            var newDI = (num+1)*10;
+                            var diID = $(li).find('span.tree-item-val').attr('data-ID');
+                            if(di != newDI && ID != diID){
+                                
+                                $.ajax(
+                                                                                           {
+                                                                                               type: "POST",
+                                                                                               url: "/Admin/Menu/AjaxSaveOrder",
+                                                                                               data: {ID:diID,
+                                                                                                 
+                                                                                                   DisplayOrder:newDI},
+                                                                                               success: function(data){
+                                                                                                   console.log(data);
+                                                                                               },
+                                                                                           });
+                               // alert('need save '+diID+' = '+newDI+' : '+di);
+                            }
+                            $(li).find('span.tree-item-val').attr('data-DisplayOrder',newDI);
+                        });
+                        var displayPosition = $(e.sourceNode).find('span.tree-item-val').attr('data-DisplayOrder');
+                        $.ajax(
+                                                            {
+                                                                type: "POST",
+                                                                url: "/Admin/Menu/AjaxSaveParent",
+                                                                data: {ID:ID,
+                                                                    ParentID:newParenID,
+                                                                    DisplayOrder:displayPosition},
+                                                                success: function(data){
+                                                                    console.log(data);
+                                                                },
+                                                            });
+
+
+                        //console.log($(e.sourceNode).find('span.tree-item-val').attr('data-ParentID'));
+                       // console.log($(e.sourceNode).parents('li:eq(0)').find('span.tree-item-val').attr('data-ID'));
+                    },
+                    SavePopUp: function (e, k) {
+                        var t = $(k).parents('.tree-edit-wrap:eq(0)').find('input[name="Title"]');
+                        var v = MenuBuilder.curItem.find('span.tree-item-val');
+                        v.text(t.val());
+                        var data = $(k).parents('.tree-edit-wrap:eq(0)').find('input').get();
+                       // console.log(data);
+                        var forsave={};
+                        for(var i in data)
+                        {
+                            if(data[i])
+                            { if($(data[i]).is(':checkbox') ){
+                                $(data[i]).val('');
+
+                                if($(data[i]).is(':checked')){
+                                    $(data[i]).val('True');
+                                }
+                            }
+                            forsave[$(data[i]).attr('name')] = $(data[i]).val();
+                                v.attr('data-'+$(data[i]).attr('name'),$(data[i]).val());
+                            }
+                        }
+                        var data = v.data();
+                        for(var i in data){
+                            if(!(i in forsave))
+                            {
+                                forsave[i] = data[i];
+                            }
+                        }
+                        console.log(forsave);
+                        var uid=MenuBuilder.curItem.parents('li:eq(0)').attr('data-uid');
+                        var curElemDataSource = MenuBuilder.treeView.dataSource.getByUid(uid);
+                        for(var i in forsave)
+                        {
+                            curElemDataSource[i] = forsave[i];
+                        }
+                        $.ajax(
+                                    {
+                                        type: "POST",
+                                        url: "/Admin/Menu/AjaxSave",
+                            data: forsave,
+                        success: function(data){
+                            console.log(data);
+                        },
+                        });
+
+
+                        MenuBuilder.ClosePop();
+                    },
+                    ClosePop: function () {
+                        $('.e-tree-popup').remove();
+                    },
+                    PopUp: function (e, k) {
+                        var t = $(k).parents('div:eq(0)');
+                        var v = t.find('span.tree-item-val');
+                        var o = $(t).offset();
+                        MenuBuilder.ClosePop();
+                        var html = $('#treeview-edittemplate').html();
+                        
+                        var data = v.data();
+                     
+                        var template = kendo.template(html);
+                        for(var i in data){
+                            
+                            if(data[i] == null)
+                            {
+                                data[i]='';
+                            }else{
+                                data[i]=v.attr('data-'+i);
+                            }
+                          //  html = html.replace(new RegExp('(' + "#: "+i+" #" + ')', 'gi'), "$1");// html.replace("#: "+i+" #", data[i]);
+                        //    alert("#: "+i+" #");
+                         }
+                        console.log(data);
+                        html = template(data); 
+                        MenuBuilder.curItem = t;
+                        $('body').append('<div class="e-tree-popup" style="position:absolute; top:' + o.top + 'px; left:' + o.left + 'px;">\
+' + html + '</div>');
+                    },
+                    Edit: function (e, k) {
+
+                        return;
+                        e.preventDefault();//stop click this
+                        e.stopPropagation();// stop event global, focus free enable
+                        var t = $(k).parents('.parentwrap:eq(0)').find('.labelwrap');
+                        var el = $(k).parents('.parentwrap:eq(0)').find('.edit-link');
+                        if (t.find('input').length > 0) {
+                            //already inputed
+                            if ($(k) == el) {
+                                el.text('Edit');
+                                t.html('<span>' + t.find('input').val() + '</span>');
+                                // t.find('input').focus().select();
+                            }
+                            else {
+                                t.find('input').focus().select();
+                            }
+                            return;
+                        }
+                        el.text('Save');
+                        t.html('<input class="k-textbox" style="width:100%; z-index:5000;"\
+ type="text" value="' + t.text() + '" name="menuitemname" \
+onkeypress="MenuBuilder.keypress(event,this);"/>');
+                        t.find('input').focus().select();
+                    },
+                    setFocus: function (t) {
+                        t.focus();
+                    },
+                    keypress: function (e, k) {
+                        return;
+                        if (e.which == 13) {
+                            var t = $(k).parents('.parentwrap:eq(0)').find('.labelwrap');
+                            var el = $(k).parents('.parentwrap:eq(0)').find('.edit-link');
+
+                            t.html('<span>' + $(k).val() + '</span>');
+                            el.text('Edit');
+
+                            }
+                        
+                    },
+                };
+                function treeGlobEvent() {
+                    MenuBuilder.ClosePop();
+                }
+                function treeDropEvent(e) {
+                    MenuBuilder.ClosePop();
+                    MenuBuilder.SaveParent(e);
+                    
+                }
+                MenuBuilder.treeView =  $("#treeview-left").kendoTreeView({
+                    dragAndDrop: true,
+                    template: kendo.template($("#treeview-template").html()),
+                   
+                    //select: treeGlobEvent,
+                    check: treeGlobEvent,
+                   // change: treeGlobEvent,
+                    collapse: treeGlobEvent,
+                    expand: treeGlobEvent,
+                    
+                    /* drag & drop events */
+                    dragstart: treeGlobEvent,
+                    drag: treeGlobEvent,
+                    drop: treeGlobEvent,
+                    dragend: treeDropEvent,
+                    navigate: treeGlobEvent,
+                    dataTextField: "Title",
+                    loadOnDemand: false,
+                    dataSource: new kendo.data.HierarchicalDataSource({
+                        data: @Html.Raw(json),
+                        schema: {
+                            model: {
+                                children: "Childrens"
+                            }
+                        }
+                    })
+                }).data("kendoTreeView");
+                
+                $(document).ready(function () {
+                    var treeView = $("#treeview-left").data("kendoTreeView");
+                    treeView.expand(".k-item");
+                });
+            </script>
+
+            <style scoped>
+                .tree-edit-wrap {
+position:relative;
+top:-4px;
+width:300px;
+min-height:30px;
+overflow:hidden;
+padding:2px;
+background: #428bca;
+color:#ebebeb; 
+border-radius:3px;               
+}
+                    .tree-edit-wrap input[type="text"] {
+       width:200px;             
+}
+                .input-wrap {
+padding-bottom:8px;                
+}
+.tree-edit-wrap label {
+  padding-left:15px;
+    width:80px;
+    display:inline-block;
+text-align:left;
+}
+                .edit-link {
+cursor:pointer;
+opacity:0.5;
+               margin-left:4px;
+padding:4px;
+}
+                .selectedvis {
+display:none;                
+}
+                .k-state-selected .selectedvis {
+                
+display:inline-block;
+}
+                    .edit-link:hover {
+color:#75bbf8;
+
+opacity:1;                   
+}
+            </style>
+        </div>

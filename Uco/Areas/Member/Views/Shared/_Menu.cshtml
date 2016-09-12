@@ -1,0 +1,31 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc;
+@using Uco.Infrastructure;
+
+@{
+    if (!Kendo.Mvc.SiteMapManager.SiteMaps.ContainsKey("member"))
+    {
+        Kendo.Mvc.SiteMapManager.SiteMaps.Register<Kendo.Mvc.XmlSiteMap>("member", sitemap => sitemap.LoadFrom("~/Areas/Member/sitemap.xml"));
+    }
+}
+@(Html.Kendo().Menu()
+    .Name("menu")
+    .BindTo("member", (item, siteMapNode) =>
+    {
+        var imageUrl = ((Kendo.Mvc.SiteMapNode)siteMapNode).Attributes["ImageUrl"];
+        if (imageUrl != null && !string.IsNullOrEmpty(imageUrl.ToString()))
+        {
+            item.ImageUrl = imageUrl.ToString();
+        }
+
+        var resourceName = ((Kendo.Mvc.SiteMapNode)siteMapNode).Attributes["Resource"];
+        
+            item.Text = RP.T(resourceName.ToString()).ToString();// Html.R(VirtualPath, resourceName.ToString());
+       
+        if (ViewBag.SelectedMenuItem == item.Text)
+        {
+            item.Selected = true;
+        }
+    })
+    .HtmlAttributes(new { style = "position: relative; z-index: 100" })
+)

@@ -1,0 +1,24 @@
+﻿@model int
+@using Uco.Models
+@{
+    ViewBag.Title = RP.T("Views.Shared.Contact.ViewBagTitle");
+
+    Layout = "~/Views/Shared/_LayoutShop.cshtml";
+    ViewBag.Url = "~/Shared/Contact/" + Model;
+
+}
+@section FooterZone{
+
+}
+
+<div class="midd_section2">
+    <div class="center_div">
+        <div class="profile_page_right_sec" style="min-height:360px;">
+            <h1 class="main_heading_h1_profile" id="successfullySend">@RP.T("Views.PagePart._ContactSuccessfullySend.SuccessfullySend") @Html.ActionLink(RP.T("Views.PagePart._ContactSuccessfullySend.SendAgain").ToString(), "Contact", "Shop", new { ID = Model })</h1>
+        </div>
+        <div class="prfl_left_sec">
+            @Html.Action("_QuestionAnswer", "PagePart")
+        </div>
+        <div class="clear"></div>
+    </div>
+</div>

@@ -1,0 +1,39 @@
+﻿@{
+    ViewBag.Title = RP.T("Admin.Views.Newsletter.Index.Title");
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutNoTree.cshtml";
+}
+
+<h2>@RP.T("Admin.Views.Newsletter.Index.Title")</h2>
+
+@(Html.Kendo().Grid<Uco.Models.Newsletter>()
+        .Name("Grid")
+        .DataSource(dataSource => dataSource.Ajax()
+            .Model(model => { model.Id(item => item.ID); })
+            .Read(r => r.Action("_AjaxIndex", "Newsletter"))
+            .Sort(sort =>
+            {
+                sort.Add(r => r.NewsletterDate).Descending();
+            })
+            .Destroy(r => r.Action("_AjaxDelete", "Newsletter"))
+        )
+        .Columns(columns =>
+        {
+            columns.Bound(r => r.NewsletterDate).Width(200).Format("{0:MM/dd/yyyy}");
+            columns.Bound(r => r.NewsletterName);
+            columns.Bound(r => r.NewsletterEmail);
+            columns.Bound(r => r.RoleDefault);
+            columns.Template(r => r.ID).ClientTemplate(
+                "<a class='k-button' href='" + Url.Action("Details", "Newsletter") + "?ID=#= ID #'" + ">" + RP.T("Admin.Views.Command.Details").ToString() + "</a>"
+            ).Width(100);
+            columns.Command(commands =>
+            {
+                commands.Destroy();
+            })
+            .Width(100);
+        })
+        .Pageable()
+        .Sortable()
+        .Filterable()
+        .Groupable()
+        .ToolBar(commands => commands.Custom().Text(RP.T("Admin.Views.Command.ExportToCSV").ToString()).Action("CSVExport", "Newsletter"))
+)

@@ -1,0 +1,18 @@
+﻿<select class="drop_down1">
+    <option>ניווט מהיר</option>
+    <option data-href="/arl/שרותים">שירותים</option>
+    <option data-href="/arl/הפתרונות_שלנו">הפתרונות</option>
+    <option data-href="/arl/מוצרים_שלנו">מוצרים</option>
+    <option data-href="/prl/פרוייקטים">תיק עבודות</option>
+    <option data-href="/c/לקוחות">לקוחות</option>
+    <option data-href="/c/אודות">אודות</option>
+    <option data-href="http://199.uco.co.il">תמיכה</option>
+    <option data-href="/f/contact">צור קשר</option>
+</select>
+@{ Html.Telerik().ScriptRegistrar().OnDocumentReady(@<text> 
+    $('.drop_down1').change(function () {
+        var href = $("option:selected", this).attr("data-href");
+        //alert(href);
+        window.location.href = href;
+    });
+</text>); }

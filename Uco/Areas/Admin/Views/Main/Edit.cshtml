@@ -1,0 +1,16 @@
+﻿@{
+    ViewBag.Title =  RP.T("Admin.Views.Main.Index.Title");
+    Layout = "~/Areas/Admin/Views/Shared/_ActionLayout.cshtml";
+}
+<div class="action_wrap">
+    @using (Html.BeginForm())
+    {
+        @Html.ValidationMessageFor(model => model)
+        @Html.ValidationSummary(false)
+        @Html.EditorForModel()
+        <div class="button_div">
+            <input type="submit" value="@RP.T("Admin.Views.Command.Save")" class="k-button" />
+            <a href="#" onclick="history.go(-1)">@RP.T("Admin.Views.Command.Back")</a>
+        </div>
+    }
+</div>

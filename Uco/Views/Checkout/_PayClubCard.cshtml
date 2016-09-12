@@ -1,0 +1,55 @@
+﻿@using Uco.Models
+@model Order
+@{
+    var IDslist = new List<string>();
+    var typesShop = LS.Get<Shop>().FirstOrDefault(x => x.ID == Model.ShopID);
+   
+    if(typesShop!=null && typesShop.ClubCardTypes !=null)
+    {
+
+        IDslist = typesShop.ClubCardTypes.Split(new char[] { ',','\n'}
+            , StringSplitOptions.RemoveEmptyEntries).ToList();
+    }
+    var clubcardtypes = IDslist.Select(x => new SelectListItem() { Text = x, Value = x }).ToList();
+}
+
+@using (Html.BeginForm("_ClubCardSubmit", "Checkout", FormMethod.Post, new { id = "payment-form-club", @class = "form3 payment_right_in_right" }))
+{
+    @Html.HiddenFor(x=>x.ID)
+
+    <div class="row">@Html.DropDownList("CardType", clubcardtypes, new { @class = "drop_down" })</div>
+    
+    <div class="row">@Html.TextBox("CardNumber", "", new { @class = "single-line", placeholder = RP.S("Views.Checkout._PayClubCard.CardNumber") })</div>
+
+    <div class="row">@Html.TextBox("CardID", "", new { @class = "single-line", placeholder = RP.S("Views.Checkout._PayClubCard.CardID") })</div>
+
+    <div class="row"><div class=""><a class="shopping-cart " href="@Url.Action("Index", "Shop", new { ID = Model.ShopID })">@RP.T("Views.ShoppingCart.Index.BackToTheStore")</a>
+       
+        <a id="submit-form" class="shopping-cart " style="float:left;" href="#">@RP.T("Views.Checkout._PayClubCard.Confirm")</a></div></div>
+}
+<script>
+    $('#submit-form').click(function (e) {
+        e.preventDefault();
+        var data = $('#payment-form-club').serialize();
+        var wrap = $('#payment-form-club');
+        $('.errror-wrap', wrap).html('');
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "/Checkout/_ClubCardSubmit",
+            data: data,
+            cache: false,
+            error: function () {
+                //alert('Server error');
+            }
+        }).done(function (data) {
+            if (data.result == "ok") {
+                wrap.html('<div class="errror-wrap"><div class="k-widget k-tooltip-validation"><span class="k-icon k-warning">\
+</span>@RP.T("Views.Checkout._PayClubCard.YourOrderAccepted")</div></div>');
+            } else {
+                //data.message - errors
+                Shop.ShowErrors(data, wrap);
+            }
+        });
+    });
+</script>

@@ -1,0 +1,151 @@
+﻿@{
+    List<Uco.Models.FormField> l = ViewBag.Items;
+    string FormSeoUrl = ViewBag.FormSeoUrl;
+    int FormID = ViewBag.FormID;
+}
+<div class="form2">
+    <div class="heading">צרו איתנו קשר</div>
+    @using (Ajax.BeginForm("FormPage", "Page", new { name = FormSeoUrl }, new AjaxOptions
+    {
+        UpdateTargetId = "form_update",
+        InsertionMode = InsertionMode.Replace,
+        LoadingElementId = "form_loading",
+        HttpMethod = "POST"
+    }))
+    {
+        <div class="contact_form contact_form_@(ViewBag.ID)" id="form_update">
+
+            <script type="text/javascript">
+                function changeClass(elementID, newClass) {
+                    var element = document.getElementById(elementID);
+                    element.className = element.className + newClass;
+                }
+                function setAttribute(elementID, attrName, attrValue) {
+                    var element = document.getElementById(elementID);
+                    element.setAttribute(attrName, attrValue);
+                }
+            </script>
+            @foreach (Uco.Models.FormField item in l)
+            {
+
+                if (item.FormFieldType == Uco.Models.FormField.FormFildType.RadioBottonList)
+                {
+                    <div class="row row_@(item.FormFieldID.ToString())">
+                        <div class="editor-label">@Html.Label(item.FormFieldTitle)@(item.FormFieldRequired ? " * " : ""):</div>
+                        <div class="editor-field">
+                            @Html.Editor("form_item_" + FormID + "_" + item.FormFieldID.ToString(), item.FormFieldType.ToString(), new { Placeholder = item.FormFieldTitle, RequiredTitle = item.FormFieldRequiredTitle })
+                            @if (item.FormFieldRequired)
+                            {
+                                <text>
+                                    <script type="text/javascript">changeClass("form_item_@(FormID)_@(item.FormFieldID.ToString())", " required")</script></text>
+                            }
+                        </div>
+                    </div>
+                }
+                else if (item.FormFieldType == Uco.Models.FormField.FormFildType.CheckboxList)
+                {
+                    <div class="row row_@(item.FormFieldID.ToString())">
+                        <div class="editor-label">@Html.Label(item.FormFieldTitle)@(item.FormFieldRequired ? " * " : ""):</div>
+                        <div class="editor-field">
+                            @Html.Editor("form_item_" + FormID + "_" + item.FormFieldID.ToString(), item.FormFieldType.ToString(), new { Placeholder = item.FormFieldTitle, RequiredTitle = item.FormFieldRequiredTitle })
+                            @if (item.FormFieldRequired)
+                            {
+                                <text>
+                                    <script type="text/javascript">changeClass("form_item_@(FormID)_@(item.FormFieldID.ToString())", " required")</script></text>
+                            }
+                        </div>
+                    </div>
+                }
+                else if (item.FormFieldType == Uco.Models.FormField.FormFildType.DropDown)
+                {
+                    <div class="row row_@(item.FormFieldID.ToString())">
+                        <div class="editor-label">@Html.Label(item.FormFieldTitle)@(item.FormFieldRequired ? " * " : ""):</div>
+                        <div class="editor-field">
+                            @Html.Editor("form_item_" + FormID + "_" + item.FormFieldID.ToString(), item.FormFieldType.ToString(), new { Placeholder = item.FormFieldTitle, RequiredTitle = item.FormFieldRequiredTitle })
+                            @if (item.FormFieldRequired)
+                            {
+                                <text>
+                                    <script type="text/javascript">changeClass("form_item_@(FormID)_@(item.FormFieldID.ToString())", " required")</script></text>
+                            }
+                        </div>
+                    </div>
+                }
+                else if (item.FormFieldType == Uco.Models.FormField.FormFildType.EmailAddress)
+                {
+                    <div class="row row_@(item.FormFieldID.ToString())">
+                        <div class="editor-label">@Html.Label(item.FormFieldTitle)@(item.FormFieldRequired ? " * " : ""):</div>
+                        <div class="editor-field">
+                            @Html.Editor("form_item_" + FormID + "_" + item.FormFieldID.ToString(), item.FormFieldType.ToString(), new { htmlAttributes = new { Placeholder = item.FormFieldTitle, type = "email", @class = "email" } })
+                            @if (item.FormFieldRequired)
+                            {
+                                if (item.FormFieldRequired)
+                                {
+                                    if (!string.IsNullOrEmpty(item.FormFieldRequiredTitle))
+                                    {
+                                        <text>
+                                            <span data-valmsg-replace="true" data-valmsg-for="form_item_@(FormID)_@(item.FormFieldID.ToString())" class="field-validation-error"></span>
+                                            <script type="text/javascript">setAttribute("form_item_@(FormID)_@(item.FormFieldID.ToString())", "data-val-required", "@item.FormFieldRequiredTitle"); setAttribute("form_item_@(FormID)_@(item.FormFieldID.ToString())", "data-val", "true");</script>
+                                        </text>
+                                    }
+                                    <text>
+                                        <script type="text/javascript">changeClass("form_item_@(FormID)_@(item.FormFieldID.ToString())", " required")</script></text>
+                                }
+                            }
+                        </div>
+                    </div>
+                }
+                else if (item.FormFieldType == Uco.Models.FormField.FormFildType.PhoneNumber)
+                {
+                    <div class="row row_@(item.FormFieldID.ToString())">
+                        <div class="editor-label">@Html.Label(item.FormFieldTitle)@(item.FormFieldRequired ? " * " : ""):</div>
+                        <div class="editor-field">
+                            @Html.Editor("form_item_" + FormID + "_" + item.FormFieldID.ToString(), item.FormFieldType.ToString(), new { htmlAttributes = new { Placeholder = item.FormFieldTitle, type = "phone", data_val_regex_pattern = "^[0-9 ()*-]{9,15}$", data_val_regex = "בדוק טלפון" } })
+                            @if (item.FormFieldRequired)
+                            {
+                                if (item.FormFieldRequired)
+                                {
+                                    if (!string.IsNullOrEmpty(item.FormFieldRequiredTitle))
+                                    {
+                                        <text>
+                                            <span data-valmsg-replace="true" data-valmsg-for="form_item_@(FormID)_@(item.FormFieldID.ToString())" class="field-validation-error"></span>
+                                            <script type="text/javascript">setAttribute("form_item_@(FormID)_@(item.FormFieldID.ToString())", "data-val-required", "@item.FormFieldRequiredTitle"); setAttribute("form_item_@(FormID)_@(item.FormFieldID.ToString())", "data-val", "true");</script>
+                                        </text>
+                                    }
+                                    <text>
+                                        <script type="text/javascript">changeClass("form_item_@(FormID)_@(item.FormFieldID.ToString())", " required")</script></text>
+                                }
+                            }
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="row row_@(item.FormFieldID.ToString())">
+                        <div class="editor-label">@Html.Label(item.FormFieldTitle)@(item.FormFieldRequired ? " * " : ""):</div>
+                        <div class="editor-field">
+                            @Html.Editor("form_item_" + FormID + "_" + item.FormFieldID.ToString(), item.FormFieldType.ToString(), new { htmlAttributes = new { Placeholder = item.FormFieldTitle } })
+                            @if (item.FormFieldRequired)
+                            {
+                                if (!string.IsNullOrEmpty(item.FormFieldRequiredTitle))
+                                {
+                                    <text>
+                                        <span data-valmsg-replace="true" data-valmsg-for="form_item_@(FormID)_@(item.FormFieldID.ToString())" class="field-validation-error"></span>
+                                        <script type="text/javascript">setAttribute("form_item_@(FormID)_@(item.FormFieldID.ToString())", "data-val-required", "@item.FormFieldRequiredTitle"); setAttribute("form_item_@(FormID)_@(item.FormFieldID.ToString())", "data-val", "true");</script>
+                                    </text>
+                                }
+                                <text>
+                                    <script type="text/javascript">changeClass("form_item_@(FormID)_@(item.FormFieldID.ToString())", " required")</script></text>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+            <div class="editor-button">
+                @Html.Partial("_InvisibleCaptcha", new Uco.Models.InvisibleCaptcha())
+                <input type="hidden" value="@FormID" name="FormID" id="FormID" />
+                <input type="submit" value="שלח פנייה" class="send" />
+                <div id="form_loading" class="dn">...שולח פניה...</div>
+            </div>
+        </div>
+    }
+</div>

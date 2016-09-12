@@ -1,0 +1,49 @@
+﻿@{
+  int month = LS.GetRandom();
+  string FieldID = ViewData.TemplateInfo.HtmlFieldPrefix.Replace(".", "_");
+}
+
+
+<input id="@FieldID@(month)" data-zero="false" name="@ViewData.TemplateInfo.HtmlFieldPrefix.Replace("_",".")" value="@Model" />
+
+<script>
+    $('#@FieldID@(month)')
+                            .kendoComboBox(
+    {
+        placeholder: "Select ",
+        dataTextField: "Name",
+        dataValueField: "ID",
+
+        filter: "contains",
+        minLength: 1,
+        "autoBind": true,
+        dataSource: {
+            schema: {
+                data: "Data",
+                total: "Total",
+                errors: "Errors",
+            },
+            type: "json",
+            serverFiltering: true,
+            filter: [],
+            transport: {
+                "prefix": "",
+                read: {
+                    url: "@Url.Action("_AjaxAutoComplete", "Generic", new {model = "Shop" })"
+,
+                    type: "POST",
+                    data: function () {
+                        var data = kendo.ui.ComboBox.requestData('#@FieldID@(month)');
+
+                        /** data["filter"] = "SpecificationAttributeID~eq~1";
+                        console.log(data);
+                        **/
+                        return data;
+                    },
+                }
+            }
+        }
+    });
+
+</script>
+

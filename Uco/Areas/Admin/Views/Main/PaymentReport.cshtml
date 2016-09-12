@@ -1,0 +1,385 @@
+﻿@using Uco.Models
+@using Uco.Models.Overview
+@using Uco.Infrastructure
+@{
+    ViewBag.Title = RP.T("Admin.Views.PaymentReport.Index.Title");
+    Layout = "~/Areas/Member/Views/Shared/_LayoutNoTree.cshtml";
+ 
+}
+@model PaymentReportModel
+@if (!string.IsNullOrEmpty(ViewBag.Mesage))
+{
+    <div class="notification information">
+        <div>
+            @ViewBag.Mesage
+        </div>
+    </div>
+}
+<h2>@ViewBag.Title</h2>
+
+<div id="paymentgridfilterbox" class="gridfilterbox">
+
+    <div class="editor-label"><label for="Date">@M("PaymentReportModel", "Date")</label></div>
+    <div class="editor-field">
+        <input data-val="true" data-val-date="The field Date must be a date." data-val-required="The Date field is required." id="Date" name="Date" type="datetime" value="" />
+        <script>
+            jQuery(function () { jQuery("#Date").kendoDateTimePicker({  timeFormat: "HH:mm", "format": "d/M/yyyy HH:mm", "min": new Date(1900, 0, 1, 0, 0, 0, 0), "max": new Date(2099, 11, 31, 0, 0, 0, 0), "interval": 30 }); });
+        </script>                        -
+        <input data-val="true" data-val-date="The field DateTime must be a date." data-val-required="The DateTime field is required." id="Date_dateto" name="Date_dateto" type="datetime" value="" />
+        <script>
+            jQuery(function () { jQuery("#Date_dateto").kendoDateTimePicker({ timeFormat: "HH:mm", "format": "d/M/yyyy HH:mm", "min": new Date(1900, 0, 1, 0, 0, 0, 0), "max": new Date(2099, 11, 31, 0, 0, 0, 0), "interval": 30 }); });
+        </script>
+    </div>
+    <div class="editor-label"><label for="ShopID">@M("PaymentReportModel", "ShopID")</label></div>
+    <div class="editor-field">
+      @{
+          var newModel = new Shop();
+          string editorTemplate = "GenericDropDown";
+            ViewData.TemplateInfo.HtmlFieldPrefix = "ShopID";
+
+            @Html.Partial("EditorTemplates/" + editorTemplate, newModel)
+            ViewData.TemplateInfo.HtmlFieldPrefix = "";
+            }
+       
+    </div>
+    <div class="editor-label"><label for="IsPaidUp">@M("PaymentReportModel", "IsPaidUp")</label></div>
+    <div class="editor-field">
+        <select class="k-dropdown-wrap k-state-default" id="IsPaidUp" name="IsPaidUp">
+            <option value="">@RP.T("Enums.PaidUp.Any")</option>
+            <option value="True">@RP.T("Enums.PaidUp.PaidUp")</option>
+            <option value="False">@RP.T("Enums.PaidUp.NotPaidUp")</option>
+        </select>
+    </div>
+   
+    <div class="button-wrap">
+        <button class="k-button" onclick="PaymentReportItemModelgridFiltering.filter('paymentgridfilterbox');">@RP.T("Admin.Views.Main.PaymentReport.Search")</button>
+        <button class="k-button" onclick="PaymentReportItemModelgridFiltering.clear();">@RP.T("Admin.Views.Main.PaymentReport.Clear")</button>
+        @*&nbsp;&nbsp;&nbsp;*@
+        <button class="k-button" onclick="PaymentReportItemModelgridFiltering.markaspaidup();">@RP.T("Admin.Views.Main.PaymentReport.MarkUsPaidUp")</button>
+        <button class="k-button" onclick="PaymentReportItemModelgridFiltering.exportcsv();">@RP.T("Admin.Views.Main.PaymentReport.Export")</button>
+        
+        <span class="message"></span>
+    </div>
+    
+</div>
+<br/>
+<div id="PaymentReportItemModelgrid"></div>
+
+
+
+
+    <script>
+
+        var PaymentReportItemModelgridFiltering = {
+            filter: function (id) {
+                var data = { logic: "and", filters: [] };
+                //{ field: "name", operator: "startswith", value: "Jane" }
+                var grid = $("#PaymentReportItemModelgrid").data('kendoGrid');
+                //  console.log(grid.dataSource.options.schema.model);
+                $('#' + id + ' input, #' + id + ' select').each(function (i, e) {
+                    
+                    var inpname = $(e).attr('name');
+                    //console.log(inpname + ': ' + $(e).val());
+                        if (inpname in grid.dataSource.options.schema.model.fields) {
+
+                            var model = grid.dataSource.options.schema.model.fields[inpname];
+                            if (model.type == 'number') {
+                                if ($(e).attr('data-zero') && model.parse($(e).val()) < 1) {
+                                    return;
+                                }
+                            }
+                            var operator = 'eq';
+                            if (model.type == 'date') {
+                                operator = 'gte'; // >
+                                var todate = $('#' + id + ' input[name="' + inpname + '_dateto"]');
+                                if (todate.length > 0 && todate.val()) {
+                                    data.filters.push({ field: $(e).attr('name'), operator: 'lte', value: model.parse(todate.val()) });
+                                }
+                            }
+                            if (model.type == 'string') {
+                                operator = 'startswith'; // .startswith
+                            }
+                            //lte <=
+                            
+                            if ($(e).attr('name') && $(e).val()) {
+                                data.filters.push({ field: $(e).attr('name'), operator: operator, value: model.parse($(e).val()) });
+                            }
+                        }
+
+                    
+                });
+
+                grid.dataSource.filter(data);
+
+            },
+            clear: function () {
+                var grid = $("#PaymentReportItemModelgrid").data('kendoGrid');
+                grid.dataSource.filter({});
+            },
+            setFilter: function (name, value) {
+                var grid = $("#PaymentReportItemModelgrid").data('kendoGrid');
+                grid.dataSource.filter({ field: name, operator: "eq", value: value });
+                //grid.dataSource.page(1);
+                // alert(name + value);
+            },
+            CheckAll: function (e,event) {
+                if ($(e).is(':checked')) {
+                    
+                    $('.e-checkbox').each(function (i, c) {
+                        $(c)[0].checked = true;
+                    });
+                    
+                } else {
+                    $('.e-checkbox').each(function (i, c) {
+                        $(c)[0].checked = false;
+                    });
+                   
+                }
+            },
+            markaspaidup: function () {
+                var data = [];
+                $('.e-checkbox').each(function (i, c) {
+                    if ($(c).is(':checked') && $(c).attr('data-orderid')) {
+                        var oid = parseInt($(c).attr('data-orderid'));
+                        if (oid > 0) {
+                            data.push(oid);
+                        }
+                    }
+                });
+                $('#paymentgridfilterbox .message').html('');
+                if (data.length > 0) {
+                    event.preventDefault();
+                    jQuery.ajaxSettings.traditional = true;
+                    $.ajax({
+                        type: "POST",
+                        dataType: "json",
+                        url: "/Admin/Main/_AjaxPaymentMarkAsPaid",
+                        data: {IDs: data},
+                        cache: false,
+                        error: function () { $('#paymentgridfilterbox .message').html('Server error'); }
+                    }).done(function (data) {
+                        if (data.result == "ok") {
+                            $('#paymentgridfilterbox .message').html(data.message);
+                            var grid = $("#PaymentReportItemModelgrid").data('kendoGrid');
+                            grid.dataSource.read();
+                        } else {
+                            //data.message - errors
+                            Shop.ShowErrors(data, $('#paymentgridfilterbox'));
+                        }
+                    });
+                   // console.log(data);
+                }
+            },
+            exportcsv:function()
+            {
+                PaymentReportItemModelgridFiltering.filter('paymentgridfilterbox');
+                //make simple kendo request query string
+                var grid = $("#PaymentReportItemModelgrid").data('kendoGrid');
+                
+                data = { filter: grid.dataSource.filter() };
+               
+                data = new kendo.data.transports["aspnetmvc-ajax"]({ prefix: "" }).parameterMap(data, 'read');
+             
+                location.href = "/Admin/Main/CSVExport?filter=" + data.filter;
+                
+            }//
+        };
+
+
+
+
+
+    $(document).ready(function () {
+        /*
+        Docs
+        http://docs.telerik.com/kendo-ui/api/javascript/ui/grid
+        */
+        var gridLocal = function () {
+            if ('messages' in kendo.ui.Grid.prototype.options) {
+                return kendo.ui.Grid.prototype.options.messages.commands.create;
+            } else {
+                return "Add new";
+            }
+        }
+        $("#PaymentReportItemModelgrid").kendoGrid({
+            dataSource: {
+
+                type: "json",
+                transport: {
+                    "prefix": "",
+                    read: {
+                        url: "/Admin/Main/_AjaxPaymentReport",
+                        type: "POST",
+                        dataType: "json",
+                        // data: { filter:'ID~eq~3'  }
+                    },
+                },
+
+                schema: {
+                    data: "Data",
+                    total: "Total",
+                    errors: "Errors",
+                    model: {
+                        "id": "OrderID",
+                        fields: {
+                            "OrderID": { "type": "number", defaultValue: 0 },
+                            "ShopID": { "type": "number", defaultValue: 0 },
+                            "IsPaidUp": { "type": "boolean" },
+                            "Date": { "type": "date" },
+                            "Total": { "type": "number", defaultValue: 0 },
+                            "TotalStr": { "type": "string" },
+                            "PaymentMethod": { "type": "number", defaultValue: 0 },
+                            "PayedTo": { "type": "number", defaultValue: 0 },
+                            // "ID": {"type":"number" ,editable: false}
+                        }
+
+                    }
+                },
+                requestEnd: function(e) {
+                    var reportmodel = e.response.model;
+                    $('#totalshop').html(reportmodel.TotalShopStr);
+                    $('#totaladmin').html(reportmodel.TotalAdminStr);
+                    $('#totalfee').html(reportmodel.TotalFeeStr);
+                    $('#e-checkall')[0].checked = false;
+                },
+                pageSize: 20,
+                "error": error_handler,
+                "sync": function (e) { this.read(); },
+                "serverPaging": true,
+                "serverSorting": true,
+                "serverFiltering": true,
+                "serverGrouping": true,
+                "serverAggregates": true,
+                "filter": [],
+                "type": "aspnetmvc-ajax",
+            },
+            refresh: true,
+            //  detailTemplate: kendo.template($("#template").html()),
+            // detailInit: detailInit,
+            // dataBound: function () {
+            //this.expandRow(this.tbody.find("tr.k-master-row").first());
+            //   },
+            pageable: {
+                refresh: true,
+                 pageSizes: [10, 20, 50, 100],
+                pageSize: 10
+            },
+
+            columns: [
+                {
+                    field: "IsPaidUp", width: "50px", title: "@M("PaymentReportItemModel","IsPaidUp")", sortable: false, filterable: false, editor: ' ',
+                    template: "# if(IsPaidUp) { # <input type=\"checkbox\" checked=\"checked\" disabled=\"disabled\" /> #"
+                + "} else { # <input type=\"checkbox\" data-orderid=\"#: OrderID #\" class=\"e-checkbox\"  /> # } #",
+                    headerTemplate: '<input type="checkbox" id="e-checkall" onclick=\"PaymentReportItemModelgridFiltering.CheckAll(this,event);\" /><label for="e-checkall">@RP.T("Admin.Views.Common.MarkAll")</label>'
+                },
+
+{
+    field: "OrderID",width:"120px", title: "@M("PaymentReportItemModel", "OrderID")", sortable: false, filterable: false, editor: ' ',
+},
+{
+    field: "Date", title: "@M("PaymentReportItemModel", "Date")", format: "{0: dd/MM/yyyy HH:mm}", sortable: false, filterable: false, editor: '<input data-val="true" data-val-date="The field Models.PaymentReportItemModel.Date must be a date." data-val-required="The Models.PaymentReportItemModel.Date field is required." id="Date" name="Date" type="datetime" value="1/1/0001 12:00 AM" /><script> \
+	jQuery(function(){jQuery("#Date").kendoDateTimePicker({"format":"M/d/yyyy h:mm tt","min":new Date(1900,0,1,0,0,0,0),"max":new Date(2099,11,31,0,0,0,0),"interval":30});}); \
+</sc'+ 'ript><span class="field-validation-valid" data-valmsg-for="Date" data-valmsg-replace="true"></span>',
+},
+
+{ field: "Total", template: "#: TotalStr #", title: "@M("PaymentReportItemModel", "Total")", sortable: false, filterable: false, editor: '<input class="k-textbox" id="TotalStr" name="TotalStr" type="text" value="" /><span class="field-validation-valid" data-valmsg-for="TotalStr" data-valmsg-replace="true"></span>', },
+{
+    field: "PaymentMethod", title: "@M("PaymentReportItemModel", "PaymentMethod")", sortable: false, filterable: false, editor: ' \
+ \
+<input data-val="true" data-val-required="The Models.PaymentReportItemModel.PaymentMethod field is required." id="PaymentMethod" name="PaymentMethod" type="text" value="0" /><script> \
+	jQuery(function(){jQuery("#PaymentMethod").kendoDropDownList({"dataSource":[{"Text":"","Value":"0"},{"Text":"Credit","Value":"1"},{"Text":"Cash","Value":"2"},{"Text":"ByPhone","Value":"3"}],"dataTextField":"Text","dataValueField":"Value"});}); \
+</sc'+ 'ript><span class="field-validation-valid" data-valmsg-for="PaymentMethod" data-valmsg-replace="true"></span>', template: "#: PaymentMethodStr #",
+},
+{
+    field: "IsPaidUp", width: "50px", title: "@M("PaymentReportItemModel","IsPaidUp")", sortable: false, filterable: false, editor: ' ',
+        template: "# if(IsPaidUp) { # yes #"
+    + "} else { # no # } #",
+        },
+{
+    field: "PayedTo", title: "@M("PaymentReportItemModel", "PayedTo")", sortable: false, filterable: false, editor: ' \
+ \
+<input data-val="true" data-val-required="The Models.PaymentReportItemModel.PayedTo field is required." id="PayedTo" name="PayedTo" type="text" value="0" /><script> \
+	jQuery(function(){jQuery("#PayedTo").kendoDropDownList({"dataSource":[{"Text":"ToAdmin","Value":"0"},{"Text":"ToShop","Value":"1"}],"dataTextField":"Text","dataValueField":"Value"});}); \
+</sc'+ 'ript><span class="field-validation-valid" data-valmsg-for="PayedTo" data-valmsg-replace="true"></span>', template: "#: PayedToStr #",
+},
+
+            ],
+            //   height: 600,
+            "scrollable": false,
+            filterable: true,
+            sortable: true,
+            "editable": {
+                "confirmation": "Are you sure you want to delete this record?",
+                "confirmDelete": "Delete",
+                "cancelDelete": "Cancel",
+                "mode": "inline",
+                "create": true,
+                "update": true,
+                "destroy": true
+            },
+
+
+
+        });
+        var PaymentReportItemModelgrid = $("#PaymentReportItemModelgrid").data('kendoGrid');
+        PaymentReportItemModelgrid.dataSource.transport.parameterMap = function (data, type) {
+
+            // console.log(type);
+            if (type != "read") {
+                for (var i in data) {
+                    //console.log(Object.prototype.toString.call( data[i] ));
+                    if (Object.prototype.toString.call(data[i]) === '[object Object]') {
+                        delete data[i];
+                    }
+                    if (Object.prototype.toString.call(data[i]) === '[object Array]') {
+                        delete data[i];
+                    }
+                    if (Object.prototype.toString.call(data[i]) === '[object Date]') {
+                        data[i] = kendo.toString(kendo.parseDate(data[i]), "G");// Date.parse(data[i]);
+                    }
+                    //if(i == 'UserID' && !data[i]){
+                    //    data[i]=
+                    // }
+                    //@ViewBag.AdditionalFilterField", operator: "eq", value: ''
+                }
+            }
+
+            //kendo.data.transports["aspnetmvc-ajax"](data);
+            data = new kendo.data.transports["aspnetmvc-ajax"]({ prefix: "" }).parameterMap(data, type);
+            //  console.log(data);
+            return data;
+        }
+
+        function error_handler(e) {
+
+            if (e.errors) {
+                e.preventDefault();   // cancel grid rebind if error occurs
+                var message = "Errors:\n";
+                $.each(e.errors, function (key, value) {
+                    if ('errors' in value) {
+                        $.each(value.errors, function () {
+                            message += this + "\n";
+                        });
+                    }
+                });
+                alert(message);
+            }
+        }
+        function detailInit(e) {
+            var detailRow = e.detailRow;
+            console.log(e);
+
+
+        }
+
+    });
+
+</script>
+
+
+
+<div class="reportwrap"><label for="TotalCard">@RP.T("Member.Views.Main.PaymentReport.TotalShop"):</label> <b id="totalshop">@Model.TotalShopStr </b>
+
+<label for="TotalCard">@RP.T("Member.Views.Main.PaymentReport.TotalAdmin"):</label> <b id="totaladmin">@Model.TotalAdminStr</b>
+
+<label for="TotalCard">@RP.T("Member.Views.Main.PaymentReport.TotalFee"):</label> <b id="totalfee">@Model.TotalFeeStr</b></div>
