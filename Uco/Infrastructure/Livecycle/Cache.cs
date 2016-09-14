@@ -692,8 +692,8 @@ namespace Uco.Infrastructure.Livecycle
 
             //order and paging
             list = list.Distinct()
-               // .OrderBy(x => x.CategoryID)
-               .OrderBy(x => x.OrderPosition)
+               .OrderBy(x => x.CategoryID)
+               .ThenBy(x => x.OrderPosition)
                 .ThenByDescending(x => x.HasImage)
                 .ThenByDescending(x=>x.SellCount);
 
@@ -704,6 +704,7 @@ namespace Uco.Infrastructure.Livecycle
             }
 
             var products = list.ToList();
+
             if (!string.IsNullOrEmpty(keywords) && page == 1)
             {
                 if (products.Count == 0)

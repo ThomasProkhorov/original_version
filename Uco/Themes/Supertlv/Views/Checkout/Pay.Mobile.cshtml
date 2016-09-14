@@ -41,7 +41,7 @@
                             {
 
                                 <div>@RP.Text("Checkout.Pay.Cash")</div>
-                                if (!LS.CurrentUser.ApprovedBySms)
+                                @*if (!LS.CurrentUser.ApprovedBySms)
                                 {
                                     <script>
                                         Shop.OrderID = @Model.ID;
@@ -53,7 +53,7 @@
                                             $('#phone').val('@Model.Phone');
                                         });
                                     </script>
-                                }
+                                }*@
                             }
                         </div>
                     </div>

@@ -10,76 +10,79 @@
 
 }
 
-<div class="midd_section2">
-    <div class="center_div">
-        <div class="profile_page_right_sec">
-            <h1 class="main_heading_h1_profile">@RP.T("Views.Shared.Contact.H1")</h1>
-            
-            <div class="cantact_right_in">
-                <div class="contact_row1">
-                    <ul>
-                        <li class="first">@String.Format(RP.T("Views.Shared.Contact.Phone").ToString(), Model.Shop.Address)</li>
-                        <li class="second">@String.Format(RP.T("Views.Shared.Contact.Phone").ToString(), Model.Shop.Phone)</li>
-                        <li class="third">@String.Format(RP.T("Views.Shared.Contact.Email").ToString(), Model.Shop.Email)</li>
-                    </ul>
-                    <div class="clear"></div>
-                </div>
-                <div class="contact_text1">@RP.T("Views.Shared.Contact.DearCustomerText")</div>
-                <div class="contact_text2">
-                    @RP.T("Views.Shared.Contact.ContactText1")<br>
-                    @RP.T("Views.Shared.Contact.ContactText2")<br>
-                    @RP.T("Views.Shared.Contact.ContactText3")
-                </div>
-                <div class="contact_text3">@RP.T("Views.Shared.Contact.ContactText4")</div>
-                <div class="contact_text3">@RP.T("Views.Shared.Contact.ContactText5")</div>
-                <div class="contact_form">
-                    <form id="formContact" name="form1" method="post" action="@Url.Action("_AddContactData", "Shop")" class="form2">
-                        <input type="hidden" name="shopID" id="shopID" value="@Model.Shop.ID" />
-                        <div class="row1">
-                            <div class="editor-field float_right">
-                                <input type="text" name="ContactName" id="ContactName" required data-required-msg="@RP.T("Views.Shared.Contact.FullNameRequiredText")" placeholder="@RP.T("Views.Shared.Contact.FullNamePlaceholder")" value="@Model.ContactName" class="single-line">
-                                @Html.ValidationMessageFor(m => m.ContactName)
+<div class="midd_section">
+    <table class="center_div">
+        <tr>
+            <td class="profile_page_right_sec" style="vertical-align: top">
+                <h1 class="main_heading_h1_profile">@RP.T("Views.Shared.Contact.H1")</h1>
+
+                <div class="cantact_right_in">
+                    <div class="contact_row1">
+                        <ul>
+                            <li class="first">@String.Format(RP.T("Views.Shared.Contact.Phone").ToString(), Model.Shop.Address)</li>
+                            <li class="second">@String.Format(RP.T("Views.Shared.Contact.Phone").ToString(), Model.Shop.Phone)</li>
+                            <li class="third">@String.Format(RP.T("Views.Shared.Contact.Email").ToString(), Model.Shop.Email)</li>
+                        </ul>
+                        <div class="clear"></div>
+                    </div>
+                    <div class="contact_text1">@RP.T("Views.Shared.Contact.DearCustomerText")</div>
+                    <div class="contact_text2">
+                        @RP.T("Views.Shared.Contact.ContactText1")<br>
+                        @RP.T("Views.Shared.Contact.ContactText2")<br>
+                        @RP.T("Views.Shared.Contact.ContactText3")
+                    </div>
+                    <div class="contact_text3">@RP.T("Views.Shared.Contact.ContactText4")</div>
+                    <div class="contact_text3">@RP.T("Views.Shared.Contact.ContactText5")</div>
+                    <div class="contact_form">
+                        <form id="formContact" name="form1" method="post" action="@Url.Action("_AddContactData", "Shop")" class="form2">
+                            <input type="hidden" name="shopID" id="shopID" value="@Model.Shop.ID" />
+                            <div class="row1">
+                                <div class="editor-field float_right">
+                                    <input type="text" name="ContactName" id="ContactName" required data-required-msg="@RP.T("Views.Shared.Contact.FullNameRequiredText")" placeholder="@RP.T("Views.Shared.Contact.FullNamePlaceholder")" value="@Model.ContactName" class="single-line">
+                                    @Html.ValidationMessageFor(m => m.ContactName)
+                                </div>
+                                <div class="editor-field float_left">
+                                    <input type="text" name="ContactPhone" id="ContactPhone" title="בדוק טלפון" pattern="^[0-9 ()*-]{9,15}$" required data-required-msg="@RP.T("Views.Shared.Contact.PhoneRequiredText")" placeholder="@RP.T("Views.Shared.Contact.PhonePlaceholder")" value="@Model.ContactPhone" class="single-line">
+                                    @Html.ValidationMessageFor(m => m.ContactPhone)
+                                </div>
+                                <div class="clear"></div>
                             </div>
-                            <div class="editor-field float_left">
-                                <input type="text" name="ContactPhone" id="ContactPhone" title="בדוק טלפון" pattern="^[0-9 ()*-]{9,15}$" required data-required-msg="@RP.T("Views.Shared.Contact.PhoneRequiredText")" placeholder="@RP.T("Views.Shared.Contact.PhonePlaceholder")" value="@Model.ContactPhone" class="single-line">
-                                @Html.ValidationMessageFor(m => m.ContactPhone)
-                            </div>
-                            <div class="clear"></div>
-                        </div>
-                        <div class="row1">
-                            <div class="editor-field float_right">
-                                <input type="email" name="ContactEmail" id="ContactEmail" required data-email-msg="Email format is not valid" data-required-msg="@RP.T("Views.Shared.Contact.EmailRequiredText")" placeholder="@RP.T("Views.Shared.Contact.EmailPlaceholder")" value="@Model.ContactEmail" class="single-line">
-                                @Html.ValidationMessageFor(m => m.ContactEmail)
-                            </div>
-                            <div class="editor-field float_left">
-                                <select name="DropDownItems" id="DropDownItems" class="single-line">
-                                    <option>@RP.T("Views.Shared.Contact.DropDownChooseText")</option>
-                                    @if(Model.DropDownItems != null && Model.DropDownItems.Count > 0)
-                                    {
-                                        foreach (var item in Model.DropDownItems)
-                                        {                                      
-                                                <option>@item</option>                                        
+                            <div class="row1">
+                                <div class="editor-field float_right">
+                                    <input type="email" name="ContactEmail" id="ContactEmail" required data-email-msg="Email format is not valid" data-required-msg="@RP.T("Views.Shared.Contact.EmailRequiredText")" placeholder="@RP.T("Views.Shared.Contact.EmailPlaceholder")" value="@Model.ContactEmail" class="single-line">
+                                    @Html.ValidationMessageFor(m => m.ContactEmail)
+                                </div>
+                                <div class="editor-field float_left">
+                                    <select name="DropDownItems" id="DropDownItems" class="single-line">
+                                        <option>@RP.T("Views.Shared.Contact.DropDownChooseText")</option>
+                                        @if (Model.DropDownItems != null && Model.DropDownItems.Count > 0)
+                                        {
+                                            foreach (var item in Model.DropDownItems)
+                                            {
+                                                <option>@item</option>
+                                            }
                                         }
-                                    }
-                                    
-                                </select>
+
+                                    </select>
+                                </div>
+                                <div class="clear"></div>
                             </div>
-                            <div class="clear"></div>
-                        </div>
-                        <div class="row2">
-                            <textarea name="ContactData" id="ContactData" required data-required-msg="@RP.T("Views.Shared.Contact.TextRequiredText")" cols="45" rows="5" placeholder="@RP.T("Views.Shared.Contact.TextAreaPlaceholder")" class="multi-line">@Model.ContactData</textarea>
-                            @Html.ValidationMessageFor(m => m.ContactData)
-                        </div>
-                        <div class="submit">
-                            <input id="contactFormSubmitBtn" type="image" src="/Content/DesignFiles/contact_submit.png" width="106" height="35" alt="@RP.T("Views.Shared.Contact.SubmitAltText")">
-                        </div>
-                    </form>
+                            <div class="row2">
+                                <textarea name="ContactData" id="ContactData" required data-required-msg="@RP.T("Views.Shared.Contact.TextRequiredText")" cols="45" rows="5" placeholder="@RP.T("Views.Shared.Contact.TextAreaPlaceholder")" class="multi-line">@Model.ContactData</textarea>
+                                @Html.ValidationMessageFor(m => m.ContactData)
+                            </div>
+                            <div class="submit">
+                                <input id="contactFormSubmitBtn" type="image" src="/Content/DesignFiles/contact_submit.png" width="106" height="35" alt="@RP.T("Views.Shared.Contact.SubmitAltText")">
+                            </div>
+                        </form>
+                    </div>
                 </div>
-            </div>
-        </div>
-        <div class="prfl_left_sec">
-            @Html.Action("_QuestionAnswer", "PagePart")
-        </div>
+            </td>
+
+            <td class="prfl_left_sec">
+                @Html.Action("_QuestionAnswer", "PagePart")
+            </td>
+        </tr>
         <div class="clear"></div>
-    </div>
+    </table>
 </div>

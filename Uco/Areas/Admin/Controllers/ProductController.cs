@@ -25,6 +25,7 @@ using OfficeOpenXml;
 using NPOI.HSSF.UserModel;
 using Uco.Infrastructure.Tasks;
 using System.Security.Cryptography;
+using System.Linq.Expressions;
 
 
 namespace Uco.Areas.Admin.Controllers
@@ -1660,20 +1661,33 @@ namespace Uco.Areas.Admin.Controllers
                         source = source.Where(x => x.CategoryID == 0);
                     }
                 }
+                //if (withPictures.HasValue)
+                //{
+                //    if (withPictures.Value)
+                //    {
+                //        source = source.Where(x => x.Image != null);
+                //    }
+                //    else
+                //    {
+                //        source = source.Where(x => x.Image == null);
+                //    }
+                //}
+
+                var list = source.AsEnumerable();
+
                 if (withPictures.HasValue)
                 {
                     if (withPictures.Value)
                     {
-                        source = source.Where(x => x.HasImage);
+                        list = list.Where(x => System.IO.File.Exists(HttpContext.Server.MapPath("~" + x.Image)));
                     }
                     else
                     {
-                        source = source.Where(x => x.HasImage == false);
+                        list = list.Where(x => System.IO.File.Exists(HttpContext.Server.MapPath("~" + x.Image)) == false);                        
                     }
                 }
 
-
-                var list = source.ToList();
+                list = list.ToList();
 
                 var cats = LS.Get<Category>();
                 var manufacturers = LS.Get<Manufacturer>();
@@ -1708,9 +1722,10 @@ namespace Uco.Areas.Admin.Controllers
 
 
                         x.ShortDescription,
-                        x.FullDescription,
+                        x.FullDescription,                       
                         x.ProductShopOptions,
-                        Flag = 1
+                        Flag = 1,
+                        x.Image
                     }
                     ).ToList();
 
@@ -1726,7 +1741,6 @@ namespace Uco.Areas.Admin.Controllers
             }
 
         }
-
 
         //public ActionResult CSVExport()
         //{

@@ -42,7 +42,7 @@
                     {
 
 
-                        if (!LS.CurrentUser.ApprovedBySms)
+                        @*if (!LS.CurrentUser.ApprovedBySms)
                         {
                             <script>
                                 Shop.OrderID = @Model.ID;
@@ -58,10 +58,10 @@
                           <div>@RP.Text("Checkout.Pay.Cash")</div> 
                         }
                         else
-                        {
+                        {*@
                             <div>@RP.Text("Checkout.Pay.CashSecondTime")</div>
                              
-                        }
+                        //}
                     }
                 </div>
             </div>
