@@ -226,6 +226,29 @@ namespace Uco.Areas.Member.Controllers
                 discount.Active = item.Active;
                 var oldProductShopIds = discount.ProductShopIDs;
                 discount.ProductShopIDs = item.ProductShopIDs;
+
+                if (oldProductShopIds != null)
+                {
+                    foreach (var prid in oldProductShopIds.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries))
+                    {
+                        int id = Convert.ToInt32(prid);
+                        var prod = _db.ProductShopMap.FirstOrDefault(x => x.ID == id);
+                        if (prod != null)
+                            prod.HaveDiscount = false;
+                    }
+                }
+
+                if (discount.ProductShopIDs != null)
+                {
+                    foreach (var prid in discount.ProductShopIDs.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries))
+                    {
+                        int id = Convert.ToInt32(prid);                        
+                        var prod = _db.ProductShopMap.FirstOrDefault(x => x.ID == id);
+                        if (prod != null)
+                            prod.HaveDiscount = discount.Active;
+                    }
+                }
+
                 _db.SaveChanges();
                 LS.Clear<Discount>();
                 discount.ProductShopIDs = discount.ProductShopIDs ?? "";

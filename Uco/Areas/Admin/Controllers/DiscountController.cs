@@ -205,6 +205,23 @@ namespace Uco.Areas.Admin.Controllers
         [HttpPost]
         public ActionResult Edit(Discount item)
         {
+            foreach (var dis in _db.Discounts.ToList())
+            {
+                if (dis.Active && dis.ProductShopIDs != null)
+                {
+                    foreach (var prid in dis.ProductShopIDs.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries))
+                    {
+                        int id = Convert.ToInt32(prid);
+                        //_db.ProductShopMap.Where(x => x.ID == id).ToList().ForEach(x => x.HaveDiscount = true);                        
+                        var prod = _db.ProductShopMap.FirstOrDefault(x => x.ID == id);
+                        if (prod != null) 
+                            prod.HaveDiscount = true;
+                    }
+                }
+            }
+            _db.SaveChanges();
+
+
             var discount = _db.Discounts.FirstOrDefault(x => x.ID == item.ID);
             if (discount != null)
             {
@@ -224,7 +241,31 @@ namespace Uco.Areas.Admin.Controllers
                 discount.ShopID = item.ShopID;
                 discount.StartDate = item.StartDate;
                 discount.Active = item.Active;
+                var oldProductShopIds = discount.ProductShopIDs;
                 discount.ProductShopIDs = item.ProductShopIDs;
+
+                if (oldProductShopIds != null)
+                {
+                    foreach (var prid in oldProductShopIds.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries))
+                    {
+                        int id = Convert.ToInt32(prid);
+                        var prod = _db.ProductShopMap.FirstOrDefault(x => x.ID == id);
+                        if (prod != null)
+                            prod.HaveDiscount = false;
+                    }
+                }
+
+                if (discount.ProductShopIDs != null)
+                {
+                    foreach (var prid in discount.ProductShopIDs.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries))
+                    {
+                        int id = Convert.ToInt32(prid);
+                        var prod = _db.ProductShopMap.FirstOrDefault(x => x.ID == id);
+                        if (prod != null)
+                            prod.HaveDiscount = discount.Active;
+                    }
+                }
+
                 _db.SaveChanges();
                 LS.Clear<Discount>();
             }

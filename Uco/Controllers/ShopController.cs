@@ -440,7 +440,8 @@ namespace Uco.Controllers
                 }
                 if (deals)
                 {
-                    list.AddRange(LS.SearchProducts(shopID, out specifications, limit: int.MaxValue, discountedProducts: true, showDiscounts: true));
+                    //list.AddRange(LS.SearchProducts(shopID, out specifications, limit: int.MaxValue, discountedProducts: true, showDiscounts: true));
+                    list.AddRange(LS.SearchProducts(shopID, out specifications, request.Page, request.PageSize, discountedProducts: true, showDiscounts: true));
                 }
             }
             else
