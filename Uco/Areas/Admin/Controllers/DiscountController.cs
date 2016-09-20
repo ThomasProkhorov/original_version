@@ -205,23 +205,6 @@ namespace Uco.Areas.Admin.Controllers
         [HttpPost]
         public ActionResult Edit(Discount item)
         {
-            foreach (var dis in _db.Discounts.ToList())
-            {
-                if (dis.Active && dis.ProductShopIDs != null)
-                {
-                    foreach (var prid in dis.ProductShopIDs.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries))
-                    {
-                        int id = Convert.ToInt32(prid);
-                        //_db.ProductShopMap.Where(x => x.ID == id).ToList().ForEach(x => x.HaveDiscount = true);                        
-                        var prod = _db.ProductShopMap.FirstOrDefault(x => x.ID == id);
-                        if (prod != null) 
-                            prod.HaveDiscount = true;
-                    }
-                }
-            }
-            _db.SaveChanges();
-
-
             var discount = _db.Discounts.FirstOrDefault(x => x.ID == item.ID);
             if (discount != null)
             {
