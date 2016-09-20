@@ -473,8 +473,8 @@ namespace Uco.Controllers
 
                     //send mail and sms
                     if (model.PaymentMethod != PaymentMethod.Credit
-                        && model.PaymentMethod != PaymentMethod.CreditShopOwner
-                        && (model.PaymentMethod != PaymentMethod.Cash))// || u.ApprovedBySms))
+                        && model.PaymentMethod != PaymentMethod.CreditShopOwner)
+                        //&& (model.PaymentMethod != PaymentMethod.Cash))// || u.ApprovedBySms))
                     {
                         var messService = new MessageService(_db);
                         messService.SendNewOrderSMSToMember(order, shop);
