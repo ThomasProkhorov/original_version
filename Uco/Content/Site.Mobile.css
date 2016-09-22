@@ -5348,8 +5348,8 @@ span.km-switch.km-widget {
 
 .logo img {
 
-    width: 100%;
-
+    width: auto;
+    max-height: 100%;
     padding-right: 5px;
 }
 
