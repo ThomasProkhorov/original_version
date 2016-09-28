@@ -246,6 +246,7 @@ namespace Uco.Areas.Member.Controllers
                         var prod = _db.ProductShopMap.FirstOrDefault(x => x.ID == id);
                         if (prod != null)
                             prod.HaveDiscount = discount.Active;
+                        prod.OrderPosition = item.OrderPosition;
                     }
                 }
 

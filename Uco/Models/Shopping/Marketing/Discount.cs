@@ -98,6 +98,9 @@ namespace Uco.Models
 
         public int DisplayOrder { get; set; }
 
+        [NotMapped]
+        public int OrderPosition { get; set; }
+
         [Model(Show = false)]
         public bool PreventNext { get; set; }
 

@@ -688,14 +688,23 @@ namespace Uco.Infrastructure.Livecycle
                 }
             }
 
-
-
-            //order and paging
-            list = list.Distinct()
-               .OrderBy(x => x.CategoryID)
-               .ThenBy(x => x.OrderPosition)
-                .ThenByDescending(x => x.HasImage)
-                .ThenByDescending(x=>x.SellCount);
+            if (discountedProducts)
+            {
+                list = list.Distinct()
+                   .OrderBy(x => x.OrderPosition)
+                   .ThenBy(x => x.CategoryID)                   
+                    .ThenByDescending(x => x.HasImage)
+                    .ThenByDescending(x => x.SellCount);
+            }
+            else
+            {
+                //order and paging
+                list = list.Distinct()
+                   .OrderBy(x => x.CategoryID)
+                   .ThenBy(x => x.OrderPosition)
+                    .ThenByDescending(x => x.HasImage)
+                    .ThenByDescending(x => x.SellCount);
+            }
 
             if (limit > 0)
             {

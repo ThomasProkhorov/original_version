@@ -18,7 +18,7 @@ using System.Xml;
 
 namespace Uco.Controllers
 {
-    [Localization]
+    [Localization]   
     public partial class CheckoutController : BaseController
     {
         private ShoppingCartService _shoppingCartService;
