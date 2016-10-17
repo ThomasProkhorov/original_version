@@ -481,6 +481,8 @@ namespace Uco.Controllers
                         messService.SendNewOrderEmailToMember(order, shop);
                         messService.SendNewOrderEmailToUser(order, shop);
                         messService.SendNewOrderSMSToUser(order, shop, u);
+
+                        //messService.SendNurtestToMember(order, shop);
                     }
                     //clear shopping cart
 

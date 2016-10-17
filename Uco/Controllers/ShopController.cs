@@ -637,7 +637,7 @@ namespace Uco.Controllers
             }
             if (deals)
             {
-                data.AddRange(LS.SearchProducts(shopID, out specifications, limit: 20, discountedProducts: true, showDiscounts: true));
+                data.AddRange(LS.SearchProducts(shopID, out specifications, limit: 100, discountedProducts: true, showDiscounts: true));
             }
             return PartialView("_ProductsGallery", data);
         }

@@ -233,6 +233,31 @@ result Subject:
             return 0;
         }
 
+        [MailTemplate("Nurtest")]
+        public int SendNurtestToMember(Order order, Shop shop)
+        {
+            MethodBase method = MethodBase.GetCurrentMethod();
+            MailTemplateAttribute attr = (MailTemplateAttribute)method.GetCustomAttributes(typeof(MailTemplateAttribute), true)[0];
+            string templateSystemName = attr.TemplateSystemName;
+
+            var virtualUser = new User()
+            {
+                Email = order.Email,
+                FirstName = order.FullName != null ? order.FullName : "",
+                ID = order.UserID,
+                Phone = order.Phone,
+                UserName = order.Email
+            };
+            var products = new OrderProductTable(order.ID);
+            var res = Tokenize(templateSystemName, order.Email, new List<object>() {
+            order,
+            virtualUser,
+            shop,
+            products
+            });
+            return res;
+        }
+
         [MailTemplate("User.Register.EmailToUser")]
         public int SendUserRegisterEmailToUser(User user)
         {
@@ -351,10 +376,13 @@ result Subject:
                 Phone = order.Phone,
                 UserName = order.Email
             };
+            var ordernote = _Context.EntityContext.OrderNotes.FirstOrDefault(o => o.OrderID == order.ID);
+
             var res = Tokenize(templateSystemName, shop.Email, new List<object>() {
             order,
             virtualUser,
-            shop
+            shop,
+            ordernote
             });
             return res;
         }
@@ -453,7 +481,8 @@ result Subject:
                   Phone = order.Phone,
                   UserName = order.Email
               };
-            var products = new OrderProductTable(order.ID);
+            var products = new OrderProductTable(order.ID);            
+
             var res = Tokenize(templateSystemName, shop.Email, new List<object>() {
             order,
             virtualUser,
