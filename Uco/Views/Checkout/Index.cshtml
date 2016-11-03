@@ -159,64 +159,57 @@ $('#siponrow').hide();
                         <div class="paymnet_text1">@RP.T("Views.Checkout.Index.PaymentType")</div>
                         <div class="payment_icons_row1">
                             <ul>
-                                @{
-                                    bool currentSetted = false;
-                                }
                                 @if (Model.Cart.Shop == null || Model.Cart.Shop.PaymentMethodIDs == null 
                                     || Model.Cart.Shop.PaymentMethodIDs.Contains("," + ((int)PaymentMethod.Credit) + ","))
                                 {
                                     
                                 <li onclick="document.getElementById('PaymentMethod').value = '@((int)PaymentMethod.Credit)'; $('.picon').removeClass('current'); $('.picon',$(this)).addClass('current');">
-                                    <div class="payment_icons1 picon checkico current">
+                                    <div class="payment_icons1 picon checkico @(Model.PaymentMethod == PaymentMethod.Credit ? "current" : "")">
                                         <div class="prdct_check  ">
                                             <img src="/Content/DesignFiles/check.png">
                                         </div>
                                     </div>
                                     <div class="paymnet_ico_text">@RP.T("Views.Checkout.Index.PaymentMethodCredit")</div>
-                                </li>
-                                    currentSetted = true;
+                                </li>                                    
                                 }
                                  @if (Model.Cart.Shop == null || Model.Cart.Shop.PaymentMethodIDs == null
                                     || Model.Cart.Shop.PaymentMethodIDs.Contains("," + ((int)PaymentMethod.ClubCard) + ","))
                                 {
                                      
                                 <li onclick="document.getElementById('PaymentMethod').value = '@((int)PaymentMethod.ClubCard)'; $('.picon').removeClass('current'); $('.picon',$(this)).addClass('current');">
-                                    <div class="payment_icons2 picon checkico @(!currentSetted ? "current" : "")">
+                                    <div class="payment_icons2 picon checkico @(Model.PaymentMethod == PaymentMethod.ClubCard ? "current" : "")">
                                         <div class="prdct_check  ">
                                             <img src="/Content/DesignFiles/check.png">
                                         </div>
                                     </div>
                                     <div class="paymnet_ico_text">@RP.T("Views.Checkout.Index.PaymentMethodClubCard")</div>
-                                </li>
-                                    currentSetted = true;
+                                </li>                                    
                                 }
                                 @if (Model.Cart.Shop == null || Model.Cart.Shop.PaymentMethodIDs == null
                                     || Model.Cart.Shop.PaymentMethodIDs.Contains("," + ((int)PaymentMethod.Cash) + ","))
                                 {
                                     
                                 <li onclick="document.getElementById('PaymentMethod').value = '@((int)PaymentMethod.Cash)'; $('.picon').removeClass('current'); $('.picon',$(this)).addClass('current');">
-                                    <div class="payment_icons2 picon checkico @(!currentSetted ? "current" : "")">
+                                    <div class="payment_icons2 picon checkico @(Model.PaymentMethod == PaymentMethod.Cash ? "current" : "")">
                                         <div class="prdct_check  ">
                                             <img src="/Content/DesignFiles/check.png">
                                         </div>
                                     </div>
                                     <div class="paymnet_ico_text">@RP.T("Views.Checkout.Index.PaymentMethodCash")</div>
-                                </li>
-                                    currentSetted = true;
+                                </li>                                    
                                 }
                                  @if (Model.Cart.Shop == null || Model.Cart.Shop.PaymentMethodIDs == null
                                     || Model.Cart.Shop.PaymentMethodIDs.Contains("," + ((int)PaymentMethod.ByPhone) + ","))
                                 {
                                      
                                 <li onclick="document.getElementById('PaymentMethod').value = '@((int)PaymentMethod.ByPhone)'; $('.picon').removeClass('current'); $('.picon',$(this)).addClass('current');">
-                                    <div class="payment_icons3 picon checkico @(!currentSetted ? "current" : "")">
+                                    <div class="payment_icons3 picon checkico @(Model.PaymentMethod == PaymentMethod.ByPhone ? "current" : "")">
                                         <div class="prdct_check  ">
                                             <img src="/Content/DesignFiles/check.png">
                                         </div>
                                     </div>
                                     <div class="paymnet_ico_text">@RP.T("Views.Checkout.Index.PaymentMethodByPhone")</div>
-                                </li>
-                                    currentSetted = true;
+                                </li>                                    
                                 }
                                 
                                 <div class="clear"></div>
